@@ -1,0 +1,33 @@
+The following list represents the commands that you can use :
+
+click 1:
+printDriversData
+	prints all the drivers date that saved in the list
+
+click 2:
+printTrucksData
+	prints all the trucks date that saved in the list
+
+click 3:
+printAdresses
+	prints all the trucks date that saved in the list
+
+click 4:
+addDriver <driver_name>,<id>,<license>
+    adds a driver with the name and the license that are given as parameters
+
+click 5:
+addAdress <location>,<contactname>,<phoneNumber>
+	adds an address with the location and the contactname and the phoneNumber that are given as parameters
+
+click 6:
+addTruck <serialNumber>,<model>,<weight>,<max_Allowed_Weight>
+	adds a truck with the serialNumber and the model and the weight and the max_Allowed_Weight that are given as parameters
+
+click 7:
+addProduct <name>,<CN>,<weight>,<amount>,<address_detailes>
+	adds a product with the serialNumber and the model and the weight and the max_Allowed_Weight that are given as parameters
+
+click 8:
+Exit
+	Exit from the program 
