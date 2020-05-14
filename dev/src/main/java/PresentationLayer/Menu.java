@@ -1,6 +1,7 @@
 package PresentationLayer;
 
 import InterfaceLayer.InterfaceContract;
+import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
 import InterfaceLayer.SystemManager;
 import java.util.*;
@@ -24,7 +25,7 @@ public class Menu {
                          "3. Add a new supplier\n" +
                          "4. Add an agreement to supplier\n" +
                          "5. Adding \"Quantity Write\" to supplier\n" +
-                         "6. Make an order\n" +
+                         "6. Make an Fix order\n" +
                          "7. Display the items in the super\n" +
                          "8. Display sll the supplier's details\n"+
                          "9. Update Order Status\n"+
@@ -662,6 +663,7 @@ public class Menu {
             Map<Integer, Integer> ItemsIDVendor_NumberOfItems = new ConcurrentHashMap<Integer, Integer>();
             Scanner myScanner = new Scanner(System.in);
             int day;
+            LinkedList<Integer> Days=new LinkedList<Integer>();
             System.out.println("Please enter the Supplier's ID you want to order from");
             ID_Suplaier = myScanner.nextInt();
             String exist = Sys.CheckSuplierExist(ID_Suplaier);
@@ -670,9 +672,20 @@ public class Menu {
                 System.out.println("the supplier is not exist in the system.");
             }
             if (conect) {
-                System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
-                day = myScanner.nextInt();
-                conect = Sys.CheckTheDay(ID_Suplaier, day);
+                boolean moreDay=true;
+                while(moreDay) {
+                    System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
+                    day = myScanner.nextInt();
+                    conect = Sys.CheckTheDay(ID_Suplaier, day);
+                   if(conect) {
+                    Days.add(day);
+                    System.out.println("Would you like to add another day? y/n");
+                    String ans = myScanner.next();
+                    if (ans.equals("n")) {
+                        moreDay = false;
+                    }
+                }
+                }
                 if (conect) {
                     boolean MoreProduct = true;
                     System.out.println("Which product would you like to add to the Order?");
@@ -696,17 +709,23 @@ public class Menu {
                                 MoreProduct = false;
                             }
                     }
-                    String Done = Sys.MakeOrder(ID_Suplaier, day,ItemsIDVendor_NumberOfItems);
+                    int Done = Sys.MakeOrder(ID_Suplaier, Days,ItemsIDVendor_NumberOfItems);
                     System.out.println(Done);
+                    if (Done>-1){
+                      InterfaceOrder o = Sys.getOrderDetails(Done);
+                      PrintOrder(o);
+                    }
                 }
                 else
-                    System.out.println("the supplier arrived to the store in another days.");
+                    System.out.println("the supplier does not supply in that days.");
             }
         }
 
      }
 
-     private static void UpdateDetailsOrder(){
+
+
+    private static void UpdateDetailsOrder(){
          boolean conect = Sys.CheckConected();
         if (!conect) {
         System.out.println("You need to connect before you take any action");
@@ -784,6 +803,7 @@ public class Menu {
     }
 
 }
+
     private static void DisplayItems() {
         boolean conect = Sys.CheckConected();
         if (!conect) {
@@ -888,6 +908,24 @@ public class Menu {
 
     public static void printWarning(String warning) {
         System.out.println(warning);
+    }
+
+    private static void PrintOrder(InterfaceOrder o) {
+         System.out.println("The Order ID is: "+o.ID_Inventation);
+         System.out.println("The Supplier ID is: "+o.ID_Vendor);
+         System.out.println("The Days that the order is coming is:"  );
+         for (int d: o.Days
+             ) {
+           System.out.println(d);
+        }
+         System.out.println("The product that include in the Order is: ");
+         System.out.println("Product  | Amount");
+         for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
+             ) {
+         System.out.print(I.getValue());
+         System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
+         }
+         System.out.println("The Total Price of the order is: "+o.TotalPrice);
     }
 
 }

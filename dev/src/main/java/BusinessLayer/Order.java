@@ -1,6 +1,7 @@
 package BusinessLayer;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class Order {
@@ -8,7 +9,7 @@ public class Order {
     private int ID_Invitation;
     private int ID_Vendor;
     private boolean auto;
-    private int Day;
+    private LinkedList<Integer> Day;
     private LocalDate OrderDate;
     private LocalDate ArrivalTime;
     private Map<Integer, Integer> ItemsID_ItemsIDVendor;
@@ -16,7 +17,7 @@ public class Order {
     private double TotalPrice;
     private String Status;
 
-    public Order(int ID_Vendor, int Id, boolean auto, int day, Map<Integer, Integer> itemsID_ItemsIDVendor, Map<Integer, Integer> itemsID_NumberOfItems, Double totalPrice){//List<DALContact> vendorContacts, List<DALContact> leadersContacts) {
+    public Order(int ID_Vendor, int Id, boolean auto, LinkedList<Integer> day, Map<Integer, Integer> itemsID_ItemsIDVendor, Map<Integer, Integer> itemsID_NumberOfItems, Double totalPrice){//List<DALContact> vendorContacts, List<DALContact> leadersContacts) {
 
         this.ID_Vendor = ID_Vendor;
         this.ID_Invitation=Id;
@@ -30,6 +31,14 @@ public class Order {
         Status = "Waiting";
         //VendorContacts = vendorContacts;
         // LeadersContacts = leadersContacts;
+    }
+
+    public boolean isAuto() {
+        return auto;
+    }
+
+    public LinkedList<Integer> getDay() {
+        return Day;
     }
 
     public int getID_Invitation() {
@@ -94,7 +103,7 @@ public class Order {
         TotalPrice = totalPrice;
     }
 
-    public void ChangeOrder(int id_order, int id_suplaier, int day, Map<Integer, Integer> productID_IDSupplier, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    public void ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> productID_IDSupplier, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
     this.Day=day;
     this.ID_Vendor=id_suplaier;
         productID_IDSupplier.forEach((Id,Id_sup)->{

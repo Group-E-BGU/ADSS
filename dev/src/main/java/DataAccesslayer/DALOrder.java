@@ -3,6 +3,7 @@ package DataAccesslayer;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class DALOrder {
     public int ID_Inventation;
     public int ID_Vendor;
     public boolean Auto;
-    public int Day;
+    public LinkedList<Integer> Day;
     public LocalDate OrderDate;
     public LocalDate ArrivalTime;
     public Map<Integer, Integer> ItemsID_ItemsIDVendor;
@@ -19,7 +20,7 @@ public class DALOrder {
     public double TotalPrice;
     public String Status;
 
-    public DALOrder(int ID_Vendor, int Id,boolean auto,int day, LocalDate orderDate, LocalDate arrivalTime, Map<Integer, Integer> itemsID_ItemsIDVendor, Map<Integer, Integer> itemsID_NumberOfItems, double totalPrice, String status){//List<DALContact> vendorContacts, List<DALContact> leadersContacts) {
+    public DALOrder(int ID_Vendor, int Id, boolean auto, LinkedList<Integer> day, LocalDate orderDate, LocalDate arrivalTime, Map<Integer, Integer> itemsID_ItemsIDVendor, Map<Integer, Integer> itemsID_NumberOfItems, double totalPrice, String status){//List<DALContact> vendorContacts, List<DALContact> leadersContacts) {
         this.ID_Vendor = ID_Vendor;
         this.ID_Inventation=Id;
         Auto=auto;

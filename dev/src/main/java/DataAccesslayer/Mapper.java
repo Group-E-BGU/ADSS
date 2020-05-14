@@ -105,7 +105,7 @@ public class Mapper {
     }
 
 
-    public void WriteOrder(int id_suplaier, int numOfOrder,boolean auto,int day, LocalDate d, LocalDate e , Map<Integer, Integer> itemsID_itemsIDSupplier, Map<Integer, Integer> productIDVendor_numberOfItems, Double TotalPrice, String status) {
+    public void WriteOrder(int id_suplaier, int numOfOrder,boolean auto,LinkedList<Integer> day, LocalDate d, LocalDate e , Map<Integer, Integer> itemsID_itemsIDSupplier, Map<Integer, Integer> productIDVendor_numberOfItems, Double TotalPrice, String status) {
         DALOrder Dalush=new DALOrder(id_suplaier,numOfOrder,auto,day,d,e,
                 itemsID_itemsIDSupplier,productIDVendor_numberOfItems,TotalPrice,status);
         Repositpry.Invetations.add(Dalush);

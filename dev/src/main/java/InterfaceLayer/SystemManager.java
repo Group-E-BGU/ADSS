@@ -3,7 +3,6 @@ package InterfaceLayer;
 import BusinessLayer.Store;
 import BusinessLayer.system;
 import BusinessLayer.User;
-import PresentationLayer.Menu;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -45,8 +44,8 @@ public class SystemManager {
         return Done;
     }
 
-    public String MakeOrder(int id_suplaier,int day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
-        String Done="you must be logged in before doing any actions";
+    public int MakeOrder(int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+        int Done=-1;
         if(current_Store!=null)
             Done= current_Store.MakeOrder(id_suplaier,day,itemsIDVendor_numberOfItems);
         return Done;
@@ -157,7 +156,7 @@ public class SystemManager {
     public boolean CheckConected() {
         return current_Store!=null;
     }
-
+/*
 <<<<<<< HEAD
     public static void sendWarning(String warning) {
         Menu.printWarning(warning);
@@ -165,7 +164,9 @@ public class SystemManager {
     public static void sendWarning(String name, int totalAmount, int minAmount) {
         //Menu.printWarning(name,totalAmount,minAmount);
 >>>>>>> 376671d6cc557916e87e535370bc3327c7094c77
+
     }
+ */
 
     public void initialize() {
         current_Store.initializeItems();
@@ -305,5 +306,10 @@ public class SystemManager {
     public String ChangeOrder(int Id_Order,int id_suplaier, int day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
     current_Store.ChangeOrder(Id_Order,id_suplaier, day,itemsIDVendor_numberOfItems);
    return "done";//todo check
+    }
+
+    public InterfaceOrder getOrderDetails(int done) {
+        InterfaceOrder o = current_Store.getOrderDetails(done);
+        return o;
     }
 }

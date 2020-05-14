@@ -2,6 +2,7 @@ package BusinessLayer;
 
 import DataAccesslayer.*;
 import InterfaceLayer.InterfaceContract;
+import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
 import InterfaceLayer.SystemManager;
 
@@ -156,7 +157,7 @@ public class Store {
         return "The supplier is not exists in the system";
     }
 
-    public String MakeOrder(int id_suplaier,int day, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
+    public int MakeOrder(int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
         Supplier sup=null;//todo check mayby it not necessary
         for (Supplier s:list_of_Suplier
         ) {
@@ -183,16 +184,17 @@ public class Store {
                 Trans.Lead(O);
             }
             list_of_Order.add(O);
-            NumOfOrder++;
             Map.WriteOrder(id_suplaier, NumOfOrder,false,day, LocalDate.now(),null,ProductID_IDSupplier, ProductIDSupplier_numberOfItems, TotalPrice.get(),"Waiting");
-            return "Done";
+
+            NumOfOrder++;
+            return NumOfOrder-1;
         }
-        return "The supplier does not exists in the system";
+        return -1;
 
     }
 
 
-    public void ChangeOrder(int id_order, int id_suplaier, int day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    public void ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
         Supplier sup=null;
         for (Supplier s: list_of_Suplier
         ) {
@@ -237,7 +239,8 @@ public class Store {
                 }
             }
         }
-        int day =0;//todo which day?
+        LinkedList<Integer> day=new LinkedList<Integer>();
+        day.add(-1);//todo which day?
         Map<Integer,Integer> ProductID_ProductID_IDSupplier=new ConcurrentHashMap<Integer, Integer>();
         Map<Integer,Integer> ProductIDSupplier_numberOfItems=new ConcurrentHashMap<Integer, Integer>();
         ProductID_ProductID_IDSupplier.put(IdProduct,Id_p_sup);
@@ -750,5 +753,9 @@ public class Store {
 
     public void createAutomaticOrder(int itemId, int amount) {
         //TODO: make order with best supplier
+    }
+
+    public InterfaceOrder getOrderDetails(int done) {
+        //todo
     }
 }
