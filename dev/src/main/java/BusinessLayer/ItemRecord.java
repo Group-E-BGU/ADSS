@@ -131,4 +131,8 @@ public class ItemRecord {
     }
 
     public int getShelfNumber(){return shelfNumber;}
+
+    public int getId() {
+        return id;
+    }
 }

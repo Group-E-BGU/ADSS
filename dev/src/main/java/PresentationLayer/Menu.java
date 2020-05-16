@@ -1,5 +1,6 @@
 package PresentationLayer;
 
+import DataAccesslayer.Mapper;
 import InterfaceLayer.InterfaceContract;
 import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
@@ -14,6 +15,7 @@ public class Menu {
          if (args.length>1 && args[1].equals("Arg")) {
            AddArguments();
            Sys.initialize();
+
         }
              boolean con = true;
              System.out.println("Welcome to 'super Le'!\n");
@@ -41,11 +43,13 @@ public class Menu {
                          "19. Print defective report\n" +
                          "20. Enter new discount\n" +
                          "21. Enter new price\n"+
-                         "22. Update DetailsOrder\n"+
-                         "23. Logout\n"+
-                         "24. Exit");
+                         "22. Enter new product\n"+
+                         "23. Update DetailsOrder\n"+
+                         "24. Logout\n"+
+                         "25. Exit");
                  Scanner myScanner = new Scanner(System.in);
                  int Ask = myScanner.nextInt();
+                 String blank = myScanner.nextLine();
                       switch (Ask) {
                           case 1:
                               Register();
@@ -172,22 +176,33 @@ public class Menu {
                               break;
                           }
 
-                          case 21:
+                          case 21: {
                               System.out.println("Please enter item name:");
                               String name = myScanner.nextLine();
                               System.out.println("Enter new store price:");
                               String price = myScanner.nextLine();
                               System.out.println("Enter new retail price:");
                               String rPrice = myScanner.nextLine();
-                              System.out.println(Sys.setNewPrice(name, price,rPrice));
+                              System.out.println(Sys.setNewPrice(name, price, rPrice));
                               break;
-
+                          }
                           case 22:
-                                UpdateDetailsOrder();
+                              System.out.println("Please enter new item name:");
+                              String name = myScanner.nextLine();
+                              System.out.println("Enter the minimum amount required:");
+                              String minAmount = myScanner.nextLine();
+                              System.out.println("Enter the shelf number of the item:");
+                              String shelfNumber = myScanner.nextLine();
+                              System.out.println("Enter the manufacturer of the item:");
+                              String manufacture = myScanner.nextLine();
+                              System.out.println(Sys.addItemRecord(name, minAmount, shelfNumber, manufacture));
+                              break;
                           case 23:
+                                UpdateDetailsOrder();
+                          case 24:
                               Logout();
                               break;
-                          case 24:
+                          case 25:
                               System.out.println("GoodBye!");
                               con = false;
                               break;

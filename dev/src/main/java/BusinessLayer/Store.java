@@ -27,6 +27,7 @@ public class Store {
     private LinkedList<Discount> discounts;
     private LinkedList<SimplePair> defects;
     private int itemId; //was static
+    private DALItemRecord dalItemRecord;
 
     public static Store createInstance(String email) {
         if (storeInstance != null) {
@@ -44,6 +45,7 @@ public class Store {
 
     private Store(String email) {
     Map=new Mapper();
+    Map.InitializeDB();
     list_of_Suplier=new LinkedList<Supplier>();
     LinkedList<DALSupplier> Suppliers=Map.ReadAllSupplier();
     for (DALSupplier s : Suppliers
@@ -75,6 +77,19 @@ public class Store {
         discounts = new LinkedList<>();
         defects = new LinkedList<>();
         itemId = 0;
+        dalItemRecord = new DALItemRecord();
+    }
+
+    public String addItemRecord(String name, int minAmount, int shelfNumber, String manufacture) {
+        if (itemRecords.containsKey(name) || dalItemRecord.getItemRecord(name,email_ID) != null) {
+            return "This product name already exists";
+        }
+        else{
+            ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
+            itemRecords.put(name,ir);
+            dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
+            return name+" added successfully";
+        }
     }
 
     public String AddSuplier(String name, int id,String address, String bank, String branch, int bankNumber,
@@ -481,8 +496,7 @@ public class Store {
 
     private void addItemToCategory(ItemRecord itemRecord, Category cat) {
         for (Category category: categories.values()) {
-            if(category.getRole().equals(cat
-                    .getRole()) && category.getItemRecords().contains(itemRecord))
+            if(category.getRole().equals(cat.getRole()) && category.getItemRecords().contains(itemRecord))
                 return;
         }
         cat.addItem(itemRecord);
@@ -756,6 +770,6 @@ public class Store {
     }
 
     public InterfaceOrder getOrderDetails(int done) {
-        //todo
+        return null;//todo
     }
 }

@@ -3,6 +3,7 @@ package InterfaceLayer;
 import BusinessLayer.Store;
 import BusinessLayer.system;
 import BusinessLayer.User;
+import PresentationLayer.Menu;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -26,6 +27,18 @@ public class SystemManager {
          Done = current_Store.AddSuplier(name, ID,Address,bank, branch,bankNumber, payments, Contacts_ID,Contacts_number);
 
         return Done;
+    }
+
+    public String addItemRecord(String name, String minAmount, String shelfNumber, String manufacture) {
+        try {
+            int minA = Integer.parseInt(minAmount);
+            if (minA < 0)
+                return "minimum amount cannot be below 0";
+            int shelfNum = Integer.parseInt(shelfNumber);
+            return current_Store.addItemRecord(name, minA, shelfNum, manufacture);
+        } catch (Exception e) {
+            return "please enter valid numbers";
+        }
     }
 
     public String AddContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days,
@@ -156,17 +169,15 @@ public class SystemManager {
     public boolean CheckConected() {
         return current_Store!=null;
     }
-/*
-<<<<<<< HEAD
+
     public static void sendWarning(String warning) {
         Menu.printWarning(warning);
-=======
+        /*
     public static void sendWarning(String name, int totalAmount, int minAmount) {
-        //Menu.printWarning(name,totalAmount,minAmount);
->>>>>>> 376671d6cc557916e87e535370bc3327c7094c77
-
+        Menu.printWarning(name,totalAmount,minAmount);
+*/
     }
- */
+
 
     public void initialize() {
         current_Store.initializeItems();
@@ -304,7 +315,7 @@ public class SystemManager {
     }
 
     public String ChangeOrder(int Id_Order,int id_suplaier, int day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
-    current_Store.ChangeOrder(Id_Order,id_suplaier, day,itemsIDVendor_numberOfItems);
+   // current_Store.ChangeOrder(Id_Order,id_suplaier, day ,itemsIDVendor_numberOfItems);
    return "done";//todo check
     }
 
