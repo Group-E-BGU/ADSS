@@ -18,7 +18,9 @@ public class system {
     public String Register(String email, String password) {
     String s=CheckEmailExist(email);
     if(s.equals("Not Exist")){
-        return  Map.Register(email,password);
+        Map.WriteUser(email,password);
+        Map.WriteStore(email, 0, 0, 0 );
+        return "Done";
     }
     return s;
     }
@@ -26,7 +28,7 @@ public class system {
     public String Login(String email, String password) {
         String s=CheckEmailExist(email);
         if(s.equals("Exist")){
-            s=Map.CheckCorrectPasword(email,password);
+            s=Map.CheckCorrectPassword(email,password);
             if(s.equals("correct")){
                 return "Done";
             }

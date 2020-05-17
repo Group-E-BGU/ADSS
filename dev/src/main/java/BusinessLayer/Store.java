@@ -1,10 +1,8 @@
 package BusinessLayer;
 
 import DataAccesslayer.*;
-import InterfaceLayer.InterfaceContract;
-import InterfaceLayer.InterfaceOrder;
-import InterfaceLayer.InterfaceSupplier;
-import InterfaceLayer.SystemManager;
+import InterfaceLayer.*;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -48,7 +46,19 @@ public class Store {
     Map.InitializeDB();
     email_ID = email;
     list_of_Suplier=new LinkedList<Supplier>();
-    LinkedList<DALSupplier> Suppliers=Map.ReadAllSupplier();
+    list_of_Order=new LinkedList<Order>();
+    NumOfOrder=0;
+    NumOfProduct=0;
+    Trans=new Transportrans();
+    HashMap<String,ItemRecord> itemRecords=new HashMap<String,ItemRecord>();
+    HashMap<String,Category> categories=new HashMap<String,Category>();
+    LinkedList<Discount> discounts=new LinkedList<Discount>();
+    LinkedList<SimplePair> defects=new LinkedList<SimplePair>();
+    itemId=0;
+    dalItemRecord = new DALItemRecord();
+
+    //TODO - read all the information?
+    /*LinkedList<DALSupplier> Suppliers=Map.ReadAllSupplier();
     for (DALSupplier s : Suppliers
         ) {
             Supplier sp = new Supplier(s.Name, s.ID, s.Address, s.Bank, s.Branch, s.BankNumber, s.Payments, s.ContactsID_Name, s.ContactsID_number);
@@ -66,7 +76,7 @@ public class Store {
             list_of_Suplier.add(sp);
         }
     LinkedList<DALOrder> Orders=Map.ReadAllInvetation();
-    list_of_Order=new LinkedList<Order>();
+
     for (DALOrder Do: Orders
         ) {
             Order or=new Order(Do.ID_Vendor,Do.ID_Inventation,Do.Auto,Do.Day,Do.ItemsID_ItemsIDVendor,Do.ItemsID_NumberOfItems,Do.TotalPrice);
@@ -78,7 +88,7 @@ public class Store {
         discounts = new LinkedList<>();
         defects = new LinkedList<>();
         itemId = 0;
-        dalItemRecord = new DALItemRecord();
+
     }
 
     public String addItemRecord(String name, int minAmount, int shelfNumber, String manufacture) {
@@ -90,7 +100,7 @@ public class Store {
             itemRecords.put(name,ir);
             dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
             return name+" added successfully";
-        }
+       }*/
     }
 
     public String AddSuplier(String name, int id,String address, String bank, String branch, int bankNumber,
@@ -103,7 +113,11 @@ public class Store {
         }
         Supplier sup=new Supplier(name, id,address, bank,branch,bankNumber,payments,contacts_id,contacts_number);
         list_of_Suplier.add(sup);
-        Map.WriteSupplier(name, id,address, bank,branch,bankNumber,payments,contacts_id,contacts_number);
+        Map.WriteSupplier(name, id,address, bank,branch,bankNumber,payments,email_ID);
+        for (Map.Entry<Integer,Integer> E: contacts_number.entrySet()
+        ) {
+            Map.WriteContact(email_ID,id,contacts_id.get(E.getKey()),E.getKey(),E.getValue());
+        }
         return "Done";
     }
 
@@ -119,7 +133,7 @@ public class Store {
         if(!exit){
             return "The supplier is not exists in the system";
         }
-        Map.DeleteSupplier(id);
+        Map.DeleteSupplier(id,email_ID);
         return "Done";
     }
 
@@ -141,32 +155,44 @@ public class Store {
         if(!exit){
             return "The supplier is not exists in the system";
         }
-        Map.EditSupplier(name, id, address, bank,branch,bankNumber,payments,contacts_id_name,contacts_number);
+        Map.EditSupplier(name, id, address, bank,branch,bankNumber,payments,email_ID);
+        for (Map.Entry<Integer,Integer> E: contacts_number.entrySet()
+             ) {
+        Map.DeleteContact(email_ID,id,E.getKey());
+        Map.WriteContact(email_ID,id,contacts_id_name.get(E.getKey()),E.getKey(),E.getValue());
+        }
         return "Done";
     }
 
     public String AddContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days, boolean leading, Map<Integer,Integer>  ItemsID_ItemsIDSupplier,
                               Map<Integer, String> productIDVendor_name, Map<Integer, Double> productIDVendor_price) {
 
-        NumOfProduct=NumOfProduct+ItemsID_ItemsIDSupplier.size();
         for (Supplier s:list_of_Suplier
         ) {
-                Contract con=new Contract(suplaier_id,fixeDays,days,leading,productIDVendor_name,ItemsID_ItemsIDSupplier,productIDVendor_price);
-                s.setContract(con);
-                Map.WriteContract(suplaier_id,fixeDays,days,leading,productIDVendor_name,ItemsID_ItemsIDSupplier,productIDVendor_price);
+            Contract con=new Contract(suplaier_id,fixeDays,days,leading,productIDVendor_name,ItemsID_ItemsIDSupplier,productIDVendor_price);
+            s.setContract(con);
+            Map.WriteContract(suplaier_id,fixeDays,leading,email_ID);
+            for (int day:days
+                 ) {
+                Map.WriteDayToContract(email_ID,suplaier_id,day);
+            }
+            for (Map.Entry<Integer,Integer> IDS_IDV: ItemsID_ItemsIDSupplier.entrySet()
+                 ) {
+                Map.WriteProductToSupplier(email_ID,suplaier_id,IDS_IDV.getKey(),IDS_IDV.getValue(),productIDVendor_price.get(IDS_IDV.getKey()),productIDVendor_name.get(IDS_IDV.getKey()));
+            }
                 return "Done";
             }
 
         return "The supplier is not exists in the system";
     }
 
-    public String AddWrite(int suplaier_id,Map<Integer, Integer> itemsID_amount, Map<Integer, Double> itemsID_assumption) {
+    public String AddWrite(int suplaier_id, Map<Integer, Integer> itemsID_amount, Map<Integer, Double> itemsID_assumption) {
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==suplaier_id){
                 Wrotequantities W=new Wrotequantities(suplaier_id,itemsID_amount,itemsID_assumption);
                 s.setWorte(W);
-                Map.WriteWrote(suplaier_id,itemsID_amount,itemsID_assumption);
+                Map.WriteWrote(email_ID,suplaier_id,itemsID_amount,itemsID_assumption);
                 return "Done";
             }
         }
@@ -199,9 +225,18 @@ public class Store {
             if(!sup.getContract().isLeading()){
                 Trans.Lead(O);
             }
-            list_of_Order.add(O);
-            Map.WriteOrder(id_suplaier, NumOfOrder,false,day, LocalDate.now(),null,ProductID_IDSupplier, ProductIDSupplier_numberOfItems, TotalPrice.get(),"Waiting");
 
+            Map<Integer, Integer> ProductIDSupplier_IDStore = new ConcurrentHashMap<Integer, Integer>();
+            for (Map.Entry<Integer,Integer> e:ProductID_IDSupplier.entrySet()
+                 ) {
+                ProductIDSupplier_IDStore.put(e.getValue(),e.getKey());
+            }
+            list_of_Order.add(O);
+            Map.WriteOrder(email_ID,id_suplaier, NumOfOrder,false, day, java.sql.Date.valueOf(LocalDate.now()),null, TotalPrice.get(),"Waiting");
+            for (Map.Entry<Integer,Integer> E:ProductID_IDSupplier.entrySet()
+                 ) {
+                Map.WriteProductOrder(email_ID,NumOfOrder,ProductIDSupplier_IDStore,ProductIDSupplier_numberOfItems);
+            }
             NumOfOrder++;
             return NumOfOrder-1;
         }
@@ -209,8 +244,7 @@ public class Store {
 
     }
 
-
-    public void ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    public String ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
         Supplier sup=null;
         for (Supplier s: list_of_Suplier
         ) {
@@ -218,15 +252,18 @@ public class Store {
                 sup=s;
             }
         }
+        Order order=null;
         if(sup!=null){
             Map<Integer, Integer> ProductID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
             for (Map.Entry<Integer,Integer> e : itemsIDVendor_numberOfItems.entrySet()) {
                 int Id_Product = sup.GetIdProduct(e.getKey());
                 ProductID_IDSupplier.put(Id_Product, e.getKey());
             }
+
             for (Order o:list_of_Order
             ) {
                 if (o.getID_Invitation() == id_order) {
+                    order=o;
                     o.ChangeOrder(id_order, id_suplaier, day, ProductID_IDSupplier, itemsIDVendor_numberOfItems);
                     AtomicReference<Double> TotalPrice = new AtomicReference<>((double) 0);
                     for (Map.Entry<Integer, Integer> e : o.getItemsID_NumberOfItems().entrySet()) {
@@ -236,8 +273,21 @@ public class Store {
                     o.setTotalPrice(TotalPrice.get());
                 }
             }
+            Map.DeleteOrder(email_ID,id_order);
+            Map<Integer, Integer> ProductIDSupplier_IDStore = new ConcurrentHashMap<Integer, Integer>();
+            for (Map.Entry<Integer,Integer> e:ProductID_IDSupplier.entrySet()
+            ) {
+                ProductIDSupplier_IDStore.put(e.getValue(),e.getKey());
+            }
+            Map.WriteOrder(email_ID,id_suplaier, NumOfOrder,false, day, java.sql.Date.valueOf(LocalDate.now()),null ,order.getTotalPrice(),"Waiting");
+            for (Map.Entry<Integer,Integer> E:ProductID_IDSupplier.entrySet()
+            ) {
+                Map.WriteProductOrder(email_ID,id_order,ProductIDSupplier_IDStore, itemsIDVendor_numberOfItems);
+            }
         }
-}
+        return null;
+    }
+
     public String AutomaticProductOrdering(int IdProduct, int amount){
         int IdSoplier= -1;
         int Id_p_sup=-1;
@@ -250,25 +300,37 @@ public class Store {
                 double price = s.getPric(IdProduct, amount);
                 if (price < FinalPrice) {
                     FinalPrice = price;
-                    IdSoplier = s.getID();
                     sup=s;
+                    IdSoplier=sup.getID();
                 }
             }
         }
-        LinkedList<Integer> day=new LinkedList<Integer>();
-        day.add(-1);//todo which day?
-        Map<Integer,Integer> ProductID_ProductID_IDSupplier=new ConcurrentHashMap<Integer, Integer>();
-        Map<Integer,Integer> ProductIDSupplier_numberOfItems=new ConcurrentHashMap<Integer, Integer>();
-        ProductID_ProductID_IDSupplier.put(IdProduct,Id_p_sup);
-        ProductIDSupplier_numberOfItems.put(Id_p_sup,amount);
-        Order O = new Order(IdSoplier, NumOfOrder,true, day, ProductID_ProductID_IDSupplier, ProductIDSupplier_numberOfItems, FinalPrice);
-        if(!sup.getContract().isLeading()){
-            Trans.Lead(O);
+        if(sup!=null) {
+            LinkedList<Integer> day = new LinkedList<Integer>();
+            day.add(-1);//todo which day?
+            Map<Integer, Integer> ProductID_ProductID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
+            Map<Integer, Integer> ProductIDSupplier_numberOfItems = new ConcurrentHashMap<Integer, Integer>();
+            ProductID_ProductID_IDSupplier.put(IdProduct, Id_p_sup);
+            ProductIDSupplier_numberOfItems.put(Id_p_sup, amount);
+            Order O = new Order(IdSoplier, NumOfOrder, true, day, ProductID_ProductID_IDSupplier, ProductIDSupplier_numberOfItems, FinalPrice);
+            if (!sup.getContract().isLeading()) {
+                Trans.Lead(O);
+            }
+            list_of_Order.add(O);
+
+            Map<Integer, Integer> ProductIDSupplier_IDStore = new ConcurrentHashMap<Integer, Integer>();
+            for (Map.Entry<Integer,Integer> e:ProductID_ProductID_IDSupplier.entrySet()
+            ) {
+                ProductIDSupplier_IDStore.put(e.getValue(),e.getKey());
+            }
+            Map.WriteOrder(email_ID,NumOfOrder, NumOfOrder,false, day, java.sql.Date.valueOf(LocalDate.now()),null ,O.getTotalPrice(),"Waiting");
+            for (Map.Entry<Integer,Integer> E:ProductID_ProductID_IDSupplier.entrySet()
+            ) {
+                Map.WriteProductOrder(email_ID,NumOfOrder,ProductIDSupplier_IDStore, ProductIDSupplier_numberOfItems);
+            }NumOfOrder++;
+            return "Done";//todo ?? return done?
         }
-        list_of_Order.add(O);
-        NumOfOrder++;
-        Map.WriteOrder(IdProduct, NumOfOrder,true,day, LocalDate.now(),null,ProductID_ProductID_IDSupplier, ProductIDSupplier_numberOfItems, FinalPrice,"Waiting");
-        return "Done";//todo ?? return done?
+        return "problem with the create autoOrder";
     }
 
     public String EditContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days, boolean leading,Map<Integer,Integer>  ItemsID_ItemsIDSupplier, Map<Integer, String> productIDVendor_name, Map<Integer, Double> producttemsIDVendor_price) {
@@ -282,8 +344,18 @@ public class Store {
                     s.getContract().setItemsID_ItemsIDSupplier(ItemsID_ItemsIDSupplier);
                     s.getContract().setProductIDVendor_Name(productIDVendor_name);
                     s.getContract().setProductIDVendor_Price(producttemsIDVendor_price);
-                    Map.DeleteContract(suplaier_id);
-                    Map.WriteContract(suplaier_id, fixeDays, days, leading, productIDVendor_name, s.getContract().getItemsID_ItemsIDSupplier(), producttemsIDVendor_price);
+                    Map.DeleteContract(suplaier_id,email_ID);
+                    Map.DeleteDayFromContract(email_ID,suplaier_id);
+                    Map.WriteContract(suplaier_id,fixeDays,leading,email_ID);
+                    for (int day:days
+                    ) {
+                        Map.WriteDayToContract(email_ID,suplaier_id,day);
+                    }
+                    for (Map.Entry<Integer,Integer> IDS_IDV: ItemsID_ItemsIDSupplier.entrySet()
+                    ) {
+                        Map.DeleteProductFromSupplier(email_ID,suplaier_id,IDS_IDV.getValue());
+                        Map.WriteProductToSupplier(email_ID,suplaier_id,IDS_IDV.getKey(),IDS_IDV.getValue(),producttemsIDVendor_price.get(IDS_IDV.getValue()),productIDVendor_name.get(IDS_IDV.getValue()));
+                    }
                     return "Done";
                 }
                 else
@@ -300,8 +372,8 @@ public class Store {
                 if(s.getWorte()!=null) {
                     s.getWorte().setItemsID_Amount(itemsID_amount);
                     s.getWorte().setItemsID_Assumption(itemsID_assumption);
-                    Map.DeleteWrote(suplaier_id);
-                    Map.WriteWrote(suplaier_id,itemsID_amount,itemsID_assumption);
+                    Map.DeleteWrote(suplaier_id,email_ID);
+                    Map.WriteWrote(email_ID, suplaier_id,itemsID_amount,itemsID_assumption);
                     return "Done";
                 }
                 else
@@ -361,7 +433,14 @@ public class Store {
         LinkedList<InterfaceSupplier> list=new LinkedList<InterfaceSupplier>();
         for (Supplier s:list_of_Suplier
         ) {
-            InterfaceSupplier I=new InterfaceSupplier(s.getName(),s.getID(),s.getBank(),s.getBranch(),s.getBankNumber(),s.getPayments(),s.getContactsID_Name(),s.getContactsID_number());
+            Contract c=s.getContract();
+            InterfaceContract contract=new InterfaceContract(c.getSuplaier_ID(),c.isFixeDays(),c.getDayes(),c.isLeading(),c.getProductIDVendor_Name(),c.getItemsID_ItemsIDSupplier(),c.getProductIDVendor_Price());
+            Wrotequantities worte=s.getWorte();
+            InterfaceWrotequantities w=null;
+            if(worte!=null) {
+                w=new InterfaceWrotequantities(worte.getSuplaier_ID(),worte.getItemsID_Amount(),worte.getItemsID_Assumption());
+            }
+            InterfaceSupplier I=new InterfaceSupplier(s.getName(),s.getID(),s.getBank(),s.getBranch(),s.getBankNumber(),s.getPayments(),s.getContactsID_Name(),s.getContactsID_number(),contract,w);
             list.add(I);
         }
         return list;
@@ -402,10 +481,10 @@ public class Store {
     }
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
-        int id=Map.getProductId(product_name,category,subcategory,sub_subcategory,manufacturer);
+        int id=Map.getProductId(email_ID,category,subcategory,sub_subcategory,product_name,manufacturer);
         if(id==-1){
-            id=NumOfProduct++;
-            Map.AddProdudt(id,product_name,category,subcategory,sub_subcategory,manufacturer);
+            id=NumOfProduct;
+            Map.WriteItemRecord_Supplier(email_ID,id,category,subcategory,sub_subcategory,product_name);
             NumOfProduct++;
         }
         return id;
@@ -429,10 +508,6 @@ public class Store {
             }
         }
     }
-
-
-
-
 
     public void initializeItems() {
         ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
@@ -770,7 +845,73 @@ public class Store {
         //TODO: make order with best supplier
     }
 
-    public InterfaceOrder getOrderDetails(int done) {
-        return null;//todo
+    public void AddToStore(java.util.Map productID_amount, java.util.Map productID_date) {
+        //Todo Add the store the product with that ID
     }
+
+    public InterfaceOrder getOrderDetails(int orderID) {
+        InterfaceOrder ord=null;
+        for (Order o:list_of_Order
+             ) {
+            if(o.getID_Invitation()==orderID);
+            ord=new InterfaceOrder(o.getID_Vendor(),o.getID_Invitation(),o.getDay(),o.getOrderDate(),o.getArrivalTime(),o.getItemsID_ItemsIDVendor(),o.getItemsID_NumberOfItems(),o.getTotalPrice(),o.getStatus());
+        }
+        return ord;
+    }
+
+    public InterfaceSupplier GetTheCyeeperSuplier(int produdtId, int amount) {
+        int Id_p_sup=-1;
+        Supplier sup=null;
+        double FinalPrice= Integer.MAX_VALUE;
+        for (Supplier s:list_of_Suplier
+        ) {
+            Id_p_sup=s.GetIdProduct(produdtId);
+            if(Id_p_sup!=-1) {
+                double price = s.getPric(produdtId, amount);
+                if (price < FinalPrice) {
+                    FinalPrice = price;
+                    sup=s;
+                }
+            }
+        }
+        if(sup!=null){
+            Contract c=sup.getContract();
+            InterfaceContract contract=new InterfaceContract(c.getSuplaier_ID(),c.isFixeDays(),c.getDayes(),c.isLeading(),c.getProductIDVendor_Name(),c.getItemsID_ItemsIDSupplier(),c.getProductIDVendor_Price());
+            Wrotequantities worte=sup.getWorte();
+            InterfaceWrotequantities w=null;
+            if(worte!=null) {
+                w=new InterfaceWrotequantities(worte.getSuplaier_ID(),worte.getItemsID_Amount(),worte.getItemsID_Assumption());
+            }
+            InterfaceSupplier s=new InterfaceSupplier(sup.getName(),sup.getID(),sup.getBank(),sup.getBranch(),sup.getBankNumber(),sup.getPayments(),sup.getContactsID_Name(),sup.getContactsID_number(),contract,w);
+            return s;
+        }
+        return null;
+        }
+
+    public int GetSupplierID_PerOrder(int id_order) {
+        for (Order o:list_of_Order
+             ) {
+            if(o.getID_Invitation()==id_order){
+                return o.getID_Vendor();
+            }
+        }
+       return -1;
+    }
+
+    public LinkedList<InterfaceOrder> GetOrderDetails() {
+     LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
+
+        for (Order o:list_of_Order
+        ) {
+            if (o.getDay().contains(1)) {//todo check the date!!
+                InterfaceOrder ord = new InterfaceOrder(o.getID_Vendor(), o.getID_Invitation(), o.getDay(), o.getOrderDate(), o.getArrivalTime(), o.getItemsID_ItemsIDVendor(), o.getItemsID_NumberOfItems(), o.getTotalPrice(), o.getStatus());
+            }
+        }
+    return orders;
+    }
+
+    public void Logout(){
+        Map.DeleteStore(email_ID);
+        Map.WriteStore(email_ID,itemId,NumOfProduct,NumOfOrder);
+ }
 }

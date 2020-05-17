@@ -1,6 +1,6 @@
 package PresentationLayer;
 
-import DataAccesslayer.Mapper;
+import BusinessLayer.Order;
 import InterfaceLayer.InterfaceContract;
 import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
@@ -9,213 +9,263 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Menu {
-     private static SystemManager Sys = new SystemManager();
 
-     public static void main(String[] args) {
-         if (args.length>1 && args[1].equals("Arg")) {
-           AddArguments();
-           Sys.initialize();
+    private static SystemManager Sys = new SystemManager();
+
+    public static void main(String[] args) {
+        if (args.length > 1 && args[1].equals("Arg")) {
+            AddArguments();
+            Sys.initialize();
+        }
+        MainMenu();
+    }
+
+    private static void  MainMenu(){
+        boolean con=true;
+        System.out.println("Welcome to 'super Le'!\n");
+        while (con) {
+            System.out.println("What action would you like to take now?\n" +
+                    "please enter the correct number\n" +
+                    "1. Register\n" +
+                    "2. Login\n" +
+                    "3. Exit");
+            Scanner myScanner = new Scanner(System.in);
+            int Ask = myScanner.nextInt();
+            String blank = myScanner.nextLine();
+            switch (Ask) {
+                case 1:
+                    Register();
+                    break;
+                case 2:
+                    Login();
+                    break;
+                case 3:
+                    System.out.println("GoodBye!");
+                    con = false;
+                    break;
+                default:
+                    System.out.println("Please enter a valid number from the menu");
+                    break;
+
+            }
+        }
+    }
+
+    private static void Action(){
+        boolean con = true;
+        while (con) {
+            System.out.println(  "What action would you like to take now?\n" +
+                    "please enter the correct number\n"+
+                    "1. Add a new supplier\n" +
+                    "2. Add an agreement to supplier\n" +
+                    "3. Adding \"Quantity Write\" to supplier\n" +
+                    "4. Make an Fix order\n" +
+                    "5. Display the items in the super\n" +
+                    "6. Display sll the supplier's details\n"+
+                    "7. Update Order Status\n"+
+                    "8. Edit supplier details\n"+
+                    "9. Edit supplier's arrangement\n" +
+                    "10. Edit \"Write Quantities\" of supplier\n" +
+                    "11. Delete supplier\n" +
+                    "12. Change item amount \n" +
+                    "13. Move from storage to shelf \n" +
+                    "14. Subtract from shelf \n" +
+                    "15. Print inventory report\n" +
+                    "16. Enter defected item\n" +
+                    "17. Print defective report\n" +
+                    "18. Enter new discount\n" +
+                    "19. Enter new price\n"+
+                    "20. Enter new product\n"+
+                    "21. Update DetailsOrder\n"+
+                    "22. Check the Cheeper Supplier for specific product\n"+
+                    "23. Logout\n");
+            Scanner myScanner = new Scanner(System.in);
+            int Ask = myScanner.nextInt();
+            String blank = myScanner.nextLine();
+            switch (Ask) {
+                case 1:
+                    Add_Edit_Supplier(1);
+                    break;
+                case 2:
+                    Add_Edit_Agreement(1);
+                    break;
+                case 3:
+                    Add_Edit_Write(1);
+                    break;
+                case 4:
+                    MakeOrder();
+                    break;
+                case 5:
+                    DisplayItems();
+                    break;
+                case 6:
+                    DisplaySupplierDetails();
+                    break;
+                case 7:
+                    UpdateOrderStatus();
+                    break;
+                case 8:
+                    Add_Edit_Supplier(2);
+                    break;
+                case 9:
+                    Add_Edit_Agreement(2);
+                    break;
+                case 10:
+                    Add_Edit_Write(2);
+                    break;
+                case 11:
+                    DeleteSupplier();
+                    break;
+                case 12: {
+                    System.out.println("Please enter item name");
+                    String name = myScanner.nextLine();
+                    String amount = Sys.getItemAmountsByName(name);
+                    System.out.println(amount);
+                    if (!amount.equals("No such item in inventory")) {
+                        System.out.println("Please enter new storage and shelf amounts");
+                        String amounts = myScanner.nextLine();
+                        System.out.println(Sys.setNewAmounts(name, amounts));
+                    }
+                    break;
+                }
+                case 13: {
+                    System.out.println("Please enter item name");
+                    String name = myScanner.nextLine();
+                    System.out.println(Sys.getItemAmountsByName(name));
+                    System.out.println("Please enter amount to move");
+                    String amount = myScanner.nextLine();
+                    System.out.println(Sys.moveToShelf(name, amount));
+                    break;
+                }
+                case 14: {
+                    System.out.println("Please enter item name");
+                    String name = myScanner.nextLine();
+                    System.out.println(Sys.getItemAmountsByName(name));
+                    System.out.println("Please enter amount to subtract");
+                    String amount = myScanner.nextLine();
+                    System.out.println(Sys.subtract(name, amount));
+                    break;
+                }
+                case 15: {
+                    System.out.println("Please enter categories or 'all'");
+                    String names = myScanner.nextLine();
+                    System.out.println(Sys.getInventoryReport(names));
+                    break;
+                }
+                case 16: {
+                    System.out.println("Please enter defected item's name");
+                    String name = myScanner.nextLine();
+                    System.out.println("Please enter defected item's ID");
+                    String id = myScanner.nextLine();
+                    System.out.println(Sys.setDefectedItem(name, id));
+                    break;
+                }
+                case 17: {
+                    System.out.println("Enter report's beginning date in the following format(dd/MM/yyyy)");
+                    String begDate = myScanner.nextLine();
+                    System.out.println("Enter report's end date in the following format(dd/MM/yyyy)");
+                    String endDate = myScanner.nextLine();
+                    System.out.println(Sys.printDefectedReport(begDate, endDate));
+
+                    break;
+                }
+                case 18: {
+                    System.out.println("1. Item discount \n" + "2. Category discount\n");
+                    String discountType = myScanner.nextLine();
+                    if (discountType.equals("1")) {                   //case item discount
+                        System.out.println("Enter item name:");
+                        String itemName = myScanner.nextLine();
+                        System.out.println("Enter discount percentage:");
+                        String percentage = myScanner.nextLine();
+                        System.out.println("Enter beginning date in the following format(dd/MM/yyyy)");
+                        String begDate = myScanner.nextLine();
+                        System.out.println("Enter end date in the following format(dd/MM/yyyy)");
+                        String endDate = myScanner.nextLine();
+
+                        System.out.println(Sys.addNewItemDiscount(itemName, percentage, begDate, endDate));
+                    } else if (discountType.equals("2")) {                      //case category discount
+                        System.out.println("Enter category name:");
+                        String categoryName = myScanner.nextLine();
+                        System.out.println("Enter discount percentage:");
+                        String percentage = myScanner.nextLine();
+                        System.out.println("Enter beginning date in the following format(dd/MM/yyyy)");
+                        String begDate = myScanner.nextLine();
+                        System.out.println("Enter end date in the following format(dd/MM/yyyy)");
+                        String endDate = myScanner.nextLine();
+
+                        System.out.println(Sys.addNewCategoryDiscount(categoryName, percentage, begDate, endDate));
+                    }
+                    else {
+                        System.out.println("Please enter valid discount type");
+                    }
+                    break;
+                }
+                case 19: {
+                    System.out.println("Please enter item name:");
+                    String name = myScanner.nextLine();
+                    System.out.println("Enter new store price:");
+                    String price = myScanner.nextLine();
+                    System.out.println("Enter new retail price:");
+                    String rPrice = myScanner.nextLine();
+                    System.out.println(Sys.setNewPrice(name, price, rPrice));
+                }
+                    break;
+                case 20: {
+                    System.out.println("Please enter new item name:");
+                    String name = myScanner.nextLine();
+                    System.out.println("Enter the minimum amount required:");
+                    String minAmount = myScanner.nextLine();
+                    System.out.println("Enter the shelf number of the item:");
+                    String shelfNumber = myScanner.nextLine();
+                    System.out.println("Enter the manufacturer of the item:");
+                    String manufacture = myScanner.nextLine();
+                    System.out.println(Sys.addItemRecord(name, minAmount, shelfNumber, manufacture));
+                }
+                    break;
+                case 21:
+                    UpdateDetailsOrder();
+                    break;
+                case 22:
+                    CheckcheepSupplier();
+                    break;
+                case 23:
+                    Logout();
+                    con=false;
+                    break;
+                default:
+                    System.out.println("Please enter a valid number from the menu");
+                    break;
+            }
 
         }
-             boolean con = true;
-             System.out.println("Welcome to 'super Le'!\n");
-             while (con) {
-                 System.out.println("What action would you like to take now?\n" +
-                         "please enter the correct number\n"+
-                         "1. Register\n"+
-                         "2. Login\n"+
-                         "3. Add a new supplier\n" +
-                         "4. Add an agreement to supplier\n" +
-                         "5. Adding \"Quantity Write\" to supplier\n" +
-                         "6. Make an Fix order\n" +
-                         "7. Display the items in the super\n" +
-                         "8. Display sll the supplier's details\n"+
-                         "9. Update Order Status\n"+
-                         "10. Edit supplier details\n"+
-                         "11. Edit supplier's arrangement\n" +
-                         "12. Edit \"Write Quantities\" of supplier\n" +
-                         "13. Delete supplier\n" +
-                         "14. Change item amount \n" +
-                         "15. Move from storage to shelf \n" +
-                         "16. Subtract from shelf \n" +
-                         "17. Print inventory report\n" +
-                         "18. Enter defected item\n" +
-                         "19. Print defective report\n" +
-                         "20. Enter new discount\n" +
-                         "21. Enter new price\n"+
-                         "22. Enter new product\n"+
-                         "23. Update DetailsOrder\n"+
-                         "24. Logout\n"+
-                         "25. Exit");
-                 Scanner myScanner = new Scanner(System.in);
-                 int Ask = myScanner.nextInt();
-                 String blank = myScanner.nextLine();
-                      switch (Ask) {
-                          case 1:
-                              Register();
-                              break;
-                          case 2:
-                              Login();
-                              break;
-                          case 3:
-                              Add_Edit_Supplier(1);
-                              break;
-                          case 4:
-                              Add_Edit_Agreement(1);
-                              break;
-                          case 5:
-                              Add_Edit_Write(1);
-                              break;
-                          case 6:
-                              MakeOrder();
-                              break;
-                          case 7:
-                              DisplayItems();
-                              break;
-                          case 8:
-                              DisplaySupplierDetails();
-                              break;
-                          case 9:
-                              UpdateOrderStatus();
-                              break;
-                          case 10:
-                              Add_Edit_Supplier(2);
-                              break;
-                          case 11:
-                              Add_Edit_Agreement(2);
-                              break;
-                          case 12:
-                              Add_Edit_Write(2);
-                              break;
-                          case 13:
-                              DeleteSupplier();
-                              break;
-                          case 14: {
-                              System.out.println("Please enter item name");
-                              String name = myScanner.nextLine();
-                              String amount = Sys.getItemAmountsByName(name);
-                              System.out.println(amount);
-                              if(!amount.equals("No such item in inventory")) {
-                                  System.out.println("Please enter new storage and shelf amounts");
-                                  String amounts = myScanner.nextLine();
-                                  System.out.println(Sys.setNewAmounts(name, amounts));
-                              }
-                              break;
-                          }
-                          case 15: {
-                              System.out.println("Please enter item name");
-                              String name = myScanner.nextLine();
-                              System.out.println(Sys.getItemAmountsByName(name));
-                              System.out.println("Please enter amount to move");
-                              String amount = myScanner.nextLine();
-                              System.out.println(Sys.moveToShelf(name, amount));
-                              break;
-                          }
-                          case 16: {
-                              System.out.println("Please enter item name");
-                              String name = myScanner.nextLine();
-                              System.out.println(Sys.getItemAmountsByName(name));
-                              System.out.println("Please enter amount to subtract");
-                              String amount = myScanner.nextLine();
-                              System.out.println(Sys.subtract(name, amount));
-                              break;
-                          }
-                          case 17: {
-                              System.out.println("Please enter categories or 'all'");
-                              String names = myScanner.nextLine();
-                              System.out.println(Sys.getInventoryReport(names));
-                              break;
-                          }
-                          case 18: {
-                              System.out.println("Please enter defected item's name");
-                              String name = myScanner.nextLine();
-                              System.out.println("Please enter defected item's ID");
-                              String id = myScanner.nextLine();
-                              System.out.println(Sys.setDefectedItem(name, id));
-                              break;
-                          }
+    }
 
-                          case 19: {
-                              System.out.println("Enter report's beginning date in the following format(dd/MM/yyyy)");
-                              String begDate = myScanner.nextLine();
-                              System.out.println("Enter report's end date in the following format(dd/MM/yyyy)");
-                              String endDate = myScanner.nextLine();
-                              System.out.println(Sys.printDefectedReport(begDate, endDate));
-
-                              break;
-                          }
-                          case 20: {
-                              System.out.println("1. Item discount \n" + "2. Category discount\n");
-                              String discountType = myScanner.nextLine();
-                              if (discountType.equals("1")) {                   //case item discount
-                                  System.out.println("Enter item name:");
-                                  String itemName = myScanner.nextLine();
-                                  System.out.println("Enter discount percentage:");
-                                  String percentage = myScanner.nextLine();
-                                  System.out.println("Enter beginning date in the following format(dd/MM/yyyy)");
-                                  String begDate = myScanner.nextLine();
-                                  System.out.println("Enter end date in the following format(dd/MM/yyyy)");
-                                  String endDate = myScanner.nextLine();
-
-                                  System.out.println(Sys.addNewItemDiscount(itemName, percentage, begDate, endDate));
-                              } else if (discountType.equals("2")) {                      //case category discount
-                                  System.out.println("Enter category name:");
-                                  String categoryName = myScanner.nextLine();
-                                  System.out.println("Enter discount percentage:");
-                                  String percentage = myScanner.nextLine();
-                                  System.out.println("Enter beginning date in the following format(dd/MM/yyyy)");
-                                  String begDate = myScanner.nextLine();
-                                  System.out.println("Enter end date in the following format(dd/MM/yyyy)");
-                                  String endDate = myScanner.nextLine();
-
-                                  System.out.println(Sys.addNewCategoryDiscount(categoryName, percentage, begDate, endDate));
-                              }
-                              else {
-                                  System.out.println("Please enter valid discount type");
-                              }
-                              break;
-                          }
-
-                          case 21: {
-                              System.out.println("Please enter item name:");
-                              String name = myScanner.nextLine();
-                              System.out.println("Enter new store price:");
-                              String price = myScanner.nextLine();
-                              System.out.println("Enter new retail price:");
-                              String rPrice = myScanner.nextLine();
-                              System.out.println(Sys.setNewPrice(name, price, rPrice));
-                              break;
-                          }
-                          case 22:
-                              System.out.println("Please enter new item name:");
-                              String name = myScanner.nextLine();
-                              System.out.println("Enter the minimum amount required:");
-                              String minAmount = myScanner.nextLine();
-                              System.out.println("Enter the shelf number of the item:");
-                              String shelfNumber = myScanner.nextLine();
-                              System.out.println("Enter the manufacturer of the item:");
-                              String manufacture = myScanner.nextLine();
-                              System.out.println(Sys.addItemRecord(name, minAmount, shelfNumber, manufacture));
-                              break;
-                          case 23:
-                                UpdateDetailsOrder();
-                          case 24:
-                              Logout();
-                              break;
-                          case 25:
-                              System.out.println("GoodBye!");
-                              con = false;
-                              break;
-                          default:
-                              System.out.println("Please enter a valid number from the menu");
-                              break;
-                      }
-
-             }
-         }
-
-
-
+    private static void CheckcheepSupplier() {
+        Scanner myScanner = new Scanner(System.in);
+        System.out.println("Please enter the product ID");
+        int ProdudtId = myScanner.nextInt();
+        System.out.println("Please enter the amount of the product you would like to invite");
+        int Amount = myScanner.nextInt();
+        InterfaceSupplier Supplier=Sys.GetTheCyeeperSuplier(ProdudtId,Amount);
+        if(Supplier==null){
+            System.out.println("there is no supplier that supply this product");
+        }
+        else{
+            System.out.println("The most profitable supplier to order "+ ProdudtId +" in "+" units, is: "+Supplier.Name+"\n with ID:"+ Supplier.ID );
+            System.out.println("The days that the supplier comes to the store are: ");
+            if (Supplier.Contract.Days==null|Supplier.Contract.Days.isEmpty()){
+                System.out.println("No day,\n" +
+                        "The supplier does not arrive on regular days ");
+            }
+            else {
+                for (int d:Supplier.Contract.Days
+                ) {
+                    System.out.print(d);
+                }
+                System.out.print("");
+            }
+        }
+    }
 
     private static void AddArguments() {
         Sys.Register("Stor1@gmail.com","S1_superLi");
@@ -352,20 +402,18 @@ public class Menu {
         System.out.println("Please enter your email");
         email = myScanner.next();
         String Ex=Sys.CheckEmailExist(email);
-        while(!Ex.equals("Not Exist")){
+        if(!Ex.equals("Not Exist")){
             System.out.println(Ex);
-            System.out.println("Please enter email again");
-            email = myScanner.next();
-            Ex=Sys.CheckEmailExist(email);
         }
-        System.out.println("Please enter password");
-        password = myScanner.next();
-        String Done=Sys.Register(email,password);
-        if(Done.equals("Done")){
-            System.out.println("The registration was successful");
+        else {
+            System.out.println("Please enter password");
+            password = myScanner.next();
+            String Done = Sys.Register(email, password);
+            if (Done.equals("Done")) {
+                System.out.println("The registration was successful");
+            } else
+                System.out.println(Done);
         }
-        else
-            System.out.println(Done);
     }
 
     private static void Login() {
@@ -375,34 +423,40 @@ public class Menu {
         System.out.println("Please enter your email");
         email = myScanner.next();
         String Ex = Sys.CheckEmailExist(email);
-        boolean continu = true;
-        while (!Ex.equals("Exist")) {
+        boolean done = true;
+        if(!Ex.equals("Exist")) {
             System.out.println(Ex);
-            System.out.println("Do you want to return to the menu? y/n");
+            done=false;
+           /* System.out.println("Do you want to return to the menu? y/n");
             String ans=myScanner.next();
             if(ans.equals("y")){
                 continu=false;
                 break;
-            }
-            System.out.println("enter your email:");
+            }*/
+           /* System.out.println("enter your email:");
             email = myScanner.next();
-            Ex = Sys.CheckEmailExist(email);
+            Ex = Sys.CheckEmailExist(email);*/
         }
-        while (continu) {
+        if (done) {
             System.out.println("Please enter password");
             password = myScanner.next();
             String Done = Sys.Login(email, password);
-            while (!Done.equals("Done")) {
+            if (!Done.equals("Done")) {
                 System.out.println(Ex);
-                System.out.println("enter the password again");
-                password = myScanner.next();
-                Done = Sys.Login(email, password);
+                done=false;
+                //System.out.println("enter the password again");
+                //password = myScanner.next();
+                //Done = Sys.Login(email, password);
             }
-            continu=false;
         }
+        if(done) {
             System.out.println(email + " welcome to your super!");
-
+            System.out.println("");
+            GetOrderDetails();
+            System.out.println("");
+            Action();
         }
+    }
 
     private static void Add_Edit_Supplier(int status) {
         boolean conect = Sys.CheckConected();
@@ -494,113 +548,113 @@ public class Menu {
             System.out.println("You need to connect before you take any action");
         }
         if (conect) {
-         Scanner myScanner = new Scanner(System.in);
-        int suplaier_ID;
-        boolean fixeDays = false;
-        LinkedList<Integer> Days = new LinkedList<Integer>();
-        boolean leading = true;
-        Map<Integer,Integer>  ItemsID_ItemsIDSupplier=new ConcurrentHashMap<Integer, Integer>();
-        Map<Integer, String> ProductIDVendor_Name = new ConcurrentHashMap<Integer, String>();
-        Map<Integer, Double> ProducttemsIDVendor_Price = new ConcurrentHashMap<Integer, Double>();
-        boolean contiue=true;
+            Scanner myScanner = new Scanner(System.in);
+            int suplaier_ID;
+            boolean fixeDays = false;
+            LinkedList<Integer> Days = new LinkedList<Integer>();
+            boolean leading = true;
+            Map<Integer,Integer>  ItemsID_ItemsIDSupplier=new ConcurrentHashMap<Integer, Integer>();
+            Map<Integer, String> ProductIDVendor_Name = new ConcurrentHashMap<Integer, String>();
+            Map<Integer, Double> ProducttemsIDVendor_Price = new ConcurrentHashMap<Integer, Double>();
+            boolean contiue=true;
 
-        System.out.println("Please enter the Supplier's ID");
-        suplaier_ID = myScanner.nextInt();
-        if(status==2){
-            String exist=Sys.CheckSAgreementExist(suplaier_ID);
-            while (!exist.equals("Done")){
-                System.out.println(exist);
-                System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
-                String ans=myScanner.next();
-                if(ans.equals("y")){
-                    System.out.println("Please enter the Supplier's ID");
-                    suplaier_ID =myScanner.nextInt();
-                    exist=Sys.CheckSAgreementExist(suplaier_ID);
-                }
-                else{
-                    {
-                        contiue=false;
-                        exist="Done";
+            System.out.println("Please enter the Supplier's ID");
+            suplaier_ID = myScanner.nextInt();
+            if(status==2){
+                String exist=Sys.CheckSAgreementExist(suplaier_ID);
+                while (!exist.equals("Done")){
+                    System.out.println(exist);
+                    System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
+                    String ans=myScanner.next();
+                    if(ans.equals("y")){
+                        System.out.println("Please enter the Supplier's ID");
+                        suplaier_ID =myScanner.nextInt();
+                        exist=Sys.CheckSAgreementExist(suplaier_ID);
                     }
-                }
-            }
-        }
-        if (contiue) {
-
-            System.out.println("Does the supplier bring the supply on regular days? y/n");
-            String ans = myScanner.next();
-            if (ans.equals("y")) {
-                fixeDays = true;
-                System.out.println("Please enter one day that the supply are expected to arrive. in number");
-                int day = myScanner.nextInt();
-                Days.add(day);
-                boolean MoreDay = true;
-                while (MoreDay) {
-                    System.out.println("Is the supply expected to arrive in more days? y/n");
-                    ans = myScanner.next();
-                    if (ans.equals("n"))
-                        MoreDay = false;
-                    else {
-                        System.out.println("Please enter the extra day. in number");
-                        day = myScanner.nextInt();
-                        if(day<8&&day>0) {
-                            Days.add(day);
-                        }
-                        else{
-                            System.out.println("the day need to be between 0-7");
+                    else{
+                        {
+                            contiue=false;
+                            exist="Done";
                         }
                     }
                 }
             }
-            System.out.println("Does the supplier bring the supplier by himself (or it required for transport Syss)? y/n");
-            ans = myScanner.next();
-            if (ans.equals("n")) {
-                leading = false;
-            }
+            if (contiue) {
 
-            boolean MoreProduct = true;
-            while (MoreProduct) {
-                String Product_Name;
-                String category;
-                String subcategory;
-                String sub_subcategory;
-                String manufacturer;
-                System.out.println("Which product the supplier will supply to the store?\n" + "Please enter its name");
-                Product_Name = myScanner.next();
-                System.out.println("Please enter its category");
-                category = myScanner.next();
-                System.out.println("Please enter its subcategory");
-                subcategory = myScanner.next();
-                System.out.println("Please enter its sub_subcategory");
-                sub_subcategory = myScanner.next();
-                System.out.println("Please enter its manufacturer");
-                manufacturer = myScanner.next();
-                int Id_Store=Sys.FindId_P_Store(Product_Name,category,subcategory,sub_subcategory,manufacturer);
-                System.out.println("Please enter his Catalog Number");
-                int product_Id = myScanner.nextInt();
-                System.out.println("Please enter the price");
-                double Product_Price = myScanner.nextInt();
-                ItemsID_ItemsIDSupplier.put(Id_Store,product_Id);
-                ProductIDVendor_Name.put(product_Id, Product_Name);
-                ProducttemsIDVendor_Price.put(product_Id, Product_Price);
-                System.out.println("Does the supplier provide another product? y/n");
+                System.out.println("Does the supplier bring the supply on regular days? y/n");
+                String ans = myScanner.next();
+                if (ans.equals("y")) {
+                    fixeDays = true;
+                    System.out.println("Please enter one day that the supply are expected to arrive. in number");
+                    int day = myScanner.nextInt();
+                    Days.add(day);
+                    boolean MoreDay = true;
+                    while (MoreDay) {
+                        System.out.println("Is the supply expected to arrive in more days? y/n");
+                        ans = myScanner.next();
+                        if (ans.equals("n"))
+                            MoreDay = false;
+                        else {
+                            System.out.println("Please enter the extra day. in number");
+                            day = myScanner.nextInt();
+                            if(day<8&&day>0) {
+                                Days.add(day);
+                            }
+                            else{
+                                System.out.println("the day need to be between 0-7");
+                            }
+                        }
+                    }
+                }
+                System.out.println("Does the supplier bring the supplier by himself (or it required for transport Syss)? y/n");
                 ans = myScanner.next();
                 if (ans.equals("n")) {
-                    MoreProduct = false;
+                    leading = false;
+                }
+
+                boolean MoreProduct = true;
+                while (MoreProduct) {
+                    String Product_Name;
+                    String category;
+                    String subcategory;
+                    String sub_subcategory;
+                    String manufacturer;
+                    System.out.println("Which product the supplier will supply to the store?\n" + "Please enter its name");
+                    Product_Name = myScanner.next();
+                    System.out.println("Please enter its category");
+                    category = myScanner.next();
+                    System.out.println("Please enter its subcategory");
+                    subcategory = myScanner.next();
+                    System.out.println("Please enter its sub_subcategory");
+                    sub_subcategory = myScanner.next();
+                    System.out.println("Please enter its manufacturer");
+                    manufacturer = myScanner.next();
+                    int Id_Store=Sys.FindId_P_Store(Product_Name,category,subcategory,sub_subcategory,manufacturer);
+                    System.out.println("Please enter his Catalog Number");
+                    int product_Id = myScanner.nextInt();
+                    System.out.println("Please enter the price");
+                    double Product_Price = myScanner.nextInt();
+                    ItemsID_ItemsIDSupplier.put(Id_Store,product_Id);
+                    ProductIDVendor_Name.put(product_Id, Product_Name);
+                    ProducttemsIDVendor_Price.put(product_Id, Product_Price);
+                    System.out.println("Does the supplier provide another product? y/n");
+                    ans = myScanner.next();
+                    if (ans.equals("n")) {
+                        MoreProduct = false;
+                    }
+                }
+                String Done;
+                switch (status) {
+                    case 1:
+                        Done = Sys.AddContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        break;
+                    case 2:
+                        Done = Sys.EditContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        break;
                 }
             }
-            String Done;
-            switch (status) {
-                case 1:
-                    Done = Sys.AddContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
-                    break;
-                case 2:
-                    Done = Sys.EditContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
-                    break;
-            }
         }
-        }
-     }
+    }
 
     private static void Add_Edit_Write(int status) {
         boolean conect = Sys.CheckConected();
@@ -608,12 +662,12 @@ public class Menu {
             System.out.println("You need to connect before you take any action");
         }
         if (conect) {
-        int Suplaier_ID;
-        Map<Integer, Integer> ItemsID_Amount=new ConcurrentHashMap<Integer, Integer>();
-        Map<Integer, Double> ItemsID_Assumption =new ConcurrentHashMap<Integer, Double>();
-        Scanner myScanner = new Scanner(System.in);
-        System.out.println("Please enter the Supplier's ID");
-        Suplaier_ID = myScanner.nextInt();
+            int Suplaier_ID;
+            Map<Integer, Integer> ItemsID_Amount=new ConcurrentHashMap<Integer, Integer>();
+            Map<Integer, Double> ItemsID_Assumption =new ConcurrentHashMap<Integer, Double>();
+            Scanner myScanner = new Scanner(System.in);
+            System.out.println("Please enter the Supplier's ID");
+            Suplaier_ID = myScanner.nextInt();
 
             boolean contiue=true;
             if (status == 2) {
@@ -692,14 +746,14 @@ public class Menu {
                     System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
                     day = myScanner.nextInt();
                     conect = Sys.CheckTheDay(ID_Suplaier, day);
-                   if(conect) {
-                    Days.add(day);
-                    System.out.println("Would you like to add another day? y/n");
-                    String ans = myScanner.next();
-                    if (ans.equals("n")) {
-                        moreDay = false;
+                    if(conect) {
+                        Days.add(day);
+                        System.out.println("Would you like to add another day? y/n");
+                        String ans = myScanner.next();
+                        if (ans.equals("n")) {
+                            moreDay = false;
+                        }
                     }
-                }
                 }
                 if (conect) {
                     boolean MoreProduct = true;
@@ -718,17 +772,17 @@ public class Menu {
                         else{
                             System.out.println("This product is not included in the agreement with the supplier.");
                         }
-                            System.out.println("Would you like to add another product? y/n");
-                            String ans = myScanner.next();
-                            if (ans.equals("n")) {
-                                MoreProduct = false;
-                            }
+                        System.out.println("Would you like to add another product? y/n");
+                        String ans = myScanner.next();
+                        if (ans.equals("n")) {
+                            MoreProduct = false;
+                        }
                     }
                     int Done = Sys.MakeOrder(ID_Suplaier, Days,ItemsIDVendor_NumberOfItems);
                     System.out.println(Done);
                     if (Done>-1){
-                      InterfaceOrder o = Sys.getOrderDetails(Done);
-                      PrintOrder(o);
+                        InterfaceOrder o = Sys.getOrderDetails(Done);
+                        PrintOrder(o);
                     }
                 }
                 else
@@ -736,88 +790,95 @@ public class Menu {
             }
         }
 
-     }
+    }
 
-
-
-    private static void UpdateDetailsOrder(){
-         boolean conect = Sys.CheckConected();
+    private static void UpdateDetailsOrder() {
+        boolean conect = Sys.CheckConected();
         if (!conect) {
-        System.out.println("You need to connect before you take any action");
-    }
-        if (conect) {
-        int ID_Suplaier;
-        int ID_Order;
-        int Product_ID;
-        int Product_Amount;
-        Map<Integer, Integer> ItemsIDVendor_NumberOfItems = new ConcurrentHashMap<Integer, Integer>();
-        Scanner myScanner = new Scanner(System.in);
-        int day;
-        System.out.println("Please enter the Order ID you want to change");
-        ID_Order = myScanner.nextInt();
-        String Able = Sys.CheckAbleToChangeOrder(ID_Order);
-        if (!Able.equals("Able")) {
-            conect = false;
-            System.out.println(Able);
+            System.out.println("You need to connect before you take any action");
         }
         if (conect) {
-            System.out.println("Please enter the Supplier's ID you want to order from");
-            ID_Suplaier = myScanner.nextInt();
-            System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
-            day = myScanner.nextInt();
-            conect = Sys.CheckTheDay(ID_Suplaier, day);
-            if (conect) {
-
-                boolean LessProduct=false;
-                System.out.println("Would you like to remove product from the Order?  y/n");
-                String ans = myScanner.next();
-                if (ans.equals("y")) {
-                    LessProduct = true;
-                }
-                while (LessProduct){
-                    System.out.println("Please enter the Product's ID (According to the supplier)");
-                    Product_ID = myScanner.nextInt();
-                    Sys.RemoveProduct(ID_Order,Product_ID);
-                    System.out.println("Would you like to remove another product? y/n");
-                    ans = myScanner.next();
-                    if (ans.equals("n")) {
-                        LessProduct = false;
-                    }
-                }
-
-                boolean MoreProduct = false;
-                System.out.println("Would you like to add Product to the Order?");
-                ans = myScanner.next();
-                if (ans.equals("y")) {
-                    MoreProduct = true;
-                }
-                while ((MoreProduct)) {
-                    System.out.println("Please enter the Product's ID (According to the supplier)");
-                    Product_ID = myScanner.nextInt();
-                    conect=Sys.CheckProductexist(ID_Suplaier,Product_ID);
-                    if(conect) {
-                        System.out.println("How many units of the product would you like to order?");
-                        Product_Amount = myScanner.nextInt();
-                        ItemsIDVendor_NumberOfItems.put(Product_ID, Product_Amount);
-                    }
-                    else{
-                        System.out.println("This product is not included in the agreement with the supplier.");
-                    }
-                    System.out.println("Would you like to add another product? y/n");
-                    ans = myScanner.next();
-                    if (ans.equals("n")) {
-                        MoreProduct = false;
-                    }
-                }
-                String Done = Sys.ChangeOrder(ID_Order,ID_Suplaier, day, ItemsIDVendor_NumberOfItems);
-                System.out.println(Done);
+            int ID_Suplaier;
+            int ID_Order;
+            int Product_ID;
+            int Product_Amount;
+            Map<Integer, Integer> ItemsIDVendor_NumberOfItems = new ConcurrentHashMap<Integer, Integer>();
+            Scanner myScanner = new Scanner(System.in);
+            LinkedList<Integer> Days = new LinkedList<Integer>();
+            System.out.println("Please enter the Order ID you want to change");
+            ID_Order = myScanner.nextInt();
+            String Able = Sys.CheckAbleToChangeOrder(ID_Order);
+            if (!Able.equals("Able")) {
+                conect = false;
+                System.out.println(Able);
             }
-            else
-                System.out.println("the supplier arrived to the store in another days.");
-        }
-    }
+            if (conect) {
+                ID_Suplaier = Sys.GetSupplierID_PerOrder(ID_Order);
+                boolean moreDay = true;
+                while (moreDay) {
+                    int day;
+                    System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
+                    day = myScanner.nextInt();
+                    conect = Sys.CheckTheDay(ID_Suplaier, day);
+                    if (conect) {
+                        Days.add(day);
+                        System.out.println("Would you like to add another day? y/n");
+                        String ans = myScanner.next();
+                        if (ans.equals("n")) {
+                            moreDay = false;
+                        }
+                    }
+                }
+                if (conect) {
+                    boolean LessProduct = false;
+                    System.out.println("Would you like to remove product from the Order?  y/n");
+                    String ans = myScanner.next();
+                    if (ans.equals("y")) {
+                        LessProduct = true;
+                    }
+                    while (LessProduct) {
+                        System.out.println("Please enter the Product's ID (According to the supplier)");
+                        Product_ID = myScanner.nextInt();
+                        Sys.RemoveProduct(ID_Order, Product_ID);
+                        System.out.println("Would you like to remove another product? y/n");
+                        ans = myScanner.next();
+                        if (ans.equals("n")) {
+                            LessProduct = false;
+                        }
+                    }
 
-}
+                    boolean MoreProduct = false;
+                    System.out.println("Would you like to add Product to the Order?");
+                    ans = myScanner.next();
+                    if (ans.equals("y")) {
+                        MoreProduct = true;
+                    }
+                    while ((MoreProduct)) {
+                        System.out.println("Please enter the Product's ID (According to the supplier)");
+                        Product_ID = myScanner.nextInt();
+                        conect = Sys.CheckProductexist(ID_Suplaier, Product_ID);
+                        if (conect) {
+                            System.out.println("How many units of the product would you like to order?");
+                            Product_Amount = myScanner.nextInt();
+                            ItemsIDVendor_NumberOfItems.put(Product_ID, Product_Amount);
+                        } else {
+                            System.out.println("This product is not included in the agreement with the supplier.");
+                        }
+                        System.out.println("Would you like to add another product? y/n");
+                        ans = myScanner.next();
+                        if (ans.equals("n")) {
+                            MoreProduct = false;
+                        }
+                    }
+                    String Done = Sys.ChangeOrder(ID_Order, ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
+                    System.out.println(Done);
+                }
+                else
+                    System.out.println("the supplier arrived to the store in another days.");
+            }
+        }
+
+    }
 
     private static void DisplayItems() {
         boolean conect = Sys.CheckConected();
@@ -873,33 +934,42 @@ public class Menu {
             }
         }
 
-        }
+    }
 
-     private static void UpdateOrderStatus() {
-         boolean conect = Sys.CheckConected();
-         if (!conect) {
-             System.out.println("You need to connect before you take any action");
-         }
-         if (conect) {
-             int ID_Order;
-             Scanner myScanner = new Scanner(System.in);
-             System.out.println("Pleas enter the Order ID that arrived to the store");
-             ID_Order = myScanner.nextInt();
-             String exist = Sys.ChangOrderStatus(ID_Order);
-             while (!exist.equals("Done")) {
-                 System.out.println(exist);
-                 System.out.println("do you want to return the menu? y/n");
-                 String ans = myScanner.next();
-                 if (ans.equals("y"))
-                     break;
-                 System.out.println("Pleas enter the Order ID again");
-                 ID_Order = myScanner.nextInt();
-                 exist = Sys.ChangOrderStatus(ID_Order);
-             }
-             if (exist.equals("Done"))
-                 System.out.println("the Order status updated!");
-         }
-     }
+    private static void UpdateOrderStatus() {
+
+        boolean conect = Sys.CheckConected();
+        if (!conect) {
+            System.out.println("You need to connect before you take any action");
+        }
+        if (conect) {
+            int ID_Order;
+            Scanner myScanner = new Scanner(System.in);
+            System.out.println("Pleas enter the Order ID that arrived to the store");
+            ID_Order = myScanner.nextInt();
+            InterfaceOrder order = Sys.getOrderDetails(ID_Order);
+            if(order!=null) {
+                Map ProductID_Amount=new HashMap<Integer, Integer>();
+                Map ProductID_Date=new HashMap<Integer, Integer>();
+                for (Map.Entry p:order.ItemsID_ItemsIDVendor.entrySet()
+                ) {
+                    System.out.println("Did the item with ID "+ p.getKey() +"arrive at the store? y/n");
+                    String ans=myScanner.next();
+                    if(ans.equals("y")|ans.equals("N")){
+                        System.out.println("Please enter the number of units that came from this product");
+                        int amount=myScanner.nextInt();
+                        ProductID_Amount.put(p.getKey(),amount);
+                        System.out.println("Please enter the expiry date for the product");
+                        int date=myScanner.nextInt();
+                        ProductID_Date.put(p.getKey(),date);
+                    }
+                }
+                Sys.AddToStore(ProductID_Amount,ProductID_Date);
+            }
+            if (order==null)
+                System.out.println("the Order is mot exist in the system");
+        }
+    }
 
     private static void DeleteSupplier() {
         boolean conect = Sys.CheckConected();
@@ -917,8 +987,8 @@ public class Menu {
     }
 
     private static void Logout() {
-         String ans=Sys.Logout();
-         System.out.println(ans);
+        String ans=Sys.Logout();
+        System.out.println(ans);
     }
 
     public static void printWarning(String warning) {
@@ -926,21 +996,39 @@ public class Menu {
     }
 
     private static void PrintOrder(InterfaceOrder o) {
-         System.out.println("The Order ID is: "+o.ID_Inventation);
-         System.out.println("The Supplier ID is: "+o.ID_Vendor);
-         System.out.println("The Days that the order is coming is:"  );
-         for (int d: o.Days
-             ) {
-           System.out.println(d);
+        System.out.println("The Order ID is: "+o.ID_Inventation);
+        System.out.println("The Supplier ID is: "+o.ID_Vendor);
+        System.out.println("The Days that the order is coming is:"  );
+        for (int d: o.Days
+        ) {
+            System.out.println(d);
         }
-         System.out.println("The product that include in the Order is: ");
-         System.out.println("Product  | Amount");
-         for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
-             ) {
-         System.out.print(I.getValue());
-         System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
-         }
-         System.out.println("The Total Price of the order is: "+o.TotalPrice);
+        System.out.println("The product that include in the Order is: ");
+        System.out.println("Product  | Amount");
+        for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
+        ) {
+            System.out.print(I.getValue());
+            System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
+        }
+        System.out.println("The Total Price of the order is: "+o.TotalPrice);
+    }
+
+    private static void GetOrderDetails() {
+        System.out.println("Orders that are scheduled to arrive today:");
+        LinkedList<InterfaceOrder> Orders=Sys.GetOrderDetails();
+        for (InterfaceOrder o:Orders
+        ) {
+            System.out.println("Order ID is: "+o.ID_Inventation);
+            System.out.println("Supplier ID is: "+o.ID_Vendor);
+            System.out.println("The product that include in the Order is: ");
+            for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
+            ) {
+                System.out.print(I.getValue());
+                System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
+            }
+            System.out.println("If an order arrives at the store,\n" +
+                    " select the \"Update Order Status\" in the menu and fill in the order details");
+        }
     }
 
 }

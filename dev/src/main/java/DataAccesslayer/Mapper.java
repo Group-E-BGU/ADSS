@@ -1,9 +1,8 @@
 package DataAccesslayer;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import BusinessLayer.ItemRecord;
+
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,30 +10,23 @@ import java.util.Map;
 
 public class Mapper {
 
-    private Repo Repositpry;
-    int ID_Invetation;
     private Connection conn;
 
     public Mapper(){
-        Repositpry=Repo.getInstance();
-        ID_Invetation=0;
     }
 
     public void InitializeDB() {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
-
+            //todo add storeId to the praymery key in every table..
             Statement stmt = conn.createStatement();
             String sqlStmt = "CREATE TABLE IF NOT EXISTS Store(" +
                     "email varchar NOT NULL," +
                     "itemId int," +
                     "NumOfProduct int," +
                     "NumOfOrder int," +
-                    "Column int," +
-                    "totalAmount int," +
-                    "StoreId varchar," +
-                    "storeEmail varchar," +
+                    "totalAmount int," + //todo?
                     "PRIMARY KEY(email));";
             stmt.execute(sqlStmt);
 
@@ -54,7 +46,7 @@ public class Mapper {
 
             sqlStmt = "CREATE TABLE IF NOT EXISTS User(" +
                     "email varchar NOT NULL," +
-                    "Column int," +
+                    "Password varchar NOT NULL," +
                     "PRIMARY KEY(email));";
             stmt.execute(sqlStmt);
 
@@ -92,7 +84,6 @@ public class Mapper {
             stmt.execute(sqlStmt);
 
             sqlStmt = "CREATE TABLE IF NOT EXISTS ItemRecord_Supplier(" +
-                    "SID int NOT NULL," +
                     "MainCategory varchar," +
                     "SubCategory varchar," +
                     "SubSubCategory varchar," +
@@ -101,7 +92,6 @@ public class Mapper {
                     "name varchar,"+
                     "PRIMARY KEY(IRID,SID)," +
                     "FOREIGN KEY(StoreId) REFERENCES Store(email), " +
-                    "FOREIGN KEY(SID) REFERENCES Supplier(id), " +
                     "FOREIGN KEY(MainCategory) REFERENCES Category(name), " +
                     "FOREIGN KEY(SubCategory) REFERENCES Category(name), " +
                     "FOREIGN KEY(SubSubCategory) REFERENCES Category(name), " +
@@ -174,25 +164,24 @@ public class Mapper {
                     "FOREIGN KEY(SID) REFERENCES Supplier(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
-
+            //todo add OID,PSupplierOD to the praymery key in every table..
             sqlStmt = "CREATE TABLE IF NOT EXISTS ProductOrder(" +
                     "OID int NOT NULL," +
                     "PStoreID int," +
                     "PSupplierOD bit," +
                     "amount int,"+
-                    "orderID int," +
                     "StoreId varchar," +
                     "PRIMARY KEY(StoreId)," +
-                    "FOREIGN KEY(orderID) REFERENCES Orders(id));";
+                    "FOREIGN KEY(OID) REFERENCES Orders(id));";
             stmt.execute(sqlStmt);
 
+
             sqlStmt = "CREATE TABLE IF NOT EXISTS Contract(" +
-                    "id int NOT NULL," +
+                    "SupplierId int NOT NULL," +
                     "fixDay bit," +
                     "leading bit," +
                     "StoreId varchar," +
-                    "SupplierId int,"+
-                    "PRIMARY KEY(id)," +
+                    "PRIMARY KEY(SupplierId)," +
                     "FOREIGN KEY(SupplierId) REFERENCES Supplier(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
@@ -200,7 +189,7 @@ public class Mapper {
             sqlStmt = "CREATE TABLE IF NOT EXISTS quantityWrote(" +
                     "pid int NOT NULL," +
                     "amount int," +
-                    "sale int," +
+                    "sale double," +
                     "SID int," +
                     "StoreId varchar," +
                     "PRIMARY KEY(pid)," +
@@ -221,26 +210,25 @@ public class Mapper {
             stmt.execute(sqlStmt);
 
             sqlStmt = "CREATE TABLE IF NOT EXISTS Contact(" +
-                    "id int NOT NULL," +
+                    "sid int NOT NULL," +
                     "name varchar," +
                     "phone int," +
-                    "ID inr,"+
+                    "ID int,"+
                     "StoreId varchar," +
-                    "ContractSupplierId int,"+
-                    "PRIMARY KEY(id)," +
-                    "FOREIGN KEY(ContractSupplierId) REFERENCES Contract(id),"+
+                    "PRIMARY KEY(ID)," +
+                    "FOREIGN KEY(sid) REFERENCES Contract(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
 
             sqlStmt = "CREATE TABLE IF NOT EXISTS ProductSupplier(" +
-                    "stid int NOT NULL," +
+                    "pstid int NOT NULL," +
                     "name varchar," +
-                    "price int," +
-                    "sid inr,"+
+                    "price double ," +
+                    "psid int,"+
                     "StoreId varchar," +
-                    "ContractSupplierId int,"+
-                    "PRIMARY KEY(stid)," +
-                    "FOREIGN KEY(ContractSupplierId) REFERENCES Contract(id),"+
+                    "SupId int,"+
+                    "PRIMARY KEY(psid)," +
+                    "FOREIGN KEY(SupId) REFERENCES Contract(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
 
@@ -248,9 +236,8 @@ public class Mapper {
                     "sid int NOT NULL," +
                     "day int," +
                     "StoreId varchar," +
-                    "ContractSupplierId int,"+
                     "PRIMARY KEY(sid)," +
-                    "FOREIGN KEY(ContractSupplierId) REFERENCES Contract(id),"+
+                    "FOREIGN KEY(sid) REFERENCES Contract(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
 
@@ -269,158 +256,755 @@ public class Mapper {
 
     }
 
+    public void WriteUser(String email, String password){
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO  User VALUES (?,?)";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setString(1,email);
+                stmt.setString(2,password);
+
+                stmt.executeUpdate();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            finally{
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+    public void WriteStore(String email, int itemeId, int numOfProduct, int NumOfOrder ){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO  Store VALUES (?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setString(1,email);
+            stmt.setInt(2,itemeId);
+            stmt.setInt(3,numOfProduct);
+            stmt.setInt(4,NumOfOrder);
+
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteStore(String email){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From Store"+
+                   "email = '"+email+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
     public void WriteSupplier(String Name, int ID, String address, String bank, String branch, int BankNumber,
-                              String Payments, Map<Integer, String> Contacts_ID,
-                              Map<Integer, Integer> Contacts_number) {
+                              String Payments,String storeId) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-        DALSupplier Dalush = new DALSupplier(Name, ID, address, bank,branch,BankNumber, Payments, Contacts_ID,
-                Contacts_number);
-        Repositpry.Suppliers.add(Dalush);
+            String sqlstmt = "INSERT INTO  Supplier VALUES (?,?,?,?,?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setInt(1,ID);
+            stmt.setString(2,Name);
+            stmt.setString(3,address);
+            stmt.setString(4,bank);
+            stmt.setString(5,branch);
+            stmt.setInt(6,BankNumber);
+            stmt.setString(7,Payments);
+            stmt.setString(8,storeId);
+
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 
-    public String EditSupplier(String Name, int ID, String address, String bank, String branch, int BankNumber,
-                               String Payments, Map<Integer, String> Contacts_ID,
-                               Map<Integer, Integer> Contacts_number) {
+    public void EditSupplier(String Name, int ID, String address, String bank, String branch, int BankNumber,
+                               String Payments,String storeId) {
 
-        DALSupplier Dalush = new DALSupplier(Name, ID,address, bank,branch,BankNumber, Payments, Contacts_ID,
-                Contacts_number);
+        try {
+        Class.forName("org.sqlite.JDBC");
+        conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-        for (DALSupplier Ven: Repositpry.Suppliers
-             ) {
-        if(Ven.ID==Dalush.ID)
-            Repositpry.Suppliers.remove(Ven);
+        String sqlstmt = "INSERT INTO Supplier VALUES (?,?,?,?,?,?,?,?)"+
+                "WHERE id = '"+ID+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setString(2,Name);
+            stmt.setString(3,address);
+            stmt.setString(4,bank);
+            stmt.setString(5,branch);
+            stmt.setInt(6,BankNumber);
+            stmt.setString(7,Payments);
+
+            stmt.executeUpdate();
+
+    } catch (Exception e) {
+        System.out.println(e.getMessage());
     }
-        Repositpry.Suppliers.add(Dalush);
-        return "Done";
+        finally{
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }
 
-    public String DeleteSupplier(int ID){
-        for (DALSupplier Ven: Repositpry.Suppliers
-        ) {
-            if(Ven.ID==ID)
-                Repositpry.Suppliers.remove(Ven);
-                return "Done";
+    public void DeleteSupplier(int ID, String storeId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From Supplier"+
+                    "WHERE id = '"+ID+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        return "the supplier is not exist in the system";
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 
-    public String WriteContract(int suplaier_ID, boolean fixeDays, List<Integer> dayes, boolean leading,
-                              Map<Integer, String> productIDSupplier_name, Map<Integer, Integer> ItemsID_ItemsIDsupplier,
-                              Map<Integer, Double> producttemsIDSupplier_price){
+    public void WriteContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId){
 
-        DALContract Dalush=new DALContract(suplaier_ID, fixeDays,dayes, leading, productIDSupplier_name,
-                ItemsID_ItemsIDsupplier, producttemsIDSupplier_price);
-        for (DALSupplier Sup:Repositpry.Suppliers
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO Contract VALUES (?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setInt(1,suplaier_ID);
+            stmt.setBoolean(2,fixeDays); //todo check if its work
+            stmt.setBoolean(3,leading);
+            stmt.setString(4,storeId);
+
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteContract(int suplaier_ID,String StoreId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From Contract"+
+                    "WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+StoreId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public DALContract ReadContract(int id) {
+        //todo
+        return null;
+    }
+
+    public void WriteWrote(String storeId ,int suplaier_ID, java.util.Map<Integer, Integer> itemsID_amount, Map<Integer,Double> itemsID_assumption){
+        for (Map.Entry<Integer,Integer> ID_Amount: itemsID_amount.entrySet()
              ) {
-            if(Sup.ID==suplaier_ID){
-                Sup.Contract=Dalush;
-                return "Done";
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO quantityWrote VALUES (?,?,?,?,?)";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setInt(1, ID_Amount.getKey());
+                stmt.setInt(2, ID_Amount.getValue());
+                stmt.setDouble(3,itemsID_assumption.get(ID_Amount.getKey()) );
+                stmt.setInt(4,suplaier_ID );
+                stmt.setString(5,storeId );
+
+                stmt.executeUpdate();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
         }
-        return "the supplier is not exist in the system";
     }
 
-    public void DeleteContract(int suplaier_ID){
-        for (DALSupplier Sup:Repositpry.Suppliers
-        ) {
-            if(Sup.ID==suplaier_ID){
-                Sup.Contract=null;
+    public void DeleteWrote(int suplaier_ID,String storeId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From quantityWrote"+
+                    "WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
             }
         }
     }
 
-    public void WriteWrote(int suplaier_ID, java.util.Map<Integer, Integer> itemsID_amount, Map<Integer,Double> itemsID_assumption){
-        DALWrotequantities Dalush=new DALWrotequantities(suplaier_ID,  itemsID_amount, itemsID_assumption);
-        for (DALSupplier Sup:Repositpry.Suppliers
-        ) {
-            if(Sup.ID==suplaier_ID){
-                Sup.Worte=Dalush;
+    public DALWrotequantities ReadWorte(int id) {
+       //todo
+        return null;
+    }
+
+    public void WriteOrder(String storeId, int id_suplaier, int IdOrder,boolean auto,LinkedList<Integer> days, Date d, Date dd , Double TotalPrice, String status) {
+
+        for (int day: days
+             ) {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setInt(1, IdOrder);
+                stmt.setInt(2, id_suplaier);
+                stmt.setBoolean(3, auto);
+                stmt.setInt(4, day);
+                stmt.setDate(5, d);
+                stmt.setDate(6, dd);
+                stmt.setDouble(7,TotalPrice);
+                stmt.setString(8, status);
+                stmt.setString(9, storeId);
+
+                stmt.executeUpdate();
+
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+    }
+
+    public void DeleteOrder(String storeId, int OrderId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From Orders"+
+                    "WHERE id = '"+OrderId+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
             }
         }
     }
 
-    public void DeleteWrote(int suplaier_ID){
-        for (DALSupplier Sup:Repositpry.Suppliers
-        ) {
-            if(Sup.ID==suplaier_ID){
-             Sup.Worte=null;
+    public void WriteProductOrder(String storeId, int IdOrder,Map<Integer,Integer>ProductIDSupplier_ProductID_Store, Map<Integer, Integer> ProductIDSupplier_numberOfItems){
+
+        for (Map.Entry<Integer,Integer> PId_num: ProductIDSupplier_numberOfItems.entrySet()
+             ) {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO ProductOrder  VALUES (?,?,?,?,?)";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setInt(1, IdOrder);
+                stmt.setInt(2, ProductIDSupplier_ProductID_Store.get(PId_num.getKey()));
+                stmt.setInt(3, PId_num.getKey());
+                stmt.setInt(4, PId_num.getValue());
+                stmt.setString(5, storeId);
+
+                stmt.executeUpdate();
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
         }
+    }
+
+    public void DeleteProductOrder(String storeId, int orderId, int ID_P_Sup){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From ProductOrder"+
+                    "WHERE OID = '"+orderId+ "' AND StoreId = '"+storeId+ "' AND PSupplierOD = '"+ID_P_Sup+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void WriteDayToContract(String storeId, int supplierId, int day){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO Days VALUES (?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setInt(1, supplierId);
+            stmt.setInt(2,day);
+            stmt.setString(3, storeId);
+
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteDayFromContract(String storeId, int supplierId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From quantityWrote"+
+                    "WHERE sid = '"+supplierId+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void WriteContact(String storeId, int supId,String name, int number, int id){
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO Contact VALUES (?,?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setInt(1, supId);
+            stmt.setString(2, name);
+            stmt.setInt(3, number);
+            stmt.setInt(4, id);
+            stmt.setString(5, storeId);
+
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteContact(String storeId, int supId,int id){
+        try {
+             Class.forName("org.sqlite.JDBC");
+             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+             String sqlstmt = "DELETE * From Contact"+
+                     "WHERE sid = '"+supId+ "' AND StoreId = '"+storeId+ "' AND ID = '"+id+"';";
+
+             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+             stmt.executeUpdate();
+
+         } catch (Exception e) {
+             System.out.println(e.getMessage());
+         }
+         finally{
+             try {
+                 if (conn != null) {
+                     conn.close();
+                 }
+             } catch (SQLException ex) {
+                 System.out.println(ex.getMessage());
+             }
+         }
+     }
+
+    public void WriteProductToSupplier(String storeId, int supId, int P_store_Id, int P_sup_Id, double price, String name){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO ProductSupplier VALUES (?,?,?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setInt(1, P_store_Id);
+            stmt.setString(2, name);
+            stmt.setDouble(3, price);
+            stmt.setInt(4, P_sup_Id);
+            stmt.setString(5, storeId);
+            stmt.setInt(6, supId);
+
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteProductFromSupplier(String storeId, int supId, int P_sup_Id ){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From ProductSuppliet"+
+                    "WHERE SupId = '"+supId+ "' AND StoreId = '"+storeId+ "' AND psid = '"+P_sup_Id+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void WriteItemRecord_Supplier(String storeId, int PId, String MainCategory, String SubCategory, String SubSubCategory, String name ){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "INSERT INTO ItemRecord_Supplier VALUES (?,?,?,?,?,?)";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+            stmt.setString(1, MainCategory);
+            stmt.setString(2, SubCategory);
+            stmt.setString(3, SubSubCategory);
+            stmt.setInt(4,PId);
+            stmt.setString(5, storeId);
+            stmt.setString(6, name);
+
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteItemRecord_Supplier(String storeId, int PId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE * From ItemRecord_Supplier"+
+                    "WHERE IRID = '"+PId+ "' AND StoreId = '"+storeId+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public String CheckEmailExist(String email) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM User " +
+                    "WHERE email = '"+email+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+               return "Exist";
+            else
+                return "Not Exist";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return "Not Exist";
+    }
+
+    public String CheckCorrectPassword(String email, String password) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM User " +
+                    "WHERE email = '"+email+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next()) {
+                if (rs.getString(2).equals(password)) {
+                    return "correct";
+                }
+            else
+                    return "un correct password";
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return "Not Exist";
+    }
+
+    public int getProductId(String storeId,String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM ItemRecord_Supplier " +
+                    "WHERE MainCategory = '"+category+"' AND SubCategory = '"+subcategory+
+                    "' AND SubSubCategory = '"+sub_subcategory+"' AND StoreId = '"+storeId+
+                    "' AND name = '"+product_name+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return rs.getInt(4);
+            else
+                return -1;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return -1;
     }
 
     public LinkedList<DALOrder> ReadAllInvetation() {
-        LinkedList<DALOrder> Invetation =Repositpry.Invetations;
+        LinkedList<DALOrder> Invetation =null;
         return Invetation;
     }
 
     public LinkedList<DALSupplier> ReadAllSupplier() {
-        LinkedList<DALSupplier> Vendors =Repositpry.Suppliers;
+        LinkedList<DALSupplier> Vendors =null;
         return Vendors;
-    }
-
-
-    public void WriteOrder(int id_suplaier, int numOfOrder,boolean auto,LinkedList<Integer> day, LocalDate d, LocalDate e , Map<Integer, Integer> itemsID_itemsIDSupplier, Map<Integer, Integer> productIDVendor_numberOfItems, Double TotalPrice, String status) {
-        DALOrder Dalush=new DALOrder(id_suplaier,numOfOrder,auto,day,d,e,
-                itemsID_itemsIDSupplier,productIDVendor_numberOfItems,TotalPrice,status);
-        Repositpry.Invetations.add(Dalush);
-    }
-
-
-    public DALContract ReadContract(int id) {
-        for (DALSupplier sup:Repositpry.Suppliers
-             ) {
-            if(sup.ID==id){
-               return sup.Contract;
-            }
-        }
-        return null;
-    }
-
-    public DALWrotequantities ReadWorte(int id) {
-        for (DALSupplier sup:Repositpry.Suppliers
-        ) {
-            if(sup.ID==id){
-                return sup.Worte;
-            }
-        }
-        return null;
-    }
-
-    public String CheckEmailExist(String email) {
-        for (DALUser du:Repositpry.Users){
-            if (du.email.equals(email)){
-                return "Exist";
-            }
-        }
-        return "Not Exist";
-    }
-
-    public String CheckCorrectPasword(String email, String password) {
-        for (DALUser du:Repositpry.Users
-             ) {
-            if(du.email.equals(email)){
-                if (du.password.equals(password)){
-                    return "correct";
-                }
-                return "un correct password";
-            }
-        }
-        return "Not Exist";
-    }
-
-    public String Register(String email, String password) {
-        DALUser du=new DALUser(email,password);
-        Repositpry.Users.add(du);
-        return "Done";
-    }
-
-    public int getProductId(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
-        //todo
-        return -1;
-    }
-
-    public void AddProdudt(int id, String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
-    Repositpry.AddProdudt(id,product_name,category,subcategory,sub_subcategory,manufacturer);
-
     }
 }

@@ -34,5 +34,17 @@ public class Wrotequantities {
 
     public void setItemsID_Assumption(Map<Integer, Double> itemsID_Assumption) {
         ItemsID_Assumption = itemsID_Assumption;
+}
+
+    public int getSuplaier_ID() {
+        return Suplaier_ID;
+    }
+
+    public Map<Integer, Integer> getItemsID_Amount() {
+        return ItemsID_Amount;
+    }
+
+    public Map<Integer, Double> getItemsID_Assumption() {
+        return ItemsID_Assumption;
     }
 }

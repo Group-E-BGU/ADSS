@@ -6,8 +6,8 @@ public class Supplier {
 
     private String Name;
     private int ID;
-    public String Bank;
-    public String Branch;
+    private String Bank;
+    private String Branch;
     private int BankNumber;
     private String Payments;
     private Map<Integer, String> ContactsID_Name;

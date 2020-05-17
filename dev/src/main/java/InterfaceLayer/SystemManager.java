@@ -1,6 +1,6 @@
 package InterfaceLayer;
 
-import BusinessLayer.Store;
+import BusinessLayer.*;
 import BusinessLayer.system;
 import BusinessLayer.User;
 import PresentationLayer.Menu;
@@ -35,7 +35,8 @@ public class SystemManager {
             if (minA < 0)
                 return "minimum amount cannot be below 0";
             int shelfNum = Integer.parseInt(shelfNumber);
-            return current_Store.addItemRecord(name, minA, shelfNum, manufacture);
+            return null; //todo check!
+            //current_Store.addItemRecord(name, minA, shelfNum, manufacture);
         } catch (Exception e) {
             return "please enter valid numbers";
         }
@@ -161,6 +162,7 @@ public class SystemManager {
         if(logged_user==null| current_Store==null){
             return "you need to Login before you logout";
         }
+        current_Store.Logout();
         current_Store=null;
         logged_user=null;
         return "login successfully";
@@ -177,7 +179,6 @@ public class SystemManager {
         Menu.printWarning(name,totalAmount,minAmount);
 */
     }
-
 
     public void initialize() {
         current_Store.initializeItems();
@@ -229,7 +230,6 @@ public class SystemManager {
         return current_Store.addItemDiscount(itemName, perc, beginDate, endDate);
     }
 
-
     public String addNewCategoryDiscount(String categoryName, String percentage, String begDate, String enDate) {
         java.sql.Date beginDate, endDate;
         int perc;
@@ -279,7 +279,6 @@ public class SystemManager {
         return current_Store.printDefectedReport(beginDate, endDate);
     }
 
-
     public String getInventoryReport(String names) {
         String[] categories = names.split("\\s+");
         String report = "";
@@ -314,13 +313,29 @@ public class SystemManager {
         current_Store.RemoveProduct(id_order,product_id);
     }
 
-    public String ChangeOrder(int Id_Order,int id_suplaier, int day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
-   // current_Store.ChangeOrder(Id_Order,id_suplaier, day ,itemsIDVendor_numberOfItems);
-   return "done";//todo check
+    public String ChangeOrder(int Id_Order, int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    return current_Store.ChangeOrder(Id_Order,id_suplaier, day ,itemsIDVendor_numberOfItems);
+
     }
 
     public InterfaceOrder getOrderDetails(int done) {
         InterfaceOrder o = current_Store.getOrderDetails(done);
         return o;
+    }
+
+    public InterfaceSupplier GetTheCyeeperSuplier(int produdtId, int amount) {
+        return current_Store.GetTheCyeeperSuplier(produdtId, amount);
+    }
+
+    public int GetSupplierID_PerOrder(int id_order) {
+        return current_Store.GetSupplierID_PerOrder(id_order);
+    }
+
+    public void AddToStore(Map productID_amount, Map productID_date) {
+        current_Store.AddToStore(productID_amount,productID_date);
+    }
+
+    public LinkedList<InterfaceOrder> GetOrderDetails() {
+        return current_Store.GetOrderDetails();
     }
 }

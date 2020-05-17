@@ -7,7 +7,7 @@ public class InterfaceContract {
 
    public int Suplaier_ID;
     public boolean FixeDays;
-    public List<Integer> Dayes;
+    public List<Integer> Days;
     public boolean leading;
     public Map<Integer, Integer> ItemsID_ItemsIDSupplier;
     public Map<Integer, String> ProductIDVendor_Name;
@@ -18,7 +18,7 @@ public class InterfaceContract {
                              Map<Integer, Double> producttemsIDSupplier_price) {
         Suplaier_ID = suplaier_ID;
         FixeDays = fixeDays;
-        Dayes=dayes;
+        Days=dayes;
         this.leading = leading;
         ProductIDVendor_Name=productIDSupplier_name;
         ItemsID_ItemsIDSupplier=ItemsID_ItemsIDsupplier;

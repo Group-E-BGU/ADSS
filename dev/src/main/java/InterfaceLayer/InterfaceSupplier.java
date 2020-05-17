@@ -13,12 +13,13 @@ public class InterfaceSupplier {
     public String Payments;
     public Map<Integer, String> ContactsID_Name;
     public Map<Integer, Integer> ContactsID_number;
-    public Contract Contract;
-    public Wrotequantities Worte;
+    public InterfaceContract Contract;
+    public InterfaceWrotequantities Worte;
 
     public InterfaceSupplier(String name, int ID, String bank,String branch, int bankNumber,
                              String payments, Map<Integer, String> Contacts_ID,
-                             Map<Integer, Integer> Contacts_number) {
+                             Map<Integer, Integer> Contacts_number,InterfaceContract contract,
+                                     InterfaceWrotequantities worte) {
         Name = name;
         this.ID = ID;
         Bank=bank;
@@ -29,6 +30,8 @@ public class InterfaceSupplier {
         Worte = null;
         ContactsID_Name=Contacts_ID;
         ContactsID_number=Contacts_number;
+        Contract=contract;
+        Worte=worte;
     }
 }
 
