@@ -30,7 +30,7 @@ public class Store {
     private DALItemRecord dalItemRecord;
 
     public static Store createInstance(String email) {
-        if (storeInstance != null) {
+        if (storeInstance == null) {
             storeInstance = new Store(email);
         }
         return storeInstance;
@@ -46,6 +46,7 @@ public class Store {
     private Store(String email) {
     Map=new Mapper();
     Map.InitializeDB();
+    email_ID = email;
     list_of_Suplier=new LinkedList<Supplier>();
     LinkedList<DALSupplier> Suppliers=Map.ReadAllSupplier();
     for (DALSupplier s : Suppliers

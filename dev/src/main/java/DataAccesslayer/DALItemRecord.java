@@ -53,15 +53,16 @@ public class DALItemRecord {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "SELECT *" +
-                    "FROM ItemRecord" +
-                    "WHERE name = "+name+ " AND StoreId = "+storeId;
+            String sqlstmt = "SELECT * " +
+                    "FROM ItemRecord " +
+                    "WHERE name = '"+name+ "' AND StoreId = '"+storeId+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
-
-            return new ItemRecord(rs.getString(2),rs.getInt(1),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7),rs.getString(8));
-
+            if(rs.next())
+                return new ItemRecord(rs.getString(2),rs.getInt(1),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7),rs.getString(8));
+            else
+                return null;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
