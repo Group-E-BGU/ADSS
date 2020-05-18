@@ -17,10 +17,10 @@ public class Category {
         return name;
     }
 
-    public String items() {
+    public String items(Store store) {
         String items = "";
         for (ItemRecord record: itemRecords) {
-           // items = items + Supply.getController().itemForReport(record) + "\n";
+           items = items + store.itemForReport(record) + "\n";
         }
         if(items.length() > 2)
             return items.substring(0,items.length()-2);
@@ -49,6 +49,10 @@ public class Category {
     }
 
     public void addItem(ItemRecord itemRecord) {
+        for (ItemRecord ir:itemRecords) {
+            if(ir.getId() == itemRecord.getId())
+                return;
+        }
         itemRecords.add(itemRecord);
     }
 

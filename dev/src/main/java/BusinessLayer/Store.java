@@ -3,6 +3,7 @@ package BusinessLayer;
 import DataAccesslayer.*;
 import InterfaceLayer.*;
 import com.sun.org.apache.xpath.internal.operations.Or;
+import com.sun.xml.internal.ws.server.ServerRtException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,8 +25,10 @@ public class Store {
     private HashMap<String,Category> categories;
     private LinkedList<Discount> discounts;
     private LinkedList<SimplePair> defects;
-    private int itemId; //was static
+    private static int itemId;
     private DALItemRecord dalItemRecord;
+    private DALCategory dalCategory;
+    private DALDiscount dalDiscount;
 
     public static Store createInstance(String email) {
         if (storeInstance == null) {
@@ -43,19 +46,20 @@ public class Store {
 
     private Store(String email) {
     Map=new Mapper();
-    Map.InitializeDB();
     email_ID = email;
     list_of_Suplier=new LinkedList<Supplier>();
     list_of_Order=new LinkedList<Order>();
     NumOfOrder=0;
     NumOfProduct=0;
     Trans=new Transportrans();
-    HashMap<String,ItemRecord> itemRecords=new HashMap<String,ItemRecord>();
-    HashMap<String,Category> categories=new HashMap<String,Category>();
-    LinkedList<Discount> discounts=new LinkedList<Discount>();
-    LinkedList<SimplePair> defects=new LinkedList<SimplePair>();
+    itemRecords=new HashMap<String,ItemRecord>();
+    categories=new HashMap<String,Category>();
+    discounts=new LinkedList<Discount>();
+    defects=new LinkedList<SimplePair>();
     itemId=0;
     dalItemRecord = new DALItemRecord();
+    dalCategory = new DALCategory();
+    dalDiscount = new DALDiscount();
 
     //TODO - read all the information?
     /*LinkedList<DALSupplier> Suppliers=Map.ReadAllSupplier();
@@ -88,6 +92,7 @@ public class Store {
         discounts = new LinkedList<>();
         defects = new LinkedList<>();
         itemId = 0;
+*/
 
     }
 
@@ -100,7 +105,7 @@ public class Store {
             itemRecords.put(name,ir);
             dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
             return name+" added successfully";
-       }*/
+       }
     }
 
     public String AddSuplier(String name, int id,String address, String bank, String branch, int bankNumber,
@@ -508,6 +513,7 @@ public class Store {
             }
         }
     }
+    @SuppressWarnings("deprecation")
 
     public void initializeItems() {
         ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
@@ -516,6 +522,7 @@ public class Store {
         itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
         itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
         itemRecords.put("milk Tnova 3%",itemRecord1);
+        dalItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
 
         ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
@@ -524,11 +531,14 @@ public class Store {
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
         itemRecords.put("white bread",itemRecord2);
+        dalItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
 
         ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
         itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
         itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
         itemRecords.put("coffee Elite",itemRecord3);
+        dalItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
+
 
         itemRecord1.addPrice(new Price(80,120));
         itemRecord2.addPrice(new Price(90,130));
@@ -543,6 +553,10 @@ public class Store {
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,category1);
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,subCat1);
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,subsubcat1);
+        dalCategory.InsertCategory(category1.getName(),1,email_ID);
+        dalCategory.InsertCategory(subCat1.getName(),2,email_ID);
+        dalCategory.InsertCategory(subsubcat1.getName(),3,email_ID);
+
 
         categories.put("Dairy",category1);
         categories.put("Milk",subCat1);
@@ -554,6 +568,9 @@ public class Store {
         addItemToCategory(itemRecords.get("white bread") ,category2);
         addItemToCategory(itemRecords.get("white bread") ,subcat2);
         addItemToCategory(itemRecords.get("white bread") ,subsubcat2);
+        dalCategory.InsertCategory(category2.getName(),1,email_ID);
+        dalCategory.InsertCategory(subcat2.getName(),2,email_ID);
+        dalCategory.InsertCategory(subsubcat2.getName(),3,email_ID);
 
         categories.put("Bread and pastry",category2);
         categories.put("Bread",subcat2);
@@ -564,6 +581,9 @@ public class Store {
         addItemToCategory(itemRecords.get("coffee Elite") ,category3);
         addItemToCategory(itemRecords.get("coffee Elite") ,subcat3);
         addItemToCategory(itemRecords.get("coffee Elite") ,subsubcat3);
+        dalCategory.InsertCategory(category3.getName(),1,email_ID);
+        dalCategory.InsertCategory(subcat3.getName(),2,email_ID);
+        dalCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
 
         categories.put("Drinks",category3);
         categories.put("Coffee powder",subcat3);
@@ -577,17 +597,17 @@ public class Store {
         }
         cat.addItem(itemRecord);
     }
-
+    @SuppressWarnings("deprecation")
     public void initializeDiscounts() {
-        CategoryDiscount cd1 = new CategoryDiscount(categories.get("Drinks"),
+        CategoryDiscount cd1 = new CategoryDiscount(1,categories.get("Drinks"),
                 new java.sql.Date(2020-1900,4-1,20),
                 new java.sql.Date(2020-1900,5-1,20),20);
-        CategoryDiscount cd2 = new CategoryDiscount(categories.get("Dairy"),
+        CategoryDiscount cd2 = new CategoryDiscount(2,categories.get("Dairy"),
                 new java.sql.Date(2020-1900,5-1,20),
                 new java.sql.Date(2020-1900,5-1,20),30);
         discounts.add(cd1);
         discounts.add(cd2);
-        ItemDiscount id =new ItemDiscount(itemRecords.get("white bread"),
+        ItemDiscount id =new ItemDiscount(3,itemRecords.get("white bread"),
                 new java.sql.Date(2020-1900,4-1,20),
                 new java.sql.Date(2020-1900,5-1,20),15);
         discounts.add(id);
@@ -599,7 +619,7 @@ public class Store {
         }
         for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
-                ItemDiscount d = new ItemDiscount(ir, beginDate, endDate, percentage);
+                ItemDiscount d = new ItemDiscount(dalDiscount.getMaxId()+1,ir, beginDate, endDate, percentage);
                 Price p = ir.getCurrPrice();
                 int beforeDiscount = p.getStorePrice();
                 int afterDiscount = (beforeDiscount/100) * percentage;
@@ -618,7 +638,7 @@ public class Store {
         }
         for( Category cat: categories.values()){
             if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
-                CategoryDiscount d = new CategoryDiscount(cat, beginDate, endDate, percentage);
+                CategoryDiscount d = new CategoryDiscount(dalDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
                 for (ItemRecord itemRec: cat.getItemRecords() ){
                     Price p = itemRec.getCurrPrice();
                     int beforeDiscount = p.getStorePrice();
@@ -670,9 +690,75 @@ public class Store {
     public String getItemAmountsByName(String name) {
         ItemRecord ir = itemRecords.get(name);
         if (ir == null){
-            return "No such item in inventory";
+            ir = dalItemRecord.getItemRecord(name,email_ID);
+            itemRecords.put(name,ir);
+            if(ir == null)
+                return "No such item in inventory";
         }
         return  ir.getAmounts();
+    }
+    @SuppressWarnings("deprecation")
+
+    //amounts should contain exp date
+    public String addAmounts(String name, String amounts) {
+        ItemRecord ir = itemRecords.get(name);
+        if(amounts.contains("-"))
+            return "Can't set amounts to a negative number";
+        String[] split = amounts.split("\\s+");
+        try {
+            int storage = Integer.parseInt(split[0]);
+            int shelf = Integer.parseInt(split[1]);
+            int total = storage + shelf;
+            String edate = split[2];
+            if(edate.length()!=10)
+                return "Please enter valid arguments";
+            java.sql.Date expdate = new java.sql.Date(Integer.parseInt(edate.substring(6))-1900,Integer.parseInt(edate.substring(3,5))-1,Integer.parseInt(edate.substring(0,2)));
+            ir.setStorageAmount(storage);
+            ir.setShelfAmount(shelf);
+            ir.setTotalAmount(total,expdate);
+            return ir.getAmounts();
+
+        } catch (Exception e) {
+            return "Action failed due to invalid input";
+        }
+    }
+
+    public String getItemIdsByName(String name) {
+        String toRet = name+" ids int store : ";
+        List<Integer> ids = dalItemRecord.geItemIdsByName(name,email_ID);
+        for (Integer id:ids) {
+            toRet = toRet + id + "\n";
+        }
+        return toRet;
+    }
+
+    public String removeItem(String name,int id) {
+        if(dalItemRecord.DeleteItem(name,id,email_ID)) {
+            ItemRecord ir = itemRecords.get(name);
+            if (ir == null) {
+                ir = dalItemRecord.getItemRecord(name, email_ID);
+                itemRecords.put(name, ir);
+            }
+            ir.removeItem(id);
+            return "item deleted succussfully";
+
+        }
+        return "item could not be deleted";
+    }
+
+
+    public String removeItemFromShelf(String name,int id) {
+        if(dalItemRecord.DeleteItem(name,id,email_ID)) {
+            ItemRecord ir = itemRecords.get(name);
+            if (ir == null) {
+                ir = dalItemRecord.getItemRecord(name, email_ID);
+                itemRecords.put(name, ir);
+            }
+            ir.removeItemFromShelf(id);
+            return "item deleted succussfully";
+
+        }
+        return "item could not be deleted";
     }
 
     public String setNewAmounts(String name, String amounts) {
@@ -686,7 +772,7 @@ public class Store {
             int total = storage + shelf;
             ir.setStorageAmount(storage);
             ir.setShelfAmount(shelf);
-            ir.setTotalAmount(total);
+            ir.setTotalAmount(total,null);
             return ir.getAmounts();
 
         } catch (Exception e) {
@@ -715,13 +801,63 @@ public class Store {
     public String getInventoryReport(String category) {
         Category category1 = categories.get(category);
         if (category1 == null){
-            return "No such category";
+            category1 = dalCategory.getCategory(category,email_ID);
+            if (category1 == null)
+                return "No such category";
         }
+        loadItemRecordsOfCategory(category1);
+        loadCategoryDiscount(category1);
         for (Discount discount: discounts) {
             if(discount.validCategoryDiscount(category))
-                return discount.withDiscount() + category1.items();
+                return discount.withDiscount() + category1.items(this);
         }
-        return category+" : \n"+ category1.items();
+        return category+" : \n"+ category1.items(this);
+    }
+
+    private void loadCategoryDiscount(Category c) {
+        List<CategoryDiscount> l = dalDiscount.getCategoryDiscounts(c,email_ID);
+        for (CategoryDiscount cd:l) {
+            boolean inList = false;
+            for (Discount d:discounts) {
+                if(d.getId() == cd.getId()) {
+                    inList = true;
+                    break;
+                }
+            }
+            if(!inList)
+                discounts.add(cd);
+        }
+    }
+
+    private void loadItemRecordsOfCategory(Category c) {
+        List<ItemRecord> l = dalItemRecord.getItemRecordByCategoryName(c.getName(),email_ID);
+        for (ItemRecord ir:l) {
+            boolean inList = false;
+            for (ItemRecord ir2: c.getItemRecords()) {
+                if(ir.getId() == ir2.getId()) {
+                    inList = true;
+                    break;
+                }
+            }
+            if(!inList)
+                c.addItem(ir);
+        }
+    }
+
+    private void loadCategoryOfItem(ItemRecord record){
+        List<Category> l = dalCategory.getCategoryOfItem(record.getId(),email_ID);
+        for (Category c:l) {
+            boolean inList = false;
+            for (Category c2: categories.values()) {
+                if(c.getName().equals(c2.getName())) {
+                    inList = true;
+                    break;
+                }
+            }
+            if(!inList)
+                categories.put(c.getName(),c);
+                c.addItem(record);//addItem is safe
+        }
     }
 
     public String itemForReport(ItemRecord record) {
@@ -729,6 +865,7 @@ public class Store {
         String main = "main category ";
         String sub = "sub category ";
         String subsub = "sub sub category " ;
+        loadCategoryOfItem(record);
         for (Category category:categories.values()) {
 
             if(category.getItemRecords().contains(record)){
@@ -750,6 +887,11 @@ public class Store {
     }
 
     public String getAllInventoryReport() {
+        List<Category> l = dalCategory.getAllCategories(email_ID);
+        for (Category c:l) {
+            if(!categories.containsKey(c.getName()))
+                categories.put(c.getName(),c);
+        }
         String report = "";
         for (Category category:categories.values()) {
             report = report + getInventoryReport(category.getName())+ "\n";

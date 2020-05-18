@@ -3,6 +3,7 @@ package InterfaceLayer;
 import BusinessLayer.*;
 import BusinessLayer.system;
 import BusinessLayer.User;
+import DataAccesslayer.Mapper;
 import PresentationLayer.Menu;
 
 import java.util.LinkedList;
@@ -19,6 +20,9 @@ public class SystemManager {
         systemcontroler=new system();
     }
 
+    public void initializeDB() {
+        Mapper.InitializeDB();
+    }
     public String AddSupplier(String name, int ID,String Address, String bank, String branch, int bankNumber,
                               String payments, Map<Integer, String> Contacts_ID,
                               Map<Integer, Integer> Contacts_number) {//  List<DALItem> Items)
@@ -35,8 +39,7 @@ public class SystemManager {
             if (minA < 0)
                 return "minimum amount cannot be below 0";
             int shelfNum = Integer.parseInt(shelfNumber);
-            return null; //todo check!
-            //current_Store.addItemRecord(name, minA, shelfNum, manufacture);
+            return current_Store.addItemRecord(name, minA, shelfNum, manufacture);
         } catch (Exception e) {
             return "please enter valid numbers";
         }
@@ -113,6 +116,7 @@ public class SystemManager {
             logged_user=new User(email,password);
             current_Store=Store.createInstance(email);
         }
+        initialize();
         return Done;
     }
 
@@ -190,16 +194,26 @@ public class SystemManager {
         return current_Store.getItemAmountsByName(name);
     }
 
+    public String addAmounts(String name,String amounts){ return  current_Store.addAmounts(name,amounts);}
+
     public String setNewAmounts(String name, String amounts) {
         return current_Store.setNewAmounts(name,amounts);
+    }
+
+    public String getItemIdsByName(String name) {
+        return current_Store.getItemIdsByName(name);
+    }
+
+    public String removeItem(String name,int id) {
+        return current_Store.removeItem(name,id);
     }
 
     public String moveToShelf(String name, String amount) {
         return current_Store.moveToShelf(name,amount);
     }
 
-    public String subtract(String name, String amount) {
-        return current_Store.subtract(name,amount);
+    public String removeItemFromShelf(String name, int id) {
+        return current_Store.removeItemFromShelf(name, id);
     }
 
     public String setDefectedItem(String  name, String id){

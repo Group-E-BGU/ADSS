@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class Mapper {
 
-    private Connection conn;
+    private static Connection conn;
 
     public Mapper(){
     }
 
-    public void InitializeDB() {
+    public static void InitializeDB() {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
@@ -90,7 +90,7 @@ public class Mapper {
                     "IRID int NOT NULL," +
                     "StoreId varchar," +
                     "name varchar,"+
-                    "PRIMARY KEY(IRID,SID)," +
+                    "PRIMARY KEY(IRID)," +
                     "FOREIGN KEY(StoreId) REFERENCES Store(email), " +
                     "FOREIGN KEY(MainCategory) REFERENCES Category(name), " +
                     "FOREIGN KEY(SubCategory) REFERENCES Category(name), " +
@@ -115,9 +115,7 @@ public class Mapper {
                     "RetailPrice int," +
                     "StorePrice int," +
                     "IRID int," +
-                    "StoreId varchar," +
                     "PRIMARY KEY(id)," +
-                    "FOREIGN KEY(StoreId) REFERENCES Store(email), " +
                     "FOREIGN KEY(IRID) REFERENCES ItemRecord(id));";
             stmt.execute(sqlStmt);
 
@@ -127,9 +125,7 @@ public class Mapper {
                     "defective bit," +
                     "defectiveDate date," +
                     "IRID int," +
-                    "StoreId varchar," +
                     "PRIMARY KEY(id)," +
-                    "FOREIGN KEY(StoreId) REFERENCES Store(email), " +
                     "FOREIGN KEY(IRID) REFERENCES ItemRecord(id));";
             stmt.execute(sqlStmt);
 

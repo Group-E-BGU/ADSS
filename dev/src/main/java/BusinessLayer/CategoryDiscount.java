@@ -6,8 +6,8 @@ public class CategoryDiscount extends Discount {
 
     private Category category;
 
-    public CategoryDiscount(Category cat, java.sql.Date start, java.sql.Date end, int perc) {
-        super(start,end,perc);
+    public CategoryDiscount(int id,Category cat, java.sql.Date start, java.sql.Date end, int perc) {
+        super(id,start,end,perc);
         category = cat;
     }
 

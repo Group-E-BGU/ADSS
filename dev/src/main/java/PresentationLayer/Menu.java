@@ -13,6 +13,7 @@ public class Menu {
     private static SystemManager Sys = new SystemManager();
 
     public static void main(String[] args) {
+        Sys.initializeDB();
         if (args.length > 1 && args[1].equals("Arg")) {
             AddArguments();
             Sys.initialize();
@@ -31,7 +32,7 @@ public class Menu {
                     "3. Exit");
             Scanner myScanner = new Scanner(System.in);
             int Ask = myScanner.nextInt();
-            String blank = myScanner.nextLine();
+            myScanner.nextLine();
             switch (Ask) {
                 case 1:
                     Register();
@@ -71,17 +72,17 @@ public class Menu {
                     "13. Move from storage to shelf \n" +
                     "14. Subtract from shelf \n" +
                     "15. Print inventory report\n" +
-                    "16. Enter defected item\n" +
+                    "16. Enter defected item\n" +//im here
                     "17. Print defective report\n" +
                     "18. Enter new discount\n" +
                     "19. Enter new price\n"+
-                    "20. Enter new product\n"+
+                    "20. Enter new product\n"+//this should be deleted before submission
                     "21. Update DetailsOrder\n"+
                     "22. Check the Cheeper Supplier for specific product\n"+
                     "23. Logout\n");
             Scanner myScanner = new Scanner(System.in);
             int Ask = myScanner.nextInt();
-            String blank = myScanner.nextLine();
+            myScanner.nextLine();
             switch (Ask) {
                 case 1:
                     Add_Edit_Supplier(1);
@@ -122,29 +123,58 @@ public class Menu {
                     String amount = Sys.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
-                        System.out.println("Please enter new storage and shelf amounts");
-                        String amounts = myScanner.nextLine();
-                        System.out.println(Sys.setNewAmounts(name, amounts));
+                        System.out.println("Choose to add or to remove:\n1.Add\n2.Remove");
+                        int choice = myScanner.nextInt();
+                        myScanner.nextLine();
+                        if(choice == 1){
+                            System.out.println("Please enter new storage and shelf amounts and expiration date in the following format(dd/MM/yyyy)");
+                            String amounts = myScanner.nextLine();
+                            System.out.println(Sys.addAmounts(name, amounts));
+                        } else if (choice == 2) {
+                            System.out.println(Sys.getItemIdsByName(name));
+                            System.out.println("Please enter item id or -1 if done");
+                            int id = myScanner.nextInt();
+                            while (id != -1) {
+                                System.out.println(Sys.removeItem(name, id));
+                                System.out.println("Please enter item id or -1 if done");
+                                id = myScanner.nextInt();
+                            }
+
+                        } else {
+                            System.out.println("number out of range");
+                            break;
+                        }
                     }
                     break;
                 }
                 case 13: {
                     System.out.println("Please enter item name");
                     String name = myScanner.nextLine();
-                    System.out.println(Sys.getItemAmountsByName(name));
-                    System.out.println("Please enter amount to move");
-                    String amount = myScanner.nextLine();
-                    System.out.println(Sys.moveToShelf(name, amount));
+                    String amount = Sys.getItemAmountsByName(name);
+                    System.out.println(amount);
+                    if (!amount.equals("No such item in inventory")) {
+                        System.out.println("Please enter amount to move");
+                        String amounts = myScanner.nextLine();
+                        System.out.println(Sys.moveToShelf(name, amounts));
+                    }
                     break;
                 }
                 case 14: {
                     System.out.println("Please enter item name");
                     String name = myScanner.nextLine();
-                    System.out.println(Sys.getItemAmountsByName(name));
-                    System.out.println("Please enter amount to subtract");
-                    String amount = myScanner.nextLine();
-                    System.out.println(Sys.subtract(name, amount));
+                    String amount = Sys.getItemAmountsByName(name);
+                    System.out.println(amount);
+                    if (!amount.equals("No such item in inventory")) {
+                        System.out.println("Please enter item id or -1 if done");
+                        int id = myScanner.nextInt();
+                        while (id != -1) {
+                            System.out.println(Sys.removeItemFromShelf(name, id));
+                            System.out.println("Please enter item id or -1 if done");
+                            id = myScanner.nextInt();
+                        }
+                    }
                     break;
+
                 }
                 case 15: {
                     System.out.println("Please enter categories or 'all'");

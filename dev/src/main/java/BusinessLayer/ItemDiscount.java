@@ -6,8 +6,8 @@ public class ItemDiscount extends Discount {
 
     private ItemRecord itemRecord;
 
-    public ItemDiscount(ItemRecord itemRecord, java.sql.Date start, java.sql.Date end, int perc) {
-        super(start, end, perc);
+    public ItemDiscount(int id,ItemRecord itemRecord, java.sql.Date start, java.sql.Date end, int perc) {
+        super(id,start, end, perc);
         this.itemRecord = itemRecord;
     }
 
