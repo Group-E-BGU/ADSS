@@ -80,7 +80,12 @@ public class Printer {
 
     public static void PrintWorkerView(int worker_id)
     {
-        Worker w = Workers.getInstance().getWorker(worker_id);
+        Worker w = blService.getWorker(worker_id);
+        if(w==null)
+        {
+            System.out.println("Error : no worker with such id");
+            return;
+        }
         System.out.println("Worker name : " + w.getName());
         System.out.println("Worker id : " + w.getId());
         System.out.println("jobs : " + w.getType().toString()+ "\n");
@@ -90,6 +95,22 @@ public class Printer {
         System.out.println("3) print working shifts");
         System.out.println("4) edit worker info");
         System.out.println("5) return");
+    }
+
+    public static void printEditWorkerMenu() {
+        System.out.println("1) Edit worker name");
+        System.out.println("2) Edit worker id");
+        System.out.println("3) Edit worker jobs");
+        System.out.println("4) Edit worker bank address");
+        System.out.println("5) Edit worker salary");
+        System.out.println("6) Return");
+    }
+//------------------------------------ Shifts ---------------------------------//
+
+    public static void printAvailableWorkers(Shift shift)
+    {
+        List<Worker> available_workers = blService.getAvailableWorkers(shift.getShiftDate(), shift.getShiftTime());
+        System.out.println(available_workers.toString());
     }
 
     public static void printShiftView(int shift_id)

@@ -13,6 +13,8 @@ import java.util.*;
 
 public class Main {
 
+    public static int id_lower_bound = 100000000;
+    public static int id_upper_bound = 999999999;
     static Scanner keyboard = new Scanner(System.in);
     static BLService blService = new BLService();
     static InitializeData init_data = new InitializeData();
@@ -85,7 +87,13 @@ public class Main {
     }
 
     private static void workerView(int worker_id) {
-        Worker w = Workers.getInstance().getWorker(worker_id);
+        Worker w = blService.getWorker(worker_id);
+
+        if(w == null)
+        {
+            System.out.println("Error : no worker with such id");
+            return;
+        }
 
         boolean go_back = false;
         while (!go_back) {
@@ -160,28 +168,27 @@ public class Main {
             int first_choice = getChoice(1, 2);
             switch (first_choice) {
                 case 1:
-                    List<Worker> available_workers = Workers.getInstance().getAvailableWorkers(shift.getShiftDate(), shift.getShiftTime());
-                    System.out.println(available_workers.toString());
+                    Printer.printAvailableWorkers(shift);
                     System.out.println("1) add a worker to this shift");
                     System.out.println("2) return");
                     int second_choice = getChoice(1, 2);
                     if (second_choice == 2)
                         break;
-                    else if (available_workers.isEmpty()) {
-                        System.out.println("Error : there are no workers to choose from!");
-
-                    } else {
+                    else {
                         System.out.println("enter the id of the worker you want to add");
                         int worker_id = keyboard.nextInt();
-                        Worker w = Workers.getInstance().getWorker(worker_id);
-                        System.out.println("which job will " + w.getName() + " do?");
-                        int index = 1;
-                        for (WorkingType type : w.getType()) {
-                            System.out.println(index + ") " + type);
-                            index++;
+                        Worker w = blService.getWorker(worker_id);
+                        if(w== null)
+                        {
+                            System.out.println("Error : no worker with such id");
+                            break;
                         }
-                        int type_index = getChoice(1, w.getType().size()) - 1;
-                        shift.addToWorkingTeam(w, w.getType().get(type_index));
+
+                        if(!blService.addToWorkingTeam(shift,w, w.getType()))
+                        {
+                            System.out.println("Error : "+w.getName()+" is not available to work in this shift!");
+                            break;
+                        }
                     }
                     break;
                 case 2:
