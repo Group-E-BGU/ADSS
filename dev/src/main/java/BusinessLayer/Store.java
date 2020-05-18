@@ -628,7 +628,8 @@ public class Store {
                 int beforeDiscount = p.getStorePrice();
                 int afterDiscount = (beforeDiscount/100) * percentage;
                 Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                ir.addPrice(discountedPrice);
+                dalPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
+                //ir.addPrice(discountedPrice);
                 discounts.add(d);
                 return "The discount was added succesfully";
             }
@@ -662,7 +663,8 @@ public class Store {
                     int afterDiscount = (beforeDiscount/100) * percentage;
                     Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
                     dalPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
-                    itemRec.addPrice(discountedPrice);
+                    //itemRec.addPrice(discountedPrice);
+
 
                 }
                 discounts.add(d);
@@ -684,6 +686,7 @@ public class Store {
                     if(item.getId()==id){
                         item.setDefective(true);
                         java.sql.Date currDate = new java.sql.Date((new Date()).getTime());
+                        dalItemRecord.updateDefect(item.getId(), ir.getId(), currDate, this.email_ID);
                         defects.add(new SimplePair(currDate, item));
                         return  "Defected item was added";
                     }
@@ -759,7 +762,7 @@ public class Store {
                 itemRecords.put(name, ir);
             }
             ir.removeItem(id);
-            return "item deleted succussfully";
+            return "item deleted successfully";
 
         }
         return "item could not be deleted";
@@ -774,7 +777,7 @@ public class Store {
                 itemRecords.put(name, ir);
             }
             ir.removeItemFromShelf(id);
-            return "item deleted succussfully";
+            return "item deleted successfully";
 
         }
         return "item could not be deleted";
@@ -919,7 +922,9 @@ public class Store {
     }
 
     public String printDefectedReport(java.sql.Date beginDate, java.sql.Date endDate){
-        String report = "";
+
+       return dalItemRecord.printDefectedItems(beginDate, endDate, this.email_ID);
+       /* String report = "";
         for(SimplePair pair: defects){
             if(pair.getDate().compareTo(beginDate)>=0 && pair.getDate().compareTo(endDate)<=0){
                 report = report + pair.getItem().toString() ;
@@ -940,6 +945,8 @@ public class Store {
             }
         }
         return report;
+
+        */
     }
 
     public void sendWarning(ItemRecord itemRecord) {

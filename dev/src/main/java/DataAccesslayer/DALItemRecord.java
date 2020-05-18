@@ -1,5 +1,6 @@
 package DataAccesslayer;
 
+import BusinessLayer.Item;
 import BusinessLayer.ItemRecord;
 
 import java.sql.*;
@@ -102,6 +103,34 @@ public class DALItemRecord {
 
     }
 
+    public void updateDefect(int itemId, int itemRecId, java.sql.Date date, String storeId) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "UPDATE Item WHERE id IN (SELECT Item.id FROM Item JOIN ItemRecord ON ItemRecord.id = itemRecId " +
+                    "SET defective = " + true + ", defectiveDate = " + date +
+                    "WHERE Item.id = "+itemId+" AND " + " ItemRecord.StoreId = '"+storeId+"')";;
+
+
+            Statement stmt = conn.createStatement();
+            stmt.execute(sqlstmt);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+    }
+
 
     public boolean DeleteItem(String name, int id, String storeId) {
         try {
@@ -158,6 +187,39 @@ public class DALItemRecord {
         }
         return null;
     }
+
+    public String printDefectedItems(java.sql.Date beginDate, java.sql.Date endDate, String storeId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Item " +
+                    "WHERE defective =" + 1 +"  AND defectiveDate >="+ beginDate +" " +
+                    "AND defectiveDate <= '"+ endDate +"'+ AND StoreId = '"+storeId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            String l = "";
+            while (rs.next()) {
+                l = l + ("Item ID " + rs.getInt(1) + " was Defected in " + rs.getDate(4) + "\n");
+            }
+            return l;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return "";
+    }
+
 
     public List<Integer> geItemIdsByName(String name, String storeId) {
         try {
