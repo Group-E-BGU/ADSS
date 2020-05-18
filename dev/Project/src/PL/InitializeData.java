@@ -60,8 +60,8 @@ public class InitializeData {
         try {
             Shift sundayMorning_shift = new Shift(date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, Workers.getInstance().getWorker(111111111), new HashMap<>());
             Shift mondayEvening_shift = new Shift(date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, Workers.getInstance().getWorker(222222222), new HashMap<>());
-            history.addShift(sundayMorning_shift);
-            history.addShift(mondayEvening_shift);
+            history.getShifts().put(sundayMorning_shift.getShiftId(),sundayMorning_shift);
+            history.getShifts().put(mondayEvening_shift.getShiftId(),mondayEvening_shift);
         } catch (ParseException pe) {
             pe.printStackTrace();
         }

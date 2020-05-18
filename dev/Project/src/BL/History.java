@@ -1,13 +1,15 @@
 package BL;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class History {
 
     private static History history_instance = null;
 
-    private List<Shift> shifts;
+    private Map<Integer,Shift> shifts;
 
 
     public static History getInstance(){
@@ -19,37 +21,16 @@ public class History {
 
     private History()
     {
-        shifts = new LinkedList<>();
+        shifts = new HashMap<>();
     }
 
-    public boolean addShift(Shift shift)
-    {
-        for(Shift s: shifts)
-        {
-            if(s.getShiftDate().equals(shift.getShiftDate()) &&  s.getShiftTime() == shift.getShiftTime())
-            {
-                return false;
-            }
-        }
-
-        shifts.add(shift);
-        return true;
-    }
-
-    public List<Shift> getShifts() {
+    public Map<Integer,Shift> getShifts() {
         return shifts;
     }
 
-    public Boolean isAvailable(int shift_id)
+    public void setShifts(Map<Integer,Shift> shifts)
     {
-        for(Shift shift : shifts)
-        {
-            if(shift.getShiftId() == shift_id)
-                return true;
-        }
-
-        return false;
+        this.shifts = shifts;
     }
-
 
 }

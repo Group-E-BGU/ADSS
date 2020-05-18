@@ -9,6 +9,7 @@ import java.util.*;
 public class CreateActions {
 
     static Scanner keyboard = new Scanner(System.in);
+    static BLService blService = new BLService();
 
     public void createShift() {
 
@@ -41,7 +42,7 @@ public class CreateActions {
                 Map<WorkPolicy.WorkingType, List<Worker>> working_team = new HashMap<>();
 
                 Shift shift = new Shift(date, shiftTime, boss, working_team);
-                boolean success = History.getInstance().addShift(shift);
+                boolean success = blService.addShift(shift);
                 if (success)
                     System.out.println("The shift has been created successfully");
                 else

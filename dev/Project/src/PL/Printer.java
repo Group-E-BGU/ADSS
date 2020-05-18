@@ -8,6 +8,8 @@ import java.util.*;
 
 public class Printer {
 
+    static BLService blService = new BLService();
+
     public static void printAllWorkingTypes()
     {
         int number =1;
@@ -66,7 +68,7 @@ public class Printer {
 
     public static void printShiftsView()
     {
-        for (Shift shift : History.getInstance().getShifts()) {
+        for (Shift shift : blService.getAllShifts().values()) {
             System.out.println(shift.toString());
             border();
         }
@@ -92,7 +94,7 @@ public class Printer {
 
     public static void printShiftView(int shift_id)
     {
-        Shift shift = History.getInstance().getShifts().get(shift_id);
+        Shift shift = blService.getShift(shift_id);
         System.out.println(shift.toString());
         System.out.println("1) print available workers for this shift");
         System.out.println("2) return");

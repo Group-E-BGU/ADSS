@@ -38,7 +38,7 @@ public class Shift {
 
     public boolean addToWorkingTeam(Worker worker, WorkingType workingType) {
 
-        if (!worker.isAvailable(shift_date, shift_time) || !worker.getType().contains(workingType))
+        if (!worker.isAvailable(shift_date, shift_time) || worker.getType() != workingType)
             return false;
 
         worker.work(this);

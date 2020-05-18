@@ -34,7 +34,7 @@ public class Workers {
     public List<Worker> getAvailableWorkers(Date date, ShiftTime time, WorkingType job) {
         List<Worker> available_workers = new LinkedList<>();
         for (Worker w : workers_map.values()) {
-            if (w.getType().contains(job) && w.isAvailable(date, time)) {
+            if (w.getType() == job && w.isAvailable(date, time)) {
                 available_workers.add(w);
             }
         }

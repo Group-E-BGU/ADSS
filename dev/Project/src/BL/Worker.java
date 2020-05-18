@@ -9,19 +9,19 @@ import java.util.*;
 import BL.Shift.ShiftTime;
 import BL.WorkPolicy.WorkingType;
 
-public class Worker {
+public abstract class Worker {
 
     private int id = 0;
     private String name;
-    private List<WorkingType> type;   // may become a list
+    private WorkingType type;
     private Map<Pair<DayOfWeek, ShiftTime>, Boolean> schedule;
     private WorkerDeal contract;
     private List<Shift> worker_shifts;
 
-    public Worker(int id,String name, List<WorkingType> type, Map<Pair<DayOfWeek, ShiftTime>, Boolean> schedule, WorkerDeal contract) {
+    public Worker(int id, String name, WorkingType type, Map<Pair<DayOfWeek, ShiftTime>, Boolean> schedule, WorkerDeal contract) {
 
         this.name = name;
-        this.id =id;
+        this.id = id;
         this.type = type;
         this.schedule = schedule;
         this.contract = contract;
@@ -33,17 +33,14 @@ public class Worker {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - 1;
-        if(dayOfWeek == 0){
+        if (dayOfWeek == 0) {
             dayOfWeek = 7;
         }//to make sure that the day index is correct
 
-        Pair<DayOfWeek,ShiftTime> pair = new Pair<>(DayOfWeek.of(dayOfWeek),shiftTime);
-        if(schedule.get(pair))
-        {
-            for(Shift shift : worker_shifts)
-            {
-                if(shift.getShiftDate() == date && shift.getShiftTime() == shiftTime)
-                {
+        Pair<DayOfWeek, ShiftTime> pair = new Pair<>(DayOfWeek.of(dayOfWeek), shiftTime);
+        if (schedule.get(pair)) {
+            for (Shift shift : worker_shifts) {
+                if (shift.getShiftDate() == date && shift.getShiftTime() == shiftTime) {
                     return false;
                 }
             }
@@ -94,8 +91,12 @@ public class Worker {
         return id;
     }
 
-    public List<WorkingType> getType() {
+    public WorkingType getType() {
         return type;
+    }
+
+    public void setType(WorkingType type) {
+        this.type = type;
     }
 
     public Map<Pair<DayOfWeek, ShiftTime>, Boolean> getSchedule() {
@@ -106,13 +107,11 @@ public class Worker {
         return contract;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setID(int id)
-    {
+    public void setID(int id) {
         this.id = id;
     }
 }

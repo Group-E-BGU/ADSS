@@ -14,6 +14,7 @@ import java.util.*;
 public class Main {
 
     static Scanner keyboard = new Scanner(System.in);
+    static BLService blService = new BLService();
     static InitializeData init_data = new InitializeData();
 
     public static void main(String[] argv) {
@@ -120,7 +121,7 @@ public class Main {
         boolean go_back = false;
         while (!go_back) {
 
-           Printer.printShiftsView();
+            Printer.printShiftsView();
             int choice = getChoice(1, 3);
             switch (choice) {
                 case 1:
@@ -130,10 +131,8 @@ public class Main {
                     }
                     System.out.println("enter the shift id :");
                     int id = keyboard.nextInt();
+                    shiftView(id);
                     Printer.border();
-                    if (!History.getInstance().isAvailable(id)) {
-                        System.out.println("Error : invalid shift_id!");
-                    } else shiftView(id);
                     break;
                 case 2:
                     new CreateActions().createShift();
@@ -147,7 +146,12 @@ public class Main {
     }
 
     private static void shiftView(int shift_id) {
-        Shift shift = History.getInstance().getShifts().get(shift_id);
+        Shift shift = blService.getShift(shift_id);
+
+        if (shift == null) {
+            System.out.println("Error : invalid shift id!");
+            return;
+        }
 
         boolean go_back = false;
         while (!go_back) {
@@ -170,14 +174,13 @@ public class Main {
                         System.out.println("enter the id of the worker you want to add");
                         int worker_id = keyboard.nextInt();
                         Worker w = Workers.getInstance().getWorker(worker_id);
-                        System.out.println("which job will "+ w.getName()+" do?");
-                        int index =1;
-                        for(WorkingType type : w.getType())
-                        {
-                            System.out.println(index+") "+type);
+                        System.out.println("which job will " + w.getName() + " do?");
+                        int index = 1;
+                        for (WorkingType type : w.getType()) {
+                            System.out.println(index + ") " + type);
                             index++;
                         }
-                        int type_index = getChoice(1,w.getType().size())-1;
+                        int type_index = getChoice(1, w.getType().size()) - 1;
                         shift.addToWorkingTeam(w, w.getType().get(type_index));
                     }
                     break;

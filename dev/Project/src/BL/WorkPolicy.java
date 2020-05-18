@@ -14,9 +14,8 @@ import java.util.List;
 public class WorkPolicy {
 
     public enum WorkingType {
-        Cashier,
-        Delivery,
-        Cleaning,
+        Driver,
+        StockKeeper,
     }
     private List<Pair<WorkingType,WorkingType>> policy; // if the map contains these two then the worker can get this job
 
