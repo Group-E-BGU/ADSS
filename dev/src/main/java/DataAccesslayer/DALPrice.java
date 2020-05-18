@@ -17,7 +17,7 @@ public class DALPrice {
 
      */
 
-    public void InsertPrice(int id,int IRID, int store, int retail) {
+    public void InsertPrice(int id,int IRID, int storePrice, int retailPrice) {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
@@ -27,8 +27,8 @@ public class DALPrice {
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
             stmt.setInt(1, id);
-            stmt.setInt(2, retail);
-            stmt.setInt(3, store);
+            stmt.setInt(2, retailPrice);
+            stmt.setInt(3, storePrice);
             stmt.setInt(4, IRID);
 
             stmt.executeUpdate();

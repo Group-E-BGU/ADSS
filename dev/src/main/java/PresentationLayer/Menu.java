@@ -78,7 +78,7 @@ public class Menu {
                     "19. Enter new price\n"+
                     "20. Enter new product\n"+//this should be deleted before submission
                     "21. Update DetailsOrder\n"+
-                    "22. Check the Cheeper Supplier for specific product\n"+
+                    "22. Check the Cheaper Supplier for specific product\n"+
                     "23. Logout\n");
             Scanner myScanner = new Scanner(System.in);
             int Ask = myScanner.nextInt();

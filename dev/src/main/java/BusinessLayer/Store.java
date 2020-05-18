@@ -2,8 +2,6 @@ package BusinessLayer;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
-import com.sun.org.apache.xpath.internal.operations.Or;
-import com.sun.xml.internal.ws.server.ServerRtException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -29,6 +27,7 @@ public class Store {
     private DALItemRecord dalItemRecord;
     private DALCategory dalCategory;
     private DALDiscount dalDiscount;
+    private DALPrice dalPrice;
 
     public static Store createInstance(String email) {
         if (storeInstance == null) {
@@ -94,6 +93,10 @@ public class Store {
         itemId = 0;
 */
 
+    }
+
+    public String getEmail_ID(){
+        return email_ID;
     }
 
     public String addItemRecord(String name, int minAmount, int shelfNumber, String manufacture) {
@@ -620,6 +623,7 @@ public class Store {
         for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
                 ItemDiscount d = new ItemDiscount(dalDiscount.getMaxId()+1,ir, beginDate, endDate, percentage);
+                dalDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
                 Price p = ir.getCurrPrice();
                 int beforeDiscount = p.getStorePrice();
                 int afterDiscount = (beforeDiscount/100) * percentage;
@@ -632,6 +636,18 @@ public class Store {
         return "No such item";
     }
 
+    /*
+     if (itemRecords.containsKey(name) || dalItemRecord.getItemRecord(name,email_ID) != null) {
+            return "This product name already exists";
+        }
+        else{
+            ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
+            itemRecords.put(name,ir);
+            dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
+            return name+" added successfully";
+       }
+     */
+
     public String addNewCategoryDiscount(String categoryName, int percentage, java.sql.Date beginDate, java.sql.Date endDate){
         if(!(percentage>=1 && percentage<=100)){
             return "Discount percentage must be a number between 1-100";
@@ -639,12 +655,15 @@ public class Store {
         for( Category cat: categories.values()){
             if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
                 CategoryDiscount d = new CategoryDiscount(dalDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
+                dalDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
                 for (ItemRecord itemRec: cat.getItemRecords() ){
                     Price p = itemRec.getCurrPrice();
                     int beforeDiscount = p.getStorePrice();
                     int afterDiscount = (beforeDiscount/100) * percentage;
                     Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
+                    dalPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
                     itemRec.addPrice(discountedPrice);
+
                 }
                 discounts.add(d);
                 return "The discount was added successfully";

@@ -58,7 +58,7 @@ public class DALItemRecord {
             stmt.setInt(1,id);
             stmt.setDate(2,expDate);
             stmt.setBoolean(3,false);
-            stmt.setDate(4,expDate);
+            stmt.setDate(4, null);
             stmt.setInt(5,IRID);
 
             stmt.executeUpdate();
@@ -101,6 +101,7 @@ public class DALItemRecord {
         }
 
     }
+
 
     public boolean DeleteItem(String name, int id, String storeId) {
         try {
