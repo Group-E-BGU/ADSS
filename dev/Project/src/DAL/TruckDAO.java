@@ -6,13 +6,12 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TruckDAO implements DAO<Truck> {
-    @Override
-    public Truck get(int id) {
+public class TruckDAO
+{
+    public Truck get(String id) {
         return null;
     }
 
-    @Override
     public List<Truck> getAll() {
         List<Truck> trucks = new LinkedList<>();
 
@@ -35,7 +34,6 @@ public class TruckDAO implements DAO<Truck> {
         return trucks;
     }
 
-    @Override
     public void save(Truck truck)
     {
 
@@ -57,12 +55,10 @@ public class TruckDAO implements DAO<Truck> {
 
     }
 
-    @Override
     public void update(Truck truck, String[] params) {
 
     }
 
-    @Override
     public void delete(Truck truck) {
 
     }

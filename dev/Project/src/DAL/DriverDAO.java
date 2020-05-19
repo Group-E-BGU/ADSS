@@ -11,8 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class DriverDAO implements DAO<Driver>{
-    @Override
+public class DriverDAO
+{
+    
     public Driver get(int driverId)
     {
         Driver driver = null;
@@ -55,7 +56,6 @@ public class DriverDAO implements DAO<Driver>{
         return driver;
     }
 
-    @Override
     public List<Driver> getAll()
     {
         String sql = "SELECT * FROM Drivers";
@@ -95,7 +95,6 @@ public class DriverDAO implements DAO<Driver>{
         return drivers;
     }
 
-    @Override
     public void save(Driver driver)
     {
         String sql = "INSERT INTO Drivers(id, name, schedule, license, shifts) VALUES(?, ?, ?, ?, ?)";
@@ -124,12 +123,10 @@ public class DriverDAO implements DAO<Driver>{
         }
     }
 
-    @Override
     public void update(Driver driver, String[] params) {
 
     }
 
-    @Override
     public void delete(Driver driver)
     {
 
@@ -228,4 +225,6 @@ public class DriverDAO implements DAO<Driver>{
         }
         return decodedShifts;
     }
+
+
 }

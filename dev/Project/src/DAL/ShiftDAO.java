@@ -13,9 +13,9 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 
-public class ShiftDAO implements DAO<Shift> {
+public class ShiftDAO {
 
-    @Override
+
     public Shift get(int id) {
 
         Shift shift;
@@ -55,7 +55,7 @@ public class ShiftDAO implements DAO<Shift> {
         return null;
     }
 
-    @Override
+
     public List<Shift> getAll() {
 
         List<Shift> shifts = new LinkedList<>();
@@ -95,7 +95,7 @@ public class ShiftDAO implements DAO<Shift> {
         return shifts;
     }
 
-    @Override
+
     public void save(Shift shift) {
 
         String sql = "INSERT INTO StockKeepers(id, date, boss, time, workTeam) VALUES(?, ?, ?, ?, ?)";
@@ -121,12 +121,12 @@ public class ShiftDAO implements DAO<Shift> {
         }
     }
 
-    @Override
+
     public void update(Shift shift, String[] params) {
 
     }
 
-    @Override
+
     public void delete(Shift shift) {
 
         String sql = "DELETE FROM Shifts WHERE id = ?";

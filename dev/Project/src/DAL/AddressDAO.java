@@ -5,14 +5,36 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AddressDAO implements DAO<Address> {
-    @Override
-    public Address get(int id) {
-        // TODO - must change the id to string.
-        return null;
+public class AddressDAO {
+
+
+    public Address get(String location) {
+
+        Address address= null;
+        String sql = "SELECT * FROM Addresses WHERE location = ?";
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // set the value
+            pstmt.setString(1, location);
+            //
+            ResultSet rs = pstmt.executeQuery();
+
+            // loop through the result set
+            if (rs.next())
+               address = new Address(rs.getString("location"), rs.getString("contactName"), rs.getString("phoneNumber"));
+            else
+                System.out.println("No address with location :" + location + " has found.");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return address;
     }
 
-    @Override
+
     public List<Address> getAll() {
 
         List<Address> addresses = new LinkedList<>();
@@ -39,7 +61,7 @@ public class AddressDAO implements DAO<Address> {
         return addresses;
     }
 
-    @Override
+
     public void save(Address address)
     {
 
@@ -63,13 +85,13 @@ public class AddressDAO implements DAO<Address> {
 
     }
 
-    @Override
+
     public void update(Address address, String[] params)
     {
 
     }
 
-    @Override
+
     public void delete(Address address) {
 
     }

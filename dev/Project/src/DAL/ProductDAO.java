@@ -6,14 +6,14 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ProductDAO implements DAO<Product> {
+public class ProductDAO{
 
-    @Override
-    public Product get(int id) {
+
+    public Product get(String id) {
         return null;
     }
 
-    @Override
+
     public List<Product> getAll() {
         List<Product> products = new LinkedList<>();
 
@@ -47,7 +47,7 @@ public class ProductDAO implements DAO<Product> {
         return products;
     }
 
-    @Override
+
     public void save(Product product) {
 
         String sql = "INSERT INTO Products(CN, weight, name) VALUES(?,?,?)";
@@ -67,12 +67,12 @@ public class ProductDAO implements DAO<Product> {
 
     }
 
-    @Override
+
     public void update(Product product, String[] params) {
 
     }
 
-    @Override
+
     public void delete(Product product) {
 
     }
