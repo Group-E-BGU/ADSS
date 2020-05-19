@@ -58,8 +58,12 @@ public class InitializeData {
         History history = History.getInstance();
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            Shift sundayMorning_shift = new Shift(date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, new BLService().getWorker(111111111), new HashMap<>());
-            Shift mondayEvening_shift = new Shift(date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, new BLService().getWorker(222222222), new HashMap<>());
+            Address a = new Address("Haifa","Shadi","0507483947");
+            Address b = new Address("Tel Aviv","Eran","0547322165");
+            Data.getInstance().getAddresses().put(a.getLocation(),a);
+            Data.getInstance().getAddresses().put(b.getLocation(),b);
+            Shift sundayMorning_shift = new Shift(a,date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, new BLService().getWorker(111111111), new HashMap<>());
+            Shift mondayEvening_shift = new Shift(b,date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, new BLService().getWorker(222222222), new HashMap<>());
             history.getShifts().put(sundayMorning_shift.getShiftId(),sundayMorning_shift);
             history.getShifts().put(mondayEvening_shift.getShiftId(),mondayEvening_shift);
         } catch (ParseException pe) {

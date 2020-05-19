@@ -18,6 +18,7 @@ public class Shift {
 
     private static int count = 0;
     private int shift_id = 0;
+    private Address address;
     private Date shift_date;
     private Worker boss;
     private ShiftTime shift_time;
@@ -27,7 +28,8 @@ public class Shift {
         return work_team;
     }
 
-    public Shift(Date shift_date, ShiftTime shift_time, Worker boss, Map<WorkingType, List<Worker>> work_team) {
+    public Shift(Address address , Date shift_date, ShiftTime shift_time, Worker boss, Map<WorkingType, List<Worker>> work_team) {
+        this.address = address;
         this.shift_date = shift_date;
         this.boss = boss;
         this.shift_time = shift_time;
@@ -39,6 +41,7 @@ public class Shift {
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String shift_string = "shift id : " + shift_id + '\n';
+        shift_string = shift_string +"Address : "+address.getLocation() +'\n';
         shift_string = shift_string + "shift date : " + dateFormat.format(shift_date) + '\n';
         dateFormat = new SimpleDateFormat("EEEE");
         shift_string = shift_string + "shift type : " + dateFormat.format(shift_date) + " , " + shift_time + '\n';
@@ -72,8 +75,24 @@ public class Shift {
         return boss;
     }
 
+    public Address getAddress()
+    {
+        return address;
+    }
+
+
     // in case if the boss can be changed
     public void setBoss(Worker boss) {
         this.boss = boss;
+    }
+
+    public void setShiftID(int shift_id)
+    {
+        this.shift_id = shift_id;
+    }
+
+    public void setAddress(Address address)
+    {
+        this.address = address;
     }
 }

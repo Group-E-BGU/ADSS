@@ -1,5 +1,6 @@
 package BL;
 
+import DAL.ShiftDAO;
 import javafx.util.Pair;
 
 import java.time.DayOfWeek;
@@ -9,10 +10,12 @@ public class BLService {
 
     private History history;
     private Workers workers;
+    private Data data;
 
     public BLService() {
         history = History.getInstance();
         workers = Workers.getInstance();
+        data = Data.getInstance();
 
     }
 //------------------------------------ Workers --------------------------------//
@@ -62,6 +65,26 @@ public class BLService {
 
         return true;
     }
+
+    public boolean removeWorker(int worker_id) {
+
+        // add DAL
+        Worker worker = getWorker(worker_id);
+        if (worker == null)
+            return false;
+
+        for (Shift shift : worker.getWorker_shifts()) {
+            shift.getWorkingTeam().get(worker.getType()).remove(worker);
+            if (shift.getWorkingTeam().get(worker.getType()).isEmpty()) {
+                shift.getWorkingTeam().remove(worker.getType());
+            }
+        }
+
+        workers.getAllWorkers().remove(worker_id);
+
+        return true;
+    }
+
 
     public boolean isAvailable(Worker worker, Date date, Shift.ShiftTime shiftTime) {
 
@@ -118,14 +141,26 @@ public class BLService {
         return history.getShifts().get(shift_id);
     }
 
+    public Shift getShift(Address address, Date date, Shift.ShiftTime shiftTime) {
+        for (Shift shift : getAllShifts().values()) {
+            if (shift.getAddress().equals(address) && shift.getShiftDate().equals(date) && shift.getShiftTime() == shiftTime)
+                return shift;
+        }
+
+        return null;
+    }
+
     public boolean addShift(Shift shift) {
         for (Shift s : history.getShifts().values()) {
-            if (s.getShiftDate().equals(shift.getShiftDate()) && s.getShiftTime() == shift.getShiftTime()) {
+            if (s.getAddress().equals(shift.getAddress()) && s.getShiftDate().equals(shift.getShiftDate()) && s.getShiftTime() == shift.getShiftTime()) {
                 return false;
             }
         }
 
         history.getShifts().put(shift.getShiftId(), shift);
+
+        ShiftDAO s = new ShiftDAO();
+
 
         // add DAL
 
@@ -144,7 +179,12 @@ public class BLService {
         shift.getWorkingTeam().get(workingType).add(worker);
         return true;
     }
-//------------------------------ WorkerDeal --------------------------//
+
+    public boolean stockKeeperAvailable(Shift shift) {
+        return (shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper) != null && !shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper).isEmpty());
+    }
+
+    //------------------------------ WorkerDeal --------------------------//
     public boolean updateContract(int worker_id, WorkerDeal contract) {
 
         // DAL
@@ -152,4 +192,61 @@ public class BLService {
         return true;
 
     }
+
+//------------------------------ Address --------------------------//
+
+    public Map<String, Address> getAllAddresses() {
+        return data.getAddresses();
+    }
+
+    public Address getAddress(String location) {
+        return data.getAddresses().get(location);
+    }
+
+    public boolean addAddress(Address address) {
+
+        data.getAddresses().put(address.getLocation(), address);
+        // add DAL
+
+        return true;
+    }
+
+//------------------------------ Truck --------------------------//
+
+
+    public Map<String,Truck> getAllTrucks()
+    {
+        return data.getTrucks();
+    }
+
+    public Truck getTruck(String serial_number)
+    {
+        return data.getTrucks().get(serial_number);
+    }
+
+    public boolean addTruck(Truck truck)
+    {
+        data.getTrucks().put(truck.getSerialNumber(),truck);
+        return true;
+    }
+
+//------------------------------ Product --------------------------//
+
+
+    public Map<String,Product> getAllProducts()
+    {
+        return data.getProducts();
+    }
+
+    public Product getProduct(String cn)
+    {
+        return data.getProducts().get(cn);
+    }
+
+    public boolean addProduct(Product product)
+    {
+        data.getProducts().put(product.getCN(),product);
+        return true;
+    }
+
 }

@@ -2,6 +2,7 @@ package PL;
 
 import BL.*;
 
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -11,11 +12,37 @@ public class CreateActions {
     static Scanner keyboard = new Scanner(System.in);
     static BLService blService = new BLService();
 
+
     public void createShift() {
 
         for (; ; ) {
+
+            System.out.println("Choose an address for this shift by typing its location :");
+            Address address = null;
+            Printer.printAllAddresses();
+            boolean address_chosen = false;
+            while(!address_chosen)
+            {
+                String location = keyboard.nextLine();
+                if(blService.getAddress(location)==null)
+                {
+                    System.out.println("Error : no address found with "+location+" as its location! , Do you want to try again? y/n");
+                    if(!getConfirmation())
+                    {
+                        System.out.println("Create shift canceled");
+                        return;
+                    }
+                }
+                else
+                {
+                    address_chosen = true;
+                    address = blService.getAddress(location);
+                }
+            }
+
+
             System.out.println("enter the date using this format dd/mm/yyyy or type EXIT to cancel ...");
-            String date_string = keyboard.next();
+            String date_string = keyboard.nextLine();
             if (date_string.equals("EXIT") || date_string.equals("exit"))
                 return;
 
@@ -44,16 +71,22 @@ public class CreateActions {
 
                 }
 
-                String available_bosses = blService.AvilableWorkerstoString(date, shiftTime);
-                if (available_bosses.equals("")) {
+                List<Worker> available_boss = blService.getAvailableWorkers(date, shiftTime);
+
+                if (available_boss.isEmpty()) {
                     System.out.println("Error : no available boss for this shift! returning to shifts view screen...");
                     return;
                 }
 
-                System.out.println(available_bosses);
+                System.out.println(available_boss.toString());
                 System.out.println("enter the id of the worker who you wish to appoint as a boss");
-                int boss_id = keyboard.nextInt();
+                int boss_id = getChoice(Main.id_lower_bound , Main.id_upper_bound);
                 Worker boss = blService.getWorker(boss_id);
+                if(boss == null)
+                {
+                    System.out.println("Error : no worker with such id");
+                    return;
+                }
                 if (!blService.isAvailable(boss, date, shiftTime)) {
                     System.out.println("Error : this worker is not available to work in this shift!");
                     return;
@@ -61,7 +94,7 @@ public class CreateActions {
 
                 Map<WorkPolicy.WorkingType, List<Worker>> working_team = new HashMap<>();
 
-                Shift shift = new Shift(date, shiftTime, boss, working_team);
+                Shift shift = new Shift(address,date, shiftTime, boss, working_team);
                 boolean success = blService.addShift(shift);
                 if (success)
                     System.out.println("The shift has been created successfully");
@@ -70,7 +103,7 @@ public class CreateActions {
                 return;
 
             } catch (ParseException pe) {
-                System.out.println("Error : invalid input");
+                System.out.println("Error : invalid date input");
             }
 
         }
@@ -140,7 +173,7 @@ public class CreateActions {
 
             Printer.printEditWorkerMenu();
 
-            int choice = getChoice(1, 6);
+            int choice = getChoice(1, 5);
             switch (choice) {
                 case 1:
                     System.out.println("Type the new name :");
@@ -156,30 +189,18 @@ public class CreateActions {
                     blService.updateWorker(worker);
                     break;
                 case 3:
-                    System.out.println("choose the worker's new job by typing the number near it :");
-                    Printer.printAllWorkingTypes();
-                    int type_choice = getChoice(1, WorkPolicy.WorkingType.values().length);
-
-                    WorkPolicy.WorkingType workingType = WorkPolicy.WorkingType.values()[Math.abs(type_choice) - 1];
-
-                    blService.updateWorker(worker);
-
-
-
-                    break;
-                case 4:
                     System.out.println("Type the new bank address :");
                     String edited_address = keyboard.nextLine();
                     worker.getContract().setBankAddress(edited_address);
                     blService.updateContract(worker_id , worker.getContract());
                     break;
-                case 5:
+                case 4:
                     System.out.println("Type the new salary :");
                     double edited_salary = getDoubleChoice(0,Double.MAX_VALUE);
                     worker.getContract().setSalary(edited_salary);
                     blService.updateContract(worker_id , worker.getContract());
                     break;
-                case 6:
+                case 5:
                     go_back = true;
                     break;
 
@@ -189,13 +210,108 @@ public class CreateActions {
 
     }
 
+    public static void AddAddress()
+    {
+
+        System.out.println("Enter the location:");
+        String location = keyboard.nextLine();
+        if(blService.getAddress(location) != null)
+        {
+            System.out.println("Error : an address with this location already exists");
+            return;
+        }
+        System.out.println("Enter the contact name:");
+        String contact_name = keyboard.nextLine();
+        System.out.println("Enter the contact's phone number:");
+        String phone_number = keyboard.nextLine();
+
+        if(blService.addAddress(new Address(location,contact_name, phone_number)))
+        {
+            System.out.println("The address has been added successfully!");
+        }
+        else
+        {
+            System.out.println("Error : Couldn't add address");
+        }
+
+    }
+
+    public static void AddTruck()
+    {
+        System.out.println("Enter the truck's serial number:");
+        String serialNumber = keyboard.nextLine();
+        if(blService.getTruck(serialNumber) != null)
+        {
+            System.out.println("Error : a truck with this serial number already exists");
+            return;
+        }
+        System.out.println("Enter the truck's model:");
+        String model = keyboard.nextLine();
+        System.out.println("Enter the truck's weight:");
+        int weight = getChoice(0, Integer.MAX_VALUE);
+        System.out.println("Enter the truck's max allowed weight:");
+        int maxAllowedWeight = getChoice(0, Integer.MAX_VALUE);
+
+        if(blService.addTruck(new Truck(serialNumber,model, weight,maxAllowedWeight)))
+        {
+            System.out.println("The truck has been added successfully!");
+        }
+        else
+        {
+            System.out.println("Error : Couldn't add truck");
+        }
+
+
+    }
+
+
+    public static void AddProduct()
+    {
+
+        System.out.println("Enter the product's CN:");
+        String product_cn = keyboard.nextLine();
+        if(blService.getProduct(product_cn) != null)
+        {
+            System.out.println("Error : a product with this cn already exists");
+            return;
+        }
+        System.out.println("Enter the product's name:");
+        String product_name = keyboard.nextLine();
+        System.out.println("Enter the product's weight:");
+        int weight = getChoice(0, Integer.MAX_VALUE);
+
+
+        if(blService.addProduct(new Product(product_name,product_cn, weight)))
+        {
+            System.out.println("The product has been added successfully!");
+        }
+        else
+        {
+            System.out.println("Error : Couldn't add product");
+        }
+
+    }
+
     private static int getChoice(int lower_bound, int upper_bound) {
         for (; ; ) {
-            int keyboard_input = keyboard.nextInt();
+            String keyboard_input = keyboard.nextLine();
+            int choice_number = -1;
+            boolean tooBig = false;
+            try {
+                BigInteger big_int = new BigInteger(keyboard_input);
+                if (big_int.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                    //    System.out.println("Error : value is too large");
+                    tooBig = true;
+                }
+                choice_number = big_int.intValue();
 
-            if (keyboard_input < lower_bound || keyboard_input > upper_bound) {
-                System.out.println("Error : number out of bounds!");
-            } else return keyboard_input;
+                if (tooBig || choice_number < lower_bound || choice_number > upper_bound) {
+                    System.out.println("Error : number out of bounds!");
+                } else return choice_number;
+            } catch (NumberFormatException numberFormatException) {
+                System.out.println("Error : Enter a numeric input!");
+            }
+
         }
     }
 
@@ -212,5 +328,20 @@ public class CreateActions {
                 System.out.println("Error : Enter a numeric input!");
             }
         }
+    }
+
+    private static boolean getConfirmation()
+    {
+        for(;;)
+        {
+            String keyboard_input = keyboard.nextLine();
+            if(keyboard_input.equals("y")|| keyboard_input.equals("Y"))
+                return true;
+            else if(keyboard_input.equals("n")|| keyboard_input.equals("N"))
+                return false;
+            else
+                System.out.println("Error : Invalid input ! type n to cancel or y to confirm");
+        }
+
     }
 }

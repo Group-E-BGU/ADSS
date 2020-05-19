@@ -53,9 +53,14 @@ public class Printer {
     }
 
     public static void printMainMenu() {
-        System.out.println("1) view workers");
-        System.out.println("2) view shifts");
-        System.out.println("3) exit");
+
+        System.out.println("1) View Workers");
+        System.out.println("2) View Shifts");
+        System.out.println("3) View Deliveries");
+        System.out.println("4) View Addresses");
+        System.out.println("5) View Trucks");
+        System.out.println("6) View Products");
+        System.out.println("7) exit");
     }
 
     public static void printWorkersView()
@@ -90,27 +95,27 @@ public class Printer {
         System.out.println("Worker id : " + w.getId());
         System.out.println("jobs : " + w.getType().toString()+ "\n");
 
-        System.out.println("1) print Schedule");
-        System.out.println("2) print contract");
-        System.out.println("3) print working shifts");
-        System.out.println("4) edit worker info");
-        System.out.println("5) return");
+        System.out.println("1) Print Schedule");
+        System.out.println("2) Print contract");
+        System.out.println("3) Print working shifts");
+        System.out.println("4) Edit worker info");
+        System.out.println("5) Delete worker");
+        System.out.println("6) return");
     }
 
     public static void printEditWorkerMenu() {
         System.out.println("1) Edit worker name");
         System.out.println("2) Edit worker id");
-        System.out.println("3) Edit worker jobs");
-        System.out.println("4) Edit worker bank address");
-        System.out.println("5) Edit worker salary");
-        System.out.println("6) Return");
+        System.out.println("3) Edit worker bank address");
+        System.out.println("4) Edit worker salary");
+        System.out.println("5) Return");
     }
 //------------------------------------ Shifts ---------------------------------//
 
     public static void printAvailableWorkers(Shift shift)
     {
-        List<Worker> available_workers = blService.getAvailableWorkers(shift.getShiftDate(), shift.getShiftTime());
-        System.out.println(available_workers.toString());
+        String available_workers = blService.AvilableWorkerstoString(shift.getShiftDate(), shift.getShiftTime());
+        System.out.println(available_workers);
     }
 
     public static void printShiftView(int shift_id)
@@ -120,8 +125,88 @@ public class Printer {
         System.out.println("1) print available workers for this shift");
         System.out.println("2) return");
     }
+//------------------------------------ Addresses ---------------------------------//
+
+    public static void printAddressesView()
+    {
+
+        printAllAddresses();
+        System.out.println("1) Add an address");
+        System.out.println("2) Return");
+
+    }
+
+    public static void printAllAddresses()
+    {
+        Map<String,Address> addresses_map = blService.getAllAddresses();
+
+        String addresses = "";
+
+        for (Address address : addresses_map.values()) {
+            addresses += "Location : " + address.getLocation() + "\n" +
+                    "Contact Name : " + address.getContactName() + "\n" +
+                    "Phone Number : " + address.getPhoneNumber() + "\n\n";
+        }
+
+        System.out.println(addresses);
+    }
+
+//------------------------------------ Trucks ---------------------------------//
+
+    public static void printTrucksView()
+    {
+
+        printAllTrucks();
+        System.out.println("1) Add a truck");
+        System.out.println("2) Return");
+
+    }
+
+    public static void printAllTrucks()
+    {
+        Map<String,Truck> trucks_map = blService.getAllTrucks();
+
+        String trucks = "";
+
+        for (Truck t : trucks_map.values()) {
+            trucks += "Truck serial number : " + t.getSerialNumber() + "\n" +
+                    "Model : " + t.getModel() + "\n" +
+                    "Weight : " + t.getWeight() + "\n" +
+                    "Max allowed weight : " + t.getMaxAllowedWeight() + "\n\n";
+        }
+
+        System.out.println(trucks);
+    }
+//------------------------------------ Products ---------------------------------//
+
+    public static void printProductsView()
+    {
+
+        printAllProducts();
+        System.out.println("1) Add a product");
+        System.out.println("2) Return");
+
+    }
+
+    public static void printAllProducts()
+    {
+        Map<String,Product> products_map = blService.getAllProducts();
+
+        String products = "";
+
+        for (Product product : products_map.values()) {
+            products += "Product Name : " + product.getName() + "\n" +
+                    "CN : " + product.getCN() + "\n" +
+                    "Weight : " + product.getWeight() + "\n\n";
+        }
+
+        System.out.println(products);
+    }
+
 
     public static void border() {
         System.out.println("--------------------------------");
     }
+
+
 }

@@ -6,6 +6,7 @@ import BL.Shift.ShiftTime;
 import BL.WorkPolicy.WorkingType;
 import javafx.util.Pair;
 
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -29,7 +30,7 @@ public class Main {
 
         while (!terminate) {
             Printer.printMainMenu();
-            int choice = getChoice(1, 3);
+            int choice = getChoice(1, 7);
 
             switch (choice) {
                 case 1:
@@ -39,6 +40,17 @@ public class Main {
                     shiftsView();
                     break;
                 case 3:
+                    break;
+                case 4:
+                    addressesView();
+                    break;
+                case 5:
+                    trucksView();
+                    break;
+                case 6:
+                    productsView();
+                    break;
+                case 7:
                     terminate = true;
                     break;
             }
@@ -67,10 +79,10 @@ public class Main {
                         break;
                     }
                     System.out.println("enter the worker id :");
-                    int id = keyboard.nextInt();
+                    int id = getChoice(id_lower_bound , id_upper_bound);
                     Printer.border();
-                    if (!Workers.getInstance().getAllWorkers().containsKey(id)) {
-                        System.out.println("Error : invalid id");
+                    if (blService.getWorker(id)==null) {
+                        System.out.println("Error : no worker with such id");
                     } else workerView(id);
                     break;
 
@@ -89,8 +101,7 @@ public class Main {
     private static void workerView(int worker_id) {
         Worker w = blService.getWorker(worker_id);
 
-        if(w == null)
-        {
+        if (w == null) {
             System.out.println("Error : no worker with such id");
             return;
         }
@@ -100,7 +111,7 @@ public class Main {
 
             Printer.PrintWorkerView(worker_id);
 
-            int choice = getChoice(1, 5);
+            int choice = getChoice(1, 6);
 
             switch (choice) {
                 case 1:
@@ -116,7 +127,25 @@ public class Main {
                     new CreateActions().editWorker(worker_id);
                     break;
                 case 5:
-                    go_back = true;
+                    System.out.println("Are you sure you want to remove this worker ? y/n");
+                    boolean confirmation = getConfirmation();
+                    if(confirmation)
+                    {
+                        if(!blService.removeWorker(worker_id))
+                        {
+                            System.out.println("Error : Worker couldn't be deleted");
+                        }
+                        else
+                        {
+                            System.out.println("The worker was deleted successfully");
+                            return;
+                        }
+                    }
+                    else
+                        System.out.println("The deletion was canceled");
+                    break;
+                case 6:
+                    go_back= true;
                     break;
             }
             Printer.border();
@@ -138,7 +167,7 @@ public class Main {
                         break;
                     }
                     System.out.println("enter the shift id :");
-                    int id = keyboard.nextInt();
+                    int id = getChoice(0,Integer.MAX_VALUE);
                     shiftView(id);
                     Printer.border();
                     break;
@@ -176,18 +205,17 @@ public class Main {
                         break;
                     else {
                         System.out.println("enter the id of the worker you want to add");
-                        int worker_id = keyboard.nextInt();
+                        int worker_id = getChoice(id_lower_bound,id_upper_bound);
                         Worker w = blService.getWorker(worker_id);
-                        if(w== null)
-                        {
+                        if (w == null) {
                             System.out.println("Error : no worker with such id");
-                            break;
                         }
-
-                        if(!blService.addToWorkingTeam(shift,w, w.getType()))
+                        else if (!blService.addToWorkingTeam(shift, w, w.getType())) {
+                            System.out.println("Error : " + w.getName() + " is not available to work in this shift!");
+                        }
+                        else
                         {
-                            System.out.println("Error : "+w.getName()+" is not available to work in this shift!");
-                            break;
+                            System.out.println("worker added successfully to shift");
                         }
                     }
                     break;
@@ -200,14 +228,116 @@ public class Main {
         }
 
     }
+// -------------------------------------- Addresses ----------------------------------------  //
 
+    private static void addressesView()
+    {
+
+        boolean terminate = false;
+
+        while(!terminate) {
+
+            Printer.printAddressesView();
+
+            int choice = getChoice(1, 2);
+            switch (choice) {
+                case 1:
+                    CreateActions.AddAddress();
+                    break;
+                case 2:
+                    terminate = true;
+                    break;
+
+            }
+        }
+
+    }
+
+// -------------------------------------- Trucks ----------------------------------------  //
+
+    private static void trucksView()
+    {
+
+        boolean terminate = false;
+
+        while(!terminate) {
+
+            Printer.printTrucksView();
+
+            int choice = getChoice(1, 2);
+            switch (choice) {
+                case 1:
+                    CreateActions.AddTruck();
+                    break;
+                case 2:
+                    terminate = true;
+                    break;
+
+            }
+        }
+
+    }
+
+// -------------------------------------- Products ----------------------------------------  //
+
+    private static void productsView()
+    {
+
+        boolean terminate = false;
+
+        while(!terminate) {
+
+            Printer.printProductsView();
+
+            int choice = getChoice(1, 2);
+            switch (choice) {
+                case 1:
+                    CreateActions.AddProduct();
+                    break;
+                case 2:
+                    terminate = true;
+                    break;
+
+            }
+        }
+
+    }
     private static int getChoice(int lower_bound, int upper_bound) {
         for (; ; ) {
-            int keyboard_input = keyboard.nextInt();
-            if (keyboard_input < lower_bound || keyboard_input > upper_bound) {
-                System.out.println("Error : number out of bounds!");
-            } else return keyboard_input;
+            String keyboard_input = keyboard.nextLine();
+            int choice_number = -1;
+            boolean tooBig = false;
+            try {
+                BigInteger big_int = new BigInteger(keyboard_input);
+                if (big_int.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                    //    System.out.println("Error : value is too large");
+                    tooBig = true;
+                }
+                choice_number = big_int.intValue();
+
+                if (tooBig || choice_number < lower_bound || choice_number > upper_bound) {
+                    System.out.println("Error : number out of bounds!");
+                } else return choice_number;
+            } catch (NumberFormatException numberFormatException) {
+                System.out.println("Error : Enter a numeric input!");
+            }
+
         }
+    }
+
+    private static boolean getConfirmation()
+    {
+        for(;;)
+        {
+            String keyboard_input = keyboard.nextLine();
+            if(keyboard_input.equals("y")|| keyboard_input.equals("Y"))
+                return true;
+            else if(keyboard_input.equals("n")|| keyboard_input.equals("N"))
+                return false;
+            else
+                System.out.println("Error : Invalid input ! type n to cancel or y to confirm");
+        }
+
     }
 }
 
