@@ -52,6 +52,11 @@ public class WorkerDeal {
         return worker_id;
     }
 
+    public String getBankAddress()
+    {
+        return bank_address;
+    }
+
     public void setBankAddress(String address)
     {
         this.bank_address = address;
