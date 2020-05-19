@@ -8,7 +8,6 @@ import java.util.Map;
 public class Document{
 
     private int document_id;
-    private int TruckWeight;
     private Map<String, Integer> deliveryGoods;
 
     public Document(){

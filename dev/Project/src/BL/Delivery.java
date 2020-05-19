@@ -14,6 +14,7 @@ public class Delivery{
     private int driverID;
     private List<Document> documents;
     private List<String> logs;
+    private int TruckWeight;
 
     public Delivery(int delivery_id , Date date, Address source, List<Address> destinations, String launchTime, String truckSerialNumber, int driverID){
         this.delivery_id = delivery_id;
@@ -87,5 +88,9 @@ public class Delivery{
 
     public void setDocuments(List<Document> documents) {
         this.documents = documents;
+    }
+
+    public void log(String s) {
+        this.logs.add(s);
     }
 }

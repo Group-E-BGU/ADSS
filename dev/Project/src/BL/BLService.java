@@ -332,4 +332,13 @@ public class BLService {
 
         return true;
     }
+
+    public Delivery arrangeDelivery(String source, Map<String, Integer> deliveryGoods) {
+        return null;
+        // todo
+    }
+
+    public void rearrangeDelivery(Delivery delivery, Map<String, Integer> deliveryGoods) {
+        // todo
+    }
 }

@@ -349,14 +349,41 @@ public class CreateActions {
     }
 
     private static void arrangeDelivery(){
-        //Delivery delivery;
+        Delivery delivery;
         String source = getSource();
         List<String> destinations = getDestinations();
+        Map<String, Integer> deliveryGoods = getDeliveryGoods(destinations);
 
+        delivery =  blService.arrangeDelivery(source, deliveryGoods);
 
+        if(delivery.getDate() != null)
+            System.out.println("A new delivery with id : " + delivery.getDeliveryID() + " will be launched at : " + delivery.getDate().toString());
+        else
+            rearrangeDelivery(delivery);
+    }
 
+    private static void rearrangeDelivery(Delivery delivery) {
+        System.out.println("The total weight of the products that you wish to deliver are above the maximum weight.\n" +
+                "maximum weight allowed : " + Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight() +"\n" +
+                "you have to rearrange your delivery.\n" +
+                "The source will still the same, just please enter the destinations and the products to each destination again.");
+        // log the changes
+        delivery.log("Some changes occurred to the delivery goods due to weight over-weight problems");
+        // get the destinations and the products again
+        List<String> destinations = getDestinations();
+        Map<String, Integer> deliveryGoods = getDeliveryGoods(destinations);
 
+        blService.rearrangeDelivery(delivery, deliveryGoods);
 
+        if(delivery.getDate() != null)
+            System.out.println("Delivery with id : " + delivery.getDeliveryID() + " will be launched at : " + delivery.getDate().toString());
+        else
+            rearrangeDelivery(delivery);
+    }
+
+    private static Map<String, Integer> getDeliveryGoods(List<String> destinations) {
+        // TODO
+        return null;
     }
 
     private static List<String> getDestinations() {
