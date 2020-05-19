@@ -8,6 +8,7 @@ import javafx.util.Pair;
 
 import java.sql.*;
 import java.time.DayOfWeek;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -134,4 +135,31 @@ public class StockKeeperDAO {
 
     }
 
+    private static Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> decodeSchedule(String schedule){
+        Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> decodedSchedule = new HashMap<>();
+        String[] separatedDays = schedule.split("\n");
+
+        for (String separatedDay : separatedDays) {
+            decodedSchedule.put(new Pair<DayOfWeek, Shift.ShiftTime>(DayOfWeek.of(separatedDay.charAt(0)), separatedDay.charAt(1) == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 1);
+        }
+
+        return decodedSchedule;
     }
+
+    private static String encodeSchedule(Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule){
+        // example : 210 - 2 : Monday, 1 : Evening, 0 : not working => <<Monday, Morning>, false>
+        StringBuilder encodedSchedule = new StringBuilder();
+
+        for(Map.Entry<Pair<DayOfWeek, Shift.ShiftTime>,Boolean> entry : schedule.entrySet()){
+            encodedSchedule.append(entry.getKey().getKey().getValue());
+            encodedSchedule.append(entry.getKey().getValue() == Shift.ShiftTime.Morning ? 0 : 1);
+            encodedSchedule.append(entry.getValue() ? 1 : 0);
+
+            encodedSchedule.append("\n");
+        }
+
+        return encodedSchedule.toString();
+    }
+
+
+}
