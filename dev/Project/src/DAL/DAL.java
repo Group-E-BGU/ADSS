@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DAL {
 
-    static String url = "jdbc:sqlite:../DataBase/SuperLi.db"; // change this to desired location
+    static String url = "jdbc:sqlite:../DataBase/SuperLee.db"; // change this to desired location
 
 
     public static Connection connect() {

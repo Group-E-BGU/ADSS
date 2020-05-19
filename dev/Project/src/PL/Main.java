@@ -26,6 +26,7 @@ public class Main {
 
         init_data.createWorkers();
         init_data.createShifts();
+        blService.loadFromDataBase();
 
 
         while (!terminate) {

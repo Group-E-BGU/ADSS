@@ -1,5 +1,6 @@
 package BL;
 
+import DAL.*;
 import DAL.ShiftDAO;
 import javafx.util.Pair;
 
@@ -11,11 +12,13 @@ public class BLService {
     private History history;
     private Workers workers;
     private Data data;
+    private DAL dal;
 
     public BLService() {
         history = History.getInstance();
         workers = Workers.getInstance();
         data = Data.getInstance();
+        dal = new DAL();
 
     }
 //------------------------------------ Workers --------------------------------//
@@ -225,7 +228,7 @@ public class BLService {
     public boolean addAddress(Address address) {
 
         data.getAddresses().put(address.getLocation(), address);
-        // add DAL
+        new AddressDAO().save(address);
 
         return true;
     }
@@ -246,6 +249,7 @@ public class BLService {
     public boolean addTruck(Truck truck)
     {
         data.getTrucks().put(truck.getSerialNumber(),truck);
+        new TruckDAO().save(truck);
         return true;
     }
 
@@ -265,7 +269,41 @@ public class BLService {
     public boolean addProduct(Product product)
     {
         data.getProducts().put(product.getCN(),product);
+        new ProductDAO().save(product);
         return true;
     }
 
+
+    public boolean loadFromDataBase()
+    {
+        List<Truck> trucks = new TruckDAO().getAll();
+        Map<String,Truck> trucks_map = new HashMap<>();
+        for(Truck truck : trucks)
+        {
+            trucks_map.put(truck.getSerialNumber(),truck);
+        }
+
+        data.setTrucks(trucks_map);
+
+        List<Product> products = new ProductDAO().getAll();
+        Map<String,Product> products_map = new HashMap<>();
+        for(Product product : products)
+        {
+            products_map.put(product.getCN(),product);
+        }
+
+        data.setProducts(products_map);
+
+
+        List<Address> addresses = new AddressDAO().getAll();
+        Map<String,Address> addresses_map = new HashMap<>();
+        for(Address address : addresses)
+        {
+            addresses_map.put(address.getLocation(),address);
+        }
+
+        data.setAddresses(addresses_map);
+
+        return true;
+    }
 }
