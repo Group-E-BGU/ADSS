@@ -12,9 +12,7 @@ import java.util.List;
 public class WorkerDealDAO {
 
 
-    public WorkerDeal get(int id)
-    {
-
+    public WorkerDeal get(int id) {
         WorkerDeal deal = null;
 
         int worker_id;
@@ -23,14 +21,12 @@ public class WorkerDealDAO {
         double salary;
         List<String> work_conditions;
 
-        String sql = "SELECT FROM Work_Deals WHERE workerId = ?";
+        String sql = "SELECT * FROM Work_Deals WHERE workerId = " + id;
 
         try (Connection conn = DAL.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
-            ResultSet rs = pstmt.executeQuery(sql);
-            // loop through the result set
             if (rs.next()) {
                 worker_id = rs.getInt("workerId");
                 start_date = rs.getDate("startDate");
@@ -39,9 +35,9 @@ public class WorkerDealDAO {
                 work_conditions = decodeWorkConditions(rs.getString("workConditions"));
 
                 deal = new WorkerDeal(worker_id, start_date, salary, bank_address, work_conditions);
-
             } else
                 System.out.println("No deal with worker id of: " + id + " is found");
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

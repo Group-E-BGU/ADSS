@@ -346,8 +346,7 @@ public class BLService {
         delivery.setDocuments(documents);
         delivery.setSource(source);
 
-
-        return delivery;    
+        return delivery;
     }
 
     private int getTotalWeight(Map<String, Document> deliveryGoods) {

@@ -25,6 +25,7 @@ public abstract class Worker {
         this.type = type;
         this.schedule = schedule;
         this.contract = contract;
+//        System.out.println(contract.toString());
         this.worker_shifts = new LinkedList<>();
     }
 
