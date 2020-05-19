@@ -68,8 +68,8 @@ public class MapperStore {
             String sqlstmt = "UPDATE Store SET " +
                     " itemId= " + itemeId + "," +
                     " NumOfProduct = " + numOfProduct + "," +
-                    " NumOfOrder = " + NumOfOrder + "," +
-                    "WHERE StoreId = '" + email + "';";
+                    " NumOfOrder = " + NumOfOrder + " " +
+                    "WHERE email = '" + email + "';";
 
             Statement stmt = conn.createStatement();
             stmt.execute(sqlstmt);

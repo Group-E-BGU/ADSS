@@ -165,7 +165,7 @@ public class Mapper {
                     "OID int NOT NULL," +
                     "day int,"+
                     "StoreId varchar," +
-                    "PRIMARY KEY(id,StoreId)," +
+                    "PRIMARY KEY(OID,StoreId)," +
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
             //todo add OID,PSupplierOD to the praymery key in every table..

@@ -311,8 +311,8 @@ public class SystemManager {
         return current_Store.CheckProductexist(id_suplaier,product_id);
     }
 
-    public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
-    return current_Store.FindId_P_Store(product_name,category,subcategory,sub_subcategory,manufacturer);
+    public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
+    return current_Store.FindId_P_Store(product_name,category,subcategory,sub_subcategory,manufacturer,minAmount,shelfNumber);
         }
 
     public String CheckAbleToChangeOrder(int id_order) {

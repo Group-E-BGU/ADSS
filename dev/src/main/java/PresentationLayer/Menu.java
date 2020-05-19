@@ -377,7 +377,7 @@ public class Menu {
         Sys.AddWrite(51328,WriteAli1,WriteAli2);
 
         Sys.Logout();
-   /*     Sys.Login("Store2@gmail.com","S2_superLi");
+        Sys.Login("Store2@gmail.com","S2_superLi");
         Map<Integer,String> contactAli22=new ConcurrentHashMap<Integer, String>();
         contactAli22.put(2087564,"yoni");
         contactAli22.put(2453214,"roi");
@@ -427,7 +427,7 @@ public class Menu {
 
 
         //todo add details!
-        Sys.Logout();*/
+        Sys.Logout();
     }
 
     private static void Register() {
@@ -639,6 +639,8 @@ public class Menu {
                     String subcategory;
                     String sub_subcategory;
                     String manufacturer;
+                    int minAmount;
+                    int shelfNumber;
                     System.out.println("Which product the supplier will supply to the store?\n" + "Please enter its name");
                     Product_Name = myScanner.next();
                     System.out.println("Please enter its category");
@@ -649,7 +651,11 @@ public class Menu {
                     sub_subcategory = myScanner.next();
                     System.out.println("Please enter its manufacturer");
                     manufacturer = myScanner.next();
-                    int Id_Store = Sys.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer);
+                    System.out.println("Please enter its min amount");
+                    minAmount = myScanner.nextInt();
+                    System.out.println("Please enter its shelf number");
+                    shelfNumber = myScanner.nextInt();
+                    int Id_Store = Sys.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer,minAmount, shelfNumber );
                     System.out.println("Please enter his Catalog Number");
                     int product_Id = myScanner.nextInt();
                     System.out.println("Please enter the price");

@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
+import sun.util.calendar.LocalGregorianCalendar;
 
 public class Store {
 
@@ -454,12 +455,25 @@ public class Store {
         return false;
     }
 
-    public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer) {
+    public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
         int id=MapIRS.getProductId(email_ID,category,subcategory,sub_subcategory,product_name,manufacturer);
         if(id==-1){
-            id=NumOfProduct;
+            id=itemId++;
             MapIRS.WriteItemRecord_Supplier(email_ID,id,category,subcategory,sub_subcategory,product_name);
-            NumOfProduct++;
+            ItemRecord ir = new ItemRecord(product_name,id,minAmount,0,0,0,shelfNumber,manufacturer);
+            mapperItemRecord.InsertItemRecord(product_name,id,minAmount,0,0,0,shelfNumber,manufacturer,email_ID);
+            if(mapperCategory.getCategory(category,email_ID) == null){
+                Category main = new Category(Category.CategoryRole.MainCategory,category);
+                categories.put(category,main);
+                mapperCategory.InsertCategory(category,1,email_ID);
+                main.addItem(ir);
+            }
+            else{
+                Category main = categories.get(category);
+                if(main == null)
+                    main = mapperCategory.getCategory(category,email_ID);
+                main.addItem(ir);
+            }//sub subsub
         }
         return id;
     }
@@ -1031,7 +1045,7 @@ public class Store {
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
      LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
-
+        Date d = new Date();
         for (Order o:list_of_Order
         ) {
             if (o.getDay().contains(1)) {//todo check the date!!
