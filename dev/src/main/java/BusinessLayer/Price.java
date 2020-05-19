@@ -1,12 +1,12 @@
 package BusinessLayer;
 
-import DataAccesslayer.DALPrice;
+import DataAccesslayer.MapperPrice;
 
 public class Price {
 
     private int retailPrice;
     private int storePrice;
-    private static DALPrice dalPrice;
+    private static MapperPrice mapperPrice;
 
 
     public int getId() {
@@ -16,18 +16,18 @@ public class Price {
     private int id;//highest id is current
 
     public Price(int retail, int store) {
-        dalPrice = new DALPrice();
+        mapperPrice = new MapperPrice();
         retailPrice = retail;
         storePrice = store;
-        id = dalPrice.getMaxPriceId()+1;
+        id = mapperPrice.getMaxPriceId()+1;
     }
 
     public void savePrice(int IRID){
-        dalPrice.InsertPrice(id,IRID,storePrice,retailPrice);
+        mapperPrice.InsertPrice(id,IRID,storePrice,retailPrice);
     }
 
     public static int getCurrId(int IRID) {
-        return DALPrice.getCurrId(IRID);
+        return MapperPrice.getCurrId(IRID);
     }
 
     public int getStorePrice() {

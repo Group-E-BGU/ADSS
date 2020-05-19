@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DALDiscount {
+public class MapperDiscount {
 
     private Connection conn;
 

@@ -178,10 +178,6 @@ public class SystemManager {
 
     public static void sendWarning(String warning) {
         Menu.printWarning(warning);
-        /*
-    public static void sendWarning(String name, int totalAmount, int minAmount) {
-        Menu.printWarning(name,totalAmount,minAmount);
-*/
     }
 
     public void initialize() {

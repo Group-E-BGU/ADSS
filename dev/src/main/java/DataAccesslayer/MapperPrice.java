@@ -2,7 +2,7 @@ package DataAccesslayer;
 
 import java.sql.*;
 
-public class DALPrice {
+public class MapperPrice {
 
     private static Connection conn = null;
 

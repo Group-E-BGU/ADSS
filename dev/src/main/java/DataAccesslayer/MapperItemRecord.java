@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DALItemRecord {
+public class MapperItemRecord {
 
     //this class also manages Items
     Connection conn = null;
@@ -251,6 +251,34 @@ public class DALItemRecord {
         return null;
     }
 
+    public int getMaxItemRecordId(){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT MAX(id) " +
+                    "FROM ItemRecord ;";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return rs.getInt(1);
+            else
+                return 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+            finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+            return 0;
+    }
     public int getMaxItemId() {
         try {
             Class.forName("org.sqlite.JDBC");

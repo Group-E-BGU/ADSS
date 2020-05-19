@@ -70,7 +70,7 @@ public class Menu {
                     "13. Move from storage to shelf \n" +
                     "14. Subtract from shelf \n" +
                     "15. Print inventory report\n" +
-                    "16. Enter defected item\n" +//im here
+                    "16. Enter defected item\n" +
                     "17. Print defective report\n" +
                     "18. Enter new discount\n" +
                     "19. Enter new price\n"+
@@ -183,9 +183,14 @@ public class Menu {
                 case 16: {
                     System.out.println("Please enter defected item's name");
                     String name = myScanner.nextLine();
-                    System.out.println("Please enter defected item's ID");
-                    String id = myScanner.nextLine();
-                    System.out.println(Sys.setDefectedItem(name, id));
+                    String amount = Sys.getItemAmountsByName(name);
+                    System.out.println(amount);
+                    if (!amount.equals("No such item in inventory")) {
+                        System.out.println(Sys.getItemIdsByName(name));
+                        System.out.println("Please enter defected item's ID");
+                        String id = myScanner.nextLine();
+                        System.out.println(Sys.setDefectedItem(name, id));
+                    }
                     break;
                 }
                 case 17: {

@@ -1,7 +1,6 @@
 package BusinessLayer;
 
-import DataAccesslayer.DALItemRecord;
-import DataAccesslayer.DALPrice;
+import DataAccesslayer.MapperItemRecord;
 
 import java.util.LinkedList;
 
@@ -17,7 +16,7 @@ public class ItemRecord {
     private String manufacture;
     private LinkedList<Item> items;
     private LinkedList<Price> prices; //first is current
-    private DALItemRecord dalItemRecord;
+    private MapperItemRecord mapperItemRecord;
 
     public ItemRecord(String name,int id, int minAmount, int storageAmount, int shelfAmount, int totalAmount, int shelfNumber, String manufacture) {
         this.name = name;
@@ -28,7 +27,7 @@ public class ItemRecord {
         this.totalAmount = totalAmount;
         this.shelfNumber = shelfNumber;
         this.manufacture = manufacture;
-        dalItemRecord = new DALItemRecord();
+        mapperItemRecord = new MapperItemRecord();
         items = new LinkedList<>();
         prices = new LinkedList<>();
     }
@@ -56,9 +55,9 @@ public class ItemRecord {
 
     public void setTotalAmount(int newAmount,java.sql.Date expDate) {
         while(totalAmount < newAmount){
-            int Iid = dalItemRecord.getMaxItemId()+1;
+            int Iid = mapperItemRecord.getMaxItemId()+1;
             items.addFirst(new Item(Iid,expDate));
-            dalItemRecord.InsertItem(id,Iid,expDate);
+            mapperItemRecord.InsertItem(id,Iid,expDate);
             storageAmount++;
             totalAmount++;
         }
@@ -69,7 +68,7 @@ public class ItemRecord {
                 store.createAutomaticOrder(id,minAmount);
             }
         }
-        dalItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
     }
 
     public void removeItem(int id) {
@@ -80,7 +79,7 @@ public class ItemRecord {
         }
         storageAmount--;
         totalAmount--;
-        dalItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
 
     }
 
@@ -92,7 +91,7 @@ public class ItemRecord {
         }
         shelfAmount--;
         totalAmount--;
-        dalItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
 
     }
 
@@ -102,7 +101,7 @@ public class ItemRecord {
         }
         storageAmount -= parseInt;
         shelfAmount += parseInt;
-        dalItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
         return "New storage amount : "+ storageAmount + "\nNew shelf amount : "+ shelfAmount;
     }
 

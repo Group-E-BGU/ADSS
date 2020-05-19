@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DALCategory {
+public class MapperCategory {
 
     private Connection conn;
 

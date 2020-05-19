@@ -24,10 +24,10 @@ public class Store {
     private LinkedList<Discount> discounts;
     private LinkedList<SimplePair> defects;
     private static int itemId;
-    private DALItemRecord dalItemRecord;
-    private DALCategory dalCategory;
-    private DALDiscount dalDiscount;
-    private DALPrice dalPrice;
+    private MapperItemRecord mapperItemRecord;
+    private MapperCategory mapperCategory;
+    private MapperDiscount mapperDiscount;
+    private MapperPrice mapperPrice;
     private MapperSupplier MapSupplier;
     private MapperContact MapContact;
     private MapperContract MapContract;
@@ -65,10 +65,11 @@ public class Store {
     categories=new HashMap<String,Category>();
     discounts=new LinkedList<Discount>();
     defects=new LinkedList<SimplePair>();
-    itemId=0;
-    dalItemRecord = new DALItemRecord();
-    dalCategory = new DALCategory();
-    dalDiscount = new DALDiscount();
+    mapperItemRecord = new MapperItemRecord();
+    itemId = mapperItemRecord.getMaxItemRecordId();
+    mapperCategory = new MapperCategory();
+    mapperDiscount = new MapperDiscount();
+    mapperPrice = new MapperPrice();
     MapSupplier=new MapperSupplier();
     MapContact=new MapperContact();
     MapContract=new MapperContract();
@@ -86,13 +87,13 @@ public class Store {
     }
 
     public String addItemRecord(String name, int minAmount, int shelfNumber, String manufacture) {
-        if (itemRecords.containsKey(name) || dalItemRecord.getItemRecord(name,email_ID) != null) {
+        if (itemRecords.containsKey(name) || mapperItemRecord.getItemRecord(name,email_ID) != null) {
             return "This product name already exists";
         }
         else{
             ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
             itemRecords.put(name,ir);
-            dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
+            mapperItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
             return name+" added successfully";
        }
     }
@@ -511,7 +512,7 @@ public class Store {
         itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
         itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
         itemRecords.put("milk Tnova 3%",itemRecord1);
-        dalItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
+        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
 
         ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
@@ -520,13 +521,13 @@ public class Store {
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
         itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
         itemRecords.put("white bread",itemRecord2);
-        dalItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
+        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
 
         ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
         itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
         itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
         itemRecords.put("coffee Elite",itemRecord3);
-        dalItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
+        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
 
 
         itemRecord1.addPrice(new Price(80,120));
@@ -542,9 +543,9 @@ public class Store {
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,category1);
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,subCat1);
         addItemToCategory(itemRecords.get("milk Tnova 3%") ,subsubcat1);
-        dalCategory.InsertCategory(category1.getName(),1,email_ID);
-        dalCategory.InsertCategory(subCat1.getName(),2,email_ID);
-        dalCategory.InsertCategory(subsubcat1.getName(),3,email_ID);
+        mapperCategory.InsertCategory(category1.getName(),1,email_ID);
+        mapperCategory.InsertCategory(subCat1.getName(),2,email_ID);
+        mapperCategory.InsertCategory(subsubcat1.getName(),3,email_ID);
 
 
         categories.put("Dairy",category1);
@@ -557,9 +558,9 @@ public class Store {
         addItemToCategory(itemRecords.get("white bread") ,category2);
         addItemToCategory(itemRecords.get("white bread") ,subcat2);
         addItemToCategory(itemRecords.get("white bread") ,subsubcat2);
-        dalCategory.InsertCategory(category2.getName(),1,email_ID);
-        dalCategory.InsertCategory(subcat2.getName(),2,email_ID);
-        dalCategory.InsertCategory(subsubcat2.getName(),3,email_ID);
+        mapperCategory.InsertCategory(category2.getName(),1,email_ID);
+        mapperCategory.InsertCategory(subcat2.getName(),2,email_ID);
+        mapperCategory.InsertCategory(subsubcat2.getName(),3,email_ID);
 
         categories.put("Bread and pastry",category2);
         categories.put("Bread",subcat2);
@@ -570,9 +571,9 @@ public class Store {
         addItemToCategory(itemRecords.get("coffee Elite") ,category3);
         addItemToCategory(itemRecords.get("coffee Elite") ,subcat3);
         addItemToCategory(itemRecords.get("coffee Elite") ,subsubcat3);
-        dalCategory.InsertCategory(category3.getName(),1,email_ID);
-        dalCategory.InsertCategory(subcat3.getName(),2,email_ID);
-        dalCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
+        mapperCategory.InsertCategory(category3.getName(),1,email_ID);
+        mapperCategory.InsertCategory(subcat3.getName(),2,email_ID);
+        mapperCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
 
         categories.put("Drinks",category3);
         categories.put("Coffee powder",subcat3);
@@ -608,13 +609,13 @@ public class Store {
         }
         for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
-                ItemDiscount d = new ItemDiscount(dalDiscount.getMaxId()+1,ir, beginDate, endDate, percentage);
-                dalDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
+                ItemDiscount d = new ItemDiscount(mapperDiscount.getMaxId()+1,ir, beginDate, endDate, percentage);
+                mapperDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
                 Price p = ir.getCurrPrice();
                 int beforeDiscount = p.getStorePrice();
                 int afterDiscount = (beforeDiscount/100) * percentage;
                 Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                dalPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
+                mapperPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
                 //ir.addPrice(discountedPrice);
                 discounts.add(d);
                 return "The discount was added succesfully";
@@ -624,13 +625,13 @@ public class Store {
     }
 
     /*
-     if (itemRecords.containsKey(name) || dalItemRecord.getItemRecord(name,email_ID) != null) {
+     if (itemRecords.containsKey(name) || mapperItemRecord.getItemRecord(name,email_ID) != null) {
             return "This product name already exists";
         }
         else{
             ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
             itemRecords.put(name,ir);
-            dalItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
+            mapperItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
             return name+" added successfully";
        }
      */
@@ -641,14 +642,14 @@ public class Store {
         }
         for( Category cat: categories.values()){
             if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
-                CategoryDiscount d = new CategoryDiscount(dalDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
-                dalDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
+                CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
+                mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
                 for (ItemRecord itemRec: cat.getItemRecords() ){
                     Price p = itemRec.getCurrPrice();
                     int beforeDiscount = p.getStorePrice();
                     int afterDiscount = (beforeDiscount/100) * percentage;
                     Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                    dalPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
+                    mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
                     //itemRec.addPrice(discountedPrice);
 
 
@@ -660,10 +661,6 @@ public class Store {
         return "No such item";
     }
 
-    public int incrementAndGetItemID(){
-        return itemId++;
-    }
-
     public String setDefectedItem(String name, int id){
         for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
@@ -672,7 +669,7 @@ public class Store {
                     if(item.getId()==id){
                         item.setDefective(true);
                         java.sql.Date currDate = new java.sql.Date((new Date()).getTime());
-                        dalItemRecord.updateDefect(item.getId(), ir.getId(), currDate, this.email_ID);
+                        mapperItemRecord.updateDefect(item.getId(), ir.getId(), currDate, this.email_ID);
                         defects.add(new SimplePair(currDate, item));
                         return  "Defected item was added";
                     }
@@ -698,7 +695,7 @@ public class Store {
     public String getItemAmountsByName(String name) {
         ItemRecord ir = itemRecords.get(name);
         if (ir == null){
-            ir = dalItemRecord.getItemRecord(name,email_ID);
+            ir = mapperItemRecord.getItemRecord(name,email_ID);
             itemRecords.put(name,ir);
             if(ir == null)
                 return "No such item in inventory";
@@ -733,7 +730,7 @@ public class Store {
 
     public String getItemIdsByName(String name) {
         String toRet = name+" ids int store : ";
-        List<Integer> ids = dalItemRecord.geItemIdsByName(name,email_ID);
+        List<Integer> ids = mapperItemRecord.geItemIdsByName(name,email_ID);
         for (Integer id:ids) {
             toRet = toRet + id + "\n";
         }
@@ -741,10 +738,10 @@ public class Store {
     }
 
     public String removeItem(String name,int id) {
-        if(dalItemRecord.DeleteItem(name,id,email_ID)) {
+        if(mapperItemRecord.DeleteItem(name,id,email_ID)) {
             ItemRecord ir = itemRecords.get(name);
             if (ir == null) {
-                ir = dalItemRecord.getItemRecord(name, email_ID);
+                ir = mapperItemRecord.getItemRecord(name, email_ID);
                 itemRecords.put(name, ir);
             }
             ir.removeItem(id);
@@ -756,10 +753,10 @@ public class Store {
 
 
     public String removeItemFromShelf(String name,int id) {
-        if(dalItemRecord.DeleteItem(name,id,email_ID)) {
+        if(mapperItemRecord.DeleteItem(name,id,email_ID)) {
             ItemRecord ir = itemRecords.get(name);
             if (ir == null) {
-                ir = dalItemRecord.getItemRecord(name, email_ID);
+                ir = mapperItemRecord.getItemRecord(name, email_ID);
                 itemRecords.put(name, ir);
             }
             ir.removeItemFromShelf(id);
@@ -809,7 +806,7 @@ public class Store {
     public String getInventoryReport(String category) {
         Category category1 = categories.get(category);
         if (category1 == null){
-            category1 = dalCategory.getCategory(category,email_ID);
+            category1 = mapperCategory.getCategory(category,email_ID);
             if (category1 == null)
                 return "No such category";
         }
@@ -823,7 +820,7 @@ public class Store {
     }
 
     private void loadCategoryDiscount(Category c) {
-        List<CategoryDiscount> l = dalDiscount.getCategoryDiscounts(c,email_ID);
+        List<CategoryDiscount> l = mapperDiscount.getCategoryDiscounts(c,email_ID);
         for (CategoryDiscount cd:l) {
             boolean inList = false;
             for (Discount d:discounts) {
@@ -838,7 +835,7 @@ public class Store {
     }
 
     private void loadItemRecordsOfCategory(Category c) {
-        List<ItemRecord> l = dalItemRecord.getItemRecordByCategoryName(c.getName(),email_ID);
+        List<ItemRecord> l = mapperItemRecord.getItemRecordByCategoryName(c.getName(),email_ID);
         for (ItemRecord ir:l) {
             boolean inList = false;
             for (ItemRecord ir2: c.getItemRecords()) {
@@ -853,7 +850,7 @@ public class Store {
     }
 
     private void loadCategoryOfItem(ItemRecord record){
-        List<Category> l = dalCategory.getCategoryOfItem(record.getId(),email_ID);
+        List<Category> l = mapperCategory.getCategoryOfItem(record.getId(),email_ID);
         for (Category c:l) {
             boolean inList = false;
             for (Category c2: categories.values()) {
@@ -895,7 +892,7 @@ public class Store {
     }
 
     public String getAllInventoryReport() {
-        List<Category> l = dalCategory.getAllCategories(email_ID);
+        List<Category> l = mapperCategory.getAllCategories(email_ID);
         for (Category c:l) {
             if(!categories.containsKey(c.getName()))
                 categories.put(c.getName(),c);
@@ -909,7 +906,7 @@ public class Store {
 
     public String printDefectedReport(java.sql.Date beginDate, java.sql.Date endDate){
 
-        return dalItemRecord.printDefectedItems(beginDate, endDate, this.email_ID);
+        return mapperItemRecord.printDefectedItems(beginDate, endDate, this.email_ID);
     /*    String report ="";
         for(SimplePair pair: defects){
             if(pair.getDate().compareTo(beginDate)>=0 && pair.getDate().compareTo(endDate)<=0){
@@ -937,6 +934,7 @@ public class Store {
     public void sendWarning(ItemRecord itemRecord) {
         SystemManager.sendWarning("Making new order of "+itemRecord.getName()+" after reaching total amount of : "+itemRecord.getTotalAmount()+" " +
                 " while min amount is : " +itemRecord.getMinAmount()+ "\n");
+        createAutomaticOrder(itemRecord.getId(),itemRecord.getMinAmount()*2);
     }
 
     public int getPrice(String itemRecord) {
