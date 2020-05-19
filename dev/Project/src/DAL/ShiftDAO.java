@@ -52,7 +52,6 @@ public class ShiftDAO implements DAO<Shift> {
         }
 
         return shift;
-
     }
 
     @Override
