@@ -96,4 +96,8 @@ public class Shift {
     {
         this.address = address;
     }
+
+    public void setShift_id(int shift_id) {
+        this.shift_id = shift_id;
+    }
 }

@@ -197,9 +197,9 @@ public class ShiftDAO implements DAO<Shift> {
                         id = rs.getInt("id");
                         name = rs.getString("name");
                         schedule = decodeSchedule(rs.getString("schedule"));
-                        contract = getDeal(id).getResult();
+                        contract = (new WorkerDealDAO()).get(id);
 
-                        stockKeeper = new StockKeeper(id, name, WorkPolicy.WorkingType.StockKeeper, schedule, contract);
+                        stockKeeper = new StockKeeper(id, name, schedule, contract);
 
                         workers.add(stockKeeper);
                     }
@@ -237,9 +237,9 @@ public class ShiftDAO implements DAO<Shift> {
                         schedule = decodeSchedule(rs.getString("schedule"));
                         license = rs.getString("license");
                         shifts = decodeShifts(rs.getString("shifts"));
-                        contract = getDeal(id).getResult();
+                        contract = (new WorkerDealDAO()).get(id);
 
-                        driver = new Driver(id, name, WorkPolicy.WorkingType.Driver, schedule, contract, license);
+                        driver = new Driver(id, name, schedule, contract, license);
 
                         workers.add(driver);
                     }
@@ -264,6 +264,62 @@ public class ShiftDAO implements DAO<Shift> {
         return output;
     }
 
+    private static Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> decodeSchedule(String schedule){
+        Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> decodedSchedule = new HashMap<>();
+        String[] separatedDays = schedule.split("\n");
+
+        for (String separatedDay : separatedDays) {
+            decodedSchedule.put(new Pair<DayOfWeek, Shift.ShiftTime>(DayOfWeek.of(separatedDay.charAt(0)), separatedDay.charAt(1) == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 1);
+        }
+
+        return decodedSchedule;
+    }
+
+    private static List<Shift> decodeShifts(String shifts) {
+        List<Shift> decodedShifts = new LinkedList<>();
+        String[] shiftsIds = shifts.split("\n");
+
+        Shift tmpShift;
+
+        int shift_id;
+        Date shift_date;
+        Worker boss;
+        Shift.ShiftTime shift_time;
+        Map<WorkPolicy.WorkingType, List<Integer>> work_team;
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM Shifts WHERE id IN (");
+
+        for (int i = 0; i < shiftsIds.length - 1; i++) {
+            sql.append(shiftsIds[i]).append(",");
+        }
+
+        sql.append(shiftsIds[shiftsIds.length - 1]).append(")");
+
+        try (Connection conn = DAL.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql.toString())) {
+
+            // loop through the result set
+            while (rs.next()) {
+                shift_id = rs.getInt("id");
+                shift_date = rs.getDate("date");
+                boss = (new StockKeeperDAO()).get(rs.getInt("boss"));
+                boss = boss != null ? boss : (new DriverDAO()).get(rs.getInt("boss"));
+                shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
+                work_team = decodeWorkingTeam(rs.getString("workTeam"));
+                Address address = (new AddressDAO()).get(rs.getString("address"));
+
+                tmpShift = new Shift(address, shift_date, shift_time, boss, work_team);
+                tmpShift.setShift_id(shift_id);
+
+                decodedShifts.add(tmpShift);
+            }
+
+        } catch (SQLException e) {
+            return null;
+        }
+        return decodedShifts;
+    }
 
 
 }

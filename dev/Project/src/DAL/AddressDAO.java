@@ -7,7 +7,8 @@ import java.util.List;
 
 public class AddressDAO implements DAO<Address> {
     @Override
-    public Address get(String id) {
+    public Address get(int id) {
+        // TODO - must change the id to string.
         return null;
     }
 
