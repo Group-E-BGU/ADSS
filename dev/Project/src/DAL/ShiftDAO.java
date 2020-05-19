@@ -3,14 +3,14 @@ package DAL;
 import BL.*;
 import BL.Driver;
 import javafx.util.Pair;
+import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.Date;
-
-
+import java.util.stream.Collectors;
 
 
 public class ShiftDAO implements DAO<Shift> {
@@ -36,22 +36,23 @@ public class ShiftDAO implements DAO<Shift> {
             // loop through the result set
             if (rs.next()) {
                 shift_date = rs.getDate("date");
-                StockKeeper s = getStockKeeper(rs.getInt("boss")).getResult();
-                boss = s != null ? s : getDriver(rs.getInt("boss")).getResult();
+                StockKeeper s = (new StockKeeperDAO()).get(rs.getInt("boss"));
+                boss = s != null ? s : (new DriverDAO()).get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
-                work_team = decodeWorkTeam(rs.getString("workTeam"));
+                work_team = decodeWorkingTeam(rs.getString("workTeam"));
                 Address address = (new AddressDAO()).get(rs.getString("address"));
 
                 shift = new Shift(address, shift_date, shift_time, boss, work_team);
                 shift.setShiftID(id);
 
+                return shift;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return null;
         }
 
-        return shift;
+        return null;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ShiftDAO implements DAO<Shift> {
         Date shift_date;
         Worker boss;
         Shift.ShiftTime shift_time;
-        Map<WorkPolicy.WorkingType, List<Worker>> work_team;
+        Map<WorkPolicy.WorkingType, List<Integer>> work_team;
 
         String sql = "SELECT * FROM Shifts";
 
@@ -76,11 +77,12 @@ public class ShiftDAO implements DAO<Shift> {
             while (rs.next()) {
                 shift_id = rs.getInt("id");
                 shift_date = rs.getDate("date");
-                boss = getStockKeeper(rs.getInt("boss")).getResult();
+                boss = (new StockKeeperDAO()).get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
-                work_team = decodeWorkTeam(rs.getString("workTeam"));
+                work_team = decodeWorkingTeam(rs.getString("workTeam"));
+                Address address = (new AddressDAO()).get(rs.getString("address"));
 
-                tmpShift = new Shift(shift_date, shift_time, boss, work_team);
+                tmpShift = new Shift(address, shift_date, shift_time, boss, work_team);
                 tmpShift.setShiftID(shift_id);
 
                 shifts.add(tmpShift);
@@ -143,15 +145,15 @@ public class ShiftDAO implements DAO<Shift> {
     }
 
 
-    private String encodeWorkTeam(Map<WorkPolicy.WorkingType, List<Worker>> workingTeam) {
+    private String encodeWorkTeam(Map<WorkPolicy.WorkingType, List<Integer>> workingTeam) {
         String encodedWorkingTeam = "";
 
-        for (Map.Entry<WorkPolicy.WorkingType, List<Worker>> entry : workingTeam.entrySet()) {
+        for (Map.Entry<WorkPolicy.WorkingType, List<Integer>> entry : workingTeam.entrySet()) {
             encodedWorkingTeam += entry.getKey() == WorkPolicy.WorkingType.StockKeeper ? 0 : 1;
             encodedWorkingTeam += ",";
 
-            for (Worker worker : entry.getValue())
-                encodedWorkingTeam += worker.getId() + ",";
+            for (Integer workerId : entry.getValue())
+                encodedWorkingTeam += workerId + ",";
 
             encodedWorkingTeam += "\n";
         }
@@ -251,10 +253,15 @@ public class ShiftDAO implements DAO<Shift> {
     }
 
     private static Map<WorkPolicy.WorkingType, List<Integer>> decodeWorkingTeam(String workTeam){
-        // TODO
+        // get the work team
+        Map<WorkPolicy.WorkingType, List<Worker>> team = decodeWorkTeam(workTeam);
+        Map<WorkPolicy.WorkingType, List<Integer>> output = new HashMap<>();
 
+        // loop through the actual working team and get the id's
+        for(Map.Entry<WorkPolicy.WorkingType, List<Worker>> entry : team.entrySet())
+            output.put(entry.getKey(), entry.getValue().stream().map(Worker::getId).collect(Collectors.toList()));
 
-        return null;
+        return output;
     }
 
 
