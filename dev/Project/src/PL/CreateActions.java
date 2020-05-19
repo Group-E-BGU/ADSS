@@ -2,6 +2,7 @@ package PL;
 
 import BL.*;
 
+import javax.swing.*;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -345,5 +346,26 @@ public class CreateActions {
                 System.out.println("Error : Invalid input ! type n to cancel or y to confirm");
         }
 
+    }
+
+    private static void arrangeDelivery(){
+        Delivery delivery;
+        String source = getSource();
+        List<String> destinations = getDestinations();
+;
+
+
+
+    }
+
+    private static List<String> getDestinations() {
+        Scanner scanner = new Scanner(System.in);
+        
+    }
+
+    private static String getSource() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter the source of the delivery :");
+        return scanner.next();
     }
 }
