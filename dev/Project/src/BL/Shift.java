@@ -22,13 +22,13 @@ public class Shift {
     private Date shift_date;
     private Worker boss;
     private ShiftTime shift_time;
-    private Map<WorkingType, List<Worker>> work_team;   // should be a multimap
+    private Map<WorkingType, List<Integer>> work_team;   // list of ids
 
-    public Map<WorkingType, List<Worker>> getWorkingTeam() {
+    public Map<WorkingType, List<Integer>> getWorkingTeam() {
         return work_team;
     }
 
-    public Shift(Address address , Date shift_date, ShiftTime shift_time, Worker boss, Map<WorkingType, List<Worker>> work_team) {
+    public Shift(Address address , Date shift_date, ShiftTime shift_time, Worker boss, Map<WorkingType, List<Integer>> work_team) {
         this.address = address;
         this.shift_date = shift_date;
         this.boss = boss;
@@ -49,7 +49,8 @@ public class Shift {
         shift_string = shift_string + "Working team :- " + '\n' + "{\n";
         for (WorkingType workingType : work_team.keySet()) {
             shift_string = shift_string + workingType + " staff : " + '\n';
-            for (Worker worker : work_team.get(workingType)) {
+            for (Integer worker_id : work_team.get(workingType)) {
+                Worker worker = Workers.getInstance().getAllWorkers().get(worker_id);
                 shift_string = shift_string + worker.toString() + '\n';
             }
         }

@@ -92,7 +92,7 @@ public class CreateActions {
                     return;
                 }
 
-                Map<WorkPolicy.WorkingType, List<Worker>> working_team = new HashMap<>();
+                Map<WorkPolicy.WorkingType, List<Integer>> working_team = new HashMap<>();
 
                 Shift shift = new Shift(address,date, shiftTime, boss, working_team);
                 boolean success = blService.addShift(shift);
@@ -158,16 +158,12 @@ public class CreateActions {
 
     }
 
-    public void editWorker(int worker_id) {
+    public int editWorker(int worker_id) {
+
+        // since this comes from workerView the worker is always not null
 
         Worker worker = blService.getWorker(worker_id);
-        if(worker == null)
-        {
-            System.out.println("Error : no worker with such id!");
-            return;
-        }
 
-        WorkPolicy.WorkingType[] current_types = WorkPolicy.WorkingType.values();
         boolean go_back = false;
         while (!go_back) {
 
@@ -179,14 +175,19 @@ public class CreateActions {
                     System.out.println("Type the new name :");
                     String edited_name = keyboard.nextLine();
                     worker.setName(edited_name);
-
                     blService.updateWorker(worker);
                     break;
                 case 2:
                     System.out.println("Type the new id :");
                     int edited_id = getChoice(Main.id_lower_bound,Main.id_upper_bound);
-                    worker.setID(edited_id);
-                    blService.updateWorker(worker);
+                    if(blService.getWorker(edited_id)!= null)
+                    {
+                        System.out.println("Error : There is already a worker with such id!");
+                        break;
+                    }
+
+                    if(blService.updateWorkerID(worker_id , edited_id))
+                        worker_id = edited_id;
                     break;
                 case 3:
                     System.out.println("Type the new bank address :");
@@ -208,6 +209,7 @@ public class CreateActions {
             }
         }
 
+        return worker_id;
     }
 
     public static void AddAddress()

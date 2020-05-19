@@ -66,6 +66,8 @@ public class InitializeData {
             Shift mondayEvening_shift = new Shift(b,date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, new BLService().getWorker(222222222), new HashMap<>());
             history.getShifts().put(sundayMorning_shift.getShiftId(),sundayMorning_shift);
             history.getShifts().put(mondayEvening_shift.getShiftId(),mondayEvening_shift);
+            Workers.getInstance().getAllWorkers().get(111111111).getWorker_shifts().add(sundayMorning_shift.getShiftId());
+            Workers.getInstance().getAllWorkers().get(222222222).getWorker_shifts().add(mondayEvening_shift.getShiftId());
         } catch (ParseException pe) {
             pe.printStackTrace();
         }

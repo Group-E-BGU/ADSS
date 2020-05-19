@@ -24,7 +24,10 @@ public class Printer {
 
         if (w.getWorker_shifts().isEmpty())
             System.out.println(w.getName() + " has no working shifts.");
-        else for (Shift shift : w.getWorker_shifts()) {
+
+
+        else for (Integer shift_id : w.getWorker_shifts()) {
+            Shift shift = blService.getShift(shift_id);
             System.out.println(shift.toString());
         }
     }
@@ -65,7 +68,14 @@ public class Printer {
 
     public static void printWorkersView()
     {
-        System.out.println(Workers.getInstance().toString() + "\n");
+
+        String workers_string="";
+        for (Worker worker : blService.getAllWorkers().values()) {
+            workers_string = workers_string+worker.toString()+'\n';
+        }
+        workers_string = workers_string.substring(0,workers_string.length()-1);
+        System.out.println(workers_string+'\n');
+
         System.out.println("1) Register a worker");
         System.out.println("2) select a worker");
         System.out.println("3) return\n");
@@ -99,8 +109,7 @@ public class Printer {
         System.out.println("2) Print contract");
         System.out.println("3) Print working shifts");
         System.out.println("4) Edit worker info");
-        System.out.println("5) Delete worker");
-        System.out.println("6) return");
+        System.out.println("5) Return");
     }
 
     public static void printEditWorkerMenu() {

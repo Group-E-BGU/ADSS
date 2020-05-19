@@ -11,12 +11,12 @@ import BL.WorkPolicy.WorkingType;
 
 public abstract class Worker {
 
-    private int id = 0;
+    private int id;
     private String name;
     private WorkingType type;
     private Map<Pair<DayOfWeek, ShiftTime>, Boolean> schedule;
     private WorkerDeal contract;
-    private List<Shift> worker_shifts;
+    private List<Integer> worker_shifts;   // Shift_id
 
     public Worker(int id, String name, WorkingType type, Map<Pair<DayOfWeek, ShiftTime>, Boolean> schedule, WorkerDeal contract) {
 
@@ -28,7 +28,7 @@ public abstract class Worker {
         this.worker_shifts = new LinkedList<>();
     }
 
-    public List<Shift> getWorker_shifts() {
+    public List<Integer> getWorker_shifts() {
         return worker_shifts;
     }
 
@@ -80,5 +80,15 @@ public abstract class Worker {
 
     public void setID(int id) {
         this.id = id;
+    }
+
+    public void setWorkerShifts(List<Integer> worker_shifts)
+    {
+        this.worker_shifts = worker_shifts;
+    }
+
+    public List<Integer> getWorkingShifts()
+    {
+        return worker_shifts;
     }
 }

@@ -17,11 +17,5 @@ public class WorkPolicy {
         Driver,
         StockKeeper,
     }
-    private List<Pair<WorkingType,WorkingType>> policy; // if the map contains these two then the worker can get this job
-
-    public boolean canWork(WorkingType w1 , WorkingType w2)
-    {
-        return false;
-    }
 
 }

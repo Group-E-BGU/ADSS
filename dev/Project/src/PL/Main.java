@@ -111,7 +111,7 @@ public class Main {
 
             Printer.PrintWorkerView(worker_id);
 
-            int choice = getChoice(1, 6);
+            int choice = getChoice(1, 5);
 
             switch (choice) {
                 case 1:
@@ -124,27 +124,10 @@ public class Main {
                     Printer.printWorkingShifts(w);
                     break;
                 case 4:
-                    new CreateActions().editWorker(worker_id);
+                    worker_id = new CreateActions().editWorker(worker_id);
                     break;
+
                 case 5:
-                    System.out.println("Are you sure you want to remove this worker ? y/n");
-                    boolean confirmation = getConfirmation();
-                    if(confirmation)
-                    {
-                        if(!blService.removeWorker(worker_id))
-                        {
-                            System.out.println("Error : Worker couldn't be deleted");
-                        }
-                        else
-                        {
-                            System.out.println("The worker was deleted successfully");
-                            return;
-                        }
-                    }
-                    else
-                        System.out.println("The deletion was canceled");
-                    break;
-                case 6:
                     go_back= true;
                     break;
             }

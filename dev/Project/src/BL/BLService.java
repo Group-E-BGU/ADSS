@@ -20,6 +20,12 @@ public class BLService {
     }
 //------------------------------------ Workers --------------------------------//
 
+
+    public Map<Integer,Worker> getAllWorkers()
+    {
+        return workers.getAllWorkers();
+    }
+
     public List<Worker> getAvailableWorkers(Date date, Shift.ShiftTime time) {
         List<Worker> available_workers = new LinkedList<>();
         for (Worker w : workers.getAllWorkers().values()) {
@@ -66,23 +72,33 @@ public class BLService {
         return true;
     }
 
-    public boolean removeWorker(int worker_id) {
+    public boolean updateWorkerID(int old_id, int new_id) {
 
-        // add DAL
-        Worker worker = getWorker(worker_id);
-        if (worker == null)
-            return false;
+        getAllWorkers().put(new_id,getWorker(old_id));
+        getAllWorkers().remove(old_id);
+        Worker worker =getWorker(new_id);
+        worker.setID(new_id);
+        for(Integer shift_id : worker.getWorker_shifts())
+        {
+            Shift shift = getShift(shift_id);
+            if(shift.getBoss().getId() != new_id)
 
-        for (Shift shift : worker.getWorker_shifts()) {
-            shift.getWorkingTeam().get(worker.getType()).remove(worker);
-            if (shift.getWorkingTeam().get(worker.getType()).isEmpty()) {
-                shift.getWorkingTeam().remove(worker.getType());
+            {
+                shift.getWorkingTeam().get(worker.getType()).remove(old_id);
+                shift.getWorkingTeam().get(worker.getType()).add(new_id);
             }
         }
 
-        workers.getAllWorkers().remove(worker_id);
+        // check if he is a driver who has a delivery
 
         return true;
+    }
+
+    public boolean removeWorker(int worker_id) {
+
+        // add DAL
+
+        return false;
     }
 
 
@@ -97,7 +113,8 @@ public class BLService {
 
         Pair<DayOfWeek, Shift.ShiftTime> pair = new Pair<>(DayOfWeek.of(dayOfWeek), shiftTime);
         if (worker.getSchedule().get(pair)) {
-            for (Shift shift : worker.getWorker_shifts()) {
+            for (Integer shift_id : worker.getWorker_shifts()) {
+                Shift shift = getShift(shift_id);
                 if (shift.getShiftDate() == date && shift.getShiftTime() == shiftTime) {
                     return false;
                 }
@@ -124,7 +141,7 @@ public class BLService {
 
     public boolean work(Worker worker, Shift shift) {
         if (isAvailable(worker, shift.getShiftDate(), shift.getShiftTime())) {
-            worker.getWorker_shifts().add(shift);
+            worker.getWorker_shifts().add(shift.getShiftId());
             return true;
         }
 
@@ -158,6 +175,8 @@ public class BLService {
         }
 
         history.getShifts().put(shift.getShiftId(), shift);
+        getWorker(shift.getBoss().getId()).getWorker_shifts().add(shift.getShiftId());
+
 
         ShiftDAO s = new ShiftDAO();
 
@@ -176,7 +195,7 @@ public class BLService {
         if (!shift.getWorkingTeam().containsKey(workingType))
             shift.getWorkingTeam().put(workingType, new LinkedList<>());
 
-        shift.getWorkingTeam().get(workingType).add(worker);
+        shift.getWorkingTeam().get(workingType).add(worker.getId());
         return true;
     }
 
