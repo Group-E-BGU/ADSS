@@ -5,17 +5,14 @@ import BL.Driver;
 import javafx.util.Pair;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.DayOfWeek;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DriverDAO
 {
-    
-    public Driver get(int driverId)
-    {
+    public Driver get(int driverId) {
         Driver driver = null;
 
         String sql = "SELECT FROM Drivers WHERE id = ?";
@@ -40,7 +37,7 @@ public class DriverDAO
                 name = rs.getString("name");
                 schedule = decodeSchedule(rs.getString("schedule"));
                 license = rs.getString("license");
-                shifts = decodeShifts(rs.getString("shifts"));
+                shifts = getShiftsIds(rs.getString("shifts"));
                 contract = new WorkerDealDAO().get(id);
 
                 driver = new Driver(id, name, schedule, contract, license);
@@ -56,8 +53,11 @@ public class DriverDAO
         return driver;
     }
 
-    public List<Driver> getAll()
-    {
+    private List<Integer> getShiftsIds(String shifts) {
+        return Arrays.stream(shifts.split("\n")).map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    public List<Driver> getAll() {
         String sql = "SELECT * FROM Drivers";
         List<Driver> drivers = new LinkedList<>();
         Driver tmpDriver;
@@ -79,7 +79,7 @@ public class DriverDAO
                 name = rs.getString("name");
                 schedule = decodeSchedule(rs.getString("schedule"));
                 license = rs.getString("license");
-                shifts = decodeShifts(rs.getString("shifts"));
+                shifts = getShiftsIds(rs.getString("shifts"));
                 contract = new WorkerDealDAO().get(id);
 
                 tmpDriver = new Driver(id, name, schedule, contract, license);//TODO - ask mohammad about the shifts field
@@ -95,8 +95,7 @@ public class DriverDAO
         return drivers;
     }
 
-    public void save(Driver driver)
-    {
+    public void save(Driver driver) {
         String sql = "INSERT INTO Drivers(id, name, schedule, license, shifts) VALUES(?, ?, ?, ?, ?)";
 
         int id = driver.getId();
@@ -127,8 +126,7 @@ public class DriverDAO
 
     }
 
-    public void delete(Driver driver)
-    {
+    public void delete(Driver driver) {
 
         String sql = "DELETE FROM Drivers WHERE id = ?";
 
@@ -160,13 +158,13 @@ public class DriverDAO
         return encodedSchedule.toString();
     }
 
-    private static String encodeShifts(List<Shift> worker_shifts) {
+    private static String encodeShifts(List<Integer> worker_shifts) {
         // when encoding a list of shifts, the string value returned is the id's of the shifts
         // separated by '\n'
         StringBuilder shiftsIds = new StringBuilder();
 
-        for (Shift shift : worker_shifts)
-            shiftsIds.append(shift.getShiftId()).append("\n");
+        for (Integer shift : worker_shifts)
+            shiftsIds.append(shift).append("\n");
 
         return shiftsIds.toString();
     }
@@ -192,7 +190,8 @@ public class DriverDAO
         Date shift_date;
         Worker boss;
         Shift.ShiftTime shift_time;
-        Map<WorkPolicy.WorkingType, List<Worker>> work_team;
+        Map<WorkPolicy.WorkingType, List<Integer>> work_team;
+        Address address;
 
         StringBuilder sql = new StringBuilder("SELECT * FROM Shifts WHERE id IN (");
 
@@ -212,9 +211,10 @@ public class DriverDAO
                 shift_date = rs.getDate("date");
                 boss = new StockKeeperDAO().get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
-                work_team = decodeWorkTeam(rs.getString("workTeam"));
+                work_team = decodeWorkingTeam(rs.getString("workTeam"));
+                address = (new AddressDAO()).get(rs.getString("address"));
 
-                tmpShift = new Shift(shift_date, shift_time, boss, work_team);
+                tmpShift = new Shift(address, shift_date, shift_time, boss, work_team);
                 tmpShift.setShiftID(shift_id);
 
                 decodedShifts.add(tmpShift);
@@ -224,6 +224,109 @@ public class DriverDAO
             return null;
         }
         return decodedShifts;
+    }
+
+    private static Map<WorkPolicy.WorkingType, List<Worker>> decodeWorkTeam(String workTeam) {
+        Map<WorkPolicy.WorkingType, List<Worker>> decodedWorkTeam = new HashMap<>();
+        String[] separatedWorkTeams = workTeam.split("\n");
+        String[] tmpTeam;
+        List<Worker> workers;
+
+        for (String team : separatedWorkTeams) {
+            tmpTeam = team.split(",");
+            tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length - 1);
+            workers = new LinkedList<>();
+
+            if (team.charAt(0) == 0) {
+                // the team are stock keepers
+                int id;
+                String name;
+                Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
+                WorkerDeal contract;
+                StockKeeper stockKeeper;
+
+                StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+
+                for (int i = 0; i < tmpTeam.length - 1; i++) {
+                    sql.append(tmpTeam[i]).append(",");
+                }
+
+                sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
+
+                try (Connection conn = DAL.connect();
+                     Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery(sql.toString())) {
+
+                    // loop through the result set
+                    while (rs.next()) {
+                        id = rs.getInt("id");
+                        name = rs.getString("name");
+                        schedule = decodeSchedule(rs.getString("schedule"));
+                        contract = (new WorkerDealDAO()).get(id);
+
+                        stockKeeper = new StockKeeper(id, name, schedule, contract);
+
+                        workers.add(stockKeeper);
+                    }
+                } catch (SQLException ignored) {
+                }
+
+                decodedWorkTeam.put(WorkPolicy.WorkingType.StockKeeper, workers);
+            } else {
+                // the team are drivers
+                Driver driver;
+
+                int id;
+                String name;
+                Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
+                String license;
+                List<Shift> shifts;
+                WorkerDeal contract;
+
+                StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+
+                for (int i = 0; i < tmpTeam.length - 1; i++) {
+                    sql.append(tmpTeam[i]).append(",");
+                }
+
+                sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
+
+                try (Connection conn = DAL.connect();
+                     Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery(sql.toString())) {
+
+                    // loop through the result set
+                    while (rs.next()) {
+                        id = rs.getInt("id");
+                        name = rs.getString("name");
+                        schedule = decodeSchedule(rs.getString("schedule"));
+                        license = rs.getString("license");
+                        shifts = decodeShifts(rs.getString("shifts"));
+                        contract = (new WorkerDealDAO()).get(id);
+
+                        driver = new Driver(id, name, schedule, contract, license);
+
+                        workers.add(driver);
+                    }
+                } catch (SQLException ignored) {
+                }
+
+                decodedWorkTeam.put(WorkPolicy.WorkingType.Driver, workers);
+            }
+        }
+        return decodedWorkTeam;
+    }
+
+    private static Map<WorkPolicy.WorkingType, List<Integer>> decodeWorkingTeam(String workTeam){
+        // get the work team
+        Map<WorkPolicy.WorkingType, List<Worker>> team = decodeWorkTeam(workTeam);
+        Map<WorkPolicy.WorkingType, List<Integer>> output = new HashMap<>();
+
+        // loop through the actual working team and get the id's
+        for(Map.Entry<WorkPolicy.WorkingType, List<Worker>> entry : team.entrySet())
+            output.put(entry.getKey(), entry.getValue().stream().map(Worker::getId).collect(Collectors.toList()));
+
+        return output;
     }
 
 

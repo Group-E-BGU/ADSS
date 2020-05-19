@@ -51,9 +51,7 @@ public class StockKeeperDAO {
         return stockKeeper;
     }
 
-
-    public List<StockKeeper> getAll()
-    {
+    public List<StockKeeper> getAll() {
         String sql = "SELECT * FROM StockKeepers";
         List<StockKeeper> stockKeepers = new LinkedList<>();
         StockKeeper tmpStockKeeper;
@@ -87,9 +85,7 @@ public class StockKeeperDAO {
         return stockKeepers;
     }
 
-
-    public void save(StockKeeper stockKeeper)
-    {
+    public void save(StockKeeper stockKeeper) {
 
         String sql = "INSERT INTO StockKeepers(id, name, schedule) VALUES(?, ?, ?)";
 
@@ -117,14 +113,11 @@ public class StockKeeperDAO {
 
     }
 
-
     public void update(StockKeeper stockKeeper, String[] params) {
 
     }
 
-
-    public void delete(StockKeeper stockKeeper)
-    {
+    public void delete(StockKeeper stockKeeper) {
         int stockKeeperId = stockKeeper.getId();
         String sql = "DELETE FROM StockKeepers WHERE id = ?";
 
