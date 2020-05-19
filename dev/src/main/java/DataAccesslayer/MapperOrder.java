@@ -1,36 +1,39 @@
 package DataAccesslayer;
 
+import BusinessLayer.ItemRecord;
+import BusinessLayer.Order;
+
 import java.awt.*;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 
 public class MapperOrder {
+
     private static Connection conn;
 
-    public void WriteOrder(String storeId, int id_suplaier, int IdOrder, boolean auto, LinkedList<Integer> days, java.sql.Date d, Date dd, Double TotalPrice, String status) {
-
-        for (int day : days
-        ) {
+    public void WriteOrder(String storeId, int id_suplaier, int IdOrder, boolean auto, LinkedList<Integer> days, java.sql.Date d, Date dd, Double TotalPrice, String status,Map<Integer,Integer> ProductIDSupplier_ProductID_Store, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
+        WriteProductOrder(storeId,IdOrder,ProductIDSupplier_ProductID_Store,ProductIDSupplier_numberOfItems);
+        WriteDays(storeId,IdOrder,days);
             try {
                 Class.forName("org.sqlite.JDBC");
                 conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?";
+                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?)";
 
                 PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
                 stmt.setInt(1, IdOrder);
                 stmt.setInt(2, id_suplaier);
                 stmt.setBoolean(3, auto);
-                stmt.setInt(4, day);
-                stmt.setDate(5, d);
-                stmt.setDate(6, dd);
-                stmt.setDouble(7, TotalPrice);
-                stmt.setString(8, status);
-                stmt.setString(9, storeId);
+                stmt.setDate(4, d);
+                stmt.setDate(5, dd);
+                stmt.setDouble(6, TotalPrice);
+                stmt.setString(7, status);
+                stmt.setString(8, storeId);
 
                 stmt.executeUpdate();
 
@@ -47,6 +50,34 @@ public class MapperOrder {
             }
         }
 
+    private void WriteDays(String storeId,int IdOrder,LinkedList<Integer> days) {
+        for (int day : days
+        ) {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO DayForOrders  VALUES (?,?,?)";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setInt(1,IdOrder);
+                stmt.setInt(2, day);
+                stmt.setString(3, storeId);
+                stmt.executeUpdate();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
     }
 
     public void DeleteOrder(String storeId, int OrderId) {
@@ -72,30 +103,188 @@ public class MapperOrder {
             }
         }
     }
-}
-   /* public int ID_Inventation;
-    public int ID_Vendor;
-    public boolean Auto;
-    public LinkedList<Integer> Day;
-    public LocalDate OrderDate;
-    public LocalDate ArrivalTime;
-    public Map<Integer, Integer> ItemsID_ItemsIDVendor;
-    public Map<Integer, Integer> ItemsID_NumberOfItems;
-    public double TotalPrice;
-    public String Status;
 
-    public MapperOrder(int ID_Vendor, int Id, boolean auto, LinkedList<Integer> day, LocalDate orderDate, LocalDate arrivalTime, Map<Integer, Integer> itemsID_ItemsIDVendor, Map<Integer, Integer> itemsID_NumberOfItems, double totalPrice, String status){//List<DALContact> vendorContacts, List<DALContact> leadersContacts) {
-        this.ID_Vendor = ID_Vendor;
-        this.ID_Inventation=Id;
-        Auto=auto;
-        Day=day;
-        OrderDate = orderDate;
-        ArrivalTime = arrivalTime;
-        ItemsID_ItemsIDVendor = itemsID_ItemsIDVendor;
-        ItemsID_NumberOfItems = itemsID_NumberOfItems;
-        TotalPrice = totalPrice;
-        Status = status;
-        //VendorContacts = vendorContacts;
-       // LeadersContacts = leadersContacts;
-    }*/
+    public Order GetOrder(int OrderdId, String StoreId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Orders " +
+                    "WHERE id = '"+OrderdId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return new Order(rs.getInt(2),rs.getInt(1),rs.getBoolean(3),null,null,null,rs.getDouble(7));
+            else
+                return null;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return null;
+    }
+
+    public void UpdateOrder(String storeId, int IdOrder, LinkedList<Integer> days) {
+
+        for (int day : days
+        ) {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "DELETE From DayForOrders" +
+                        "WHERE OID = '"+IdOrder+ "' AND StoreId = '"+storeId+ "' AND day = '"+day+"';";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+                stmt.executeUpdate();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+        }
+    WriteDays(storeId,IdOrder,days);
+
+    }
+
+    public void WriteProductOrder(String storeId, int IdOrder, Map<Integer,Integer> ProductIDSupplier_ProductID_Store, Map<Integer, Integer> ProductIDSupplier_numberOfItems){
+
+        for (Map.Entry<Integer,Integer> PId_num: ProductIDSupplier_numberOfItems.entrySet()
+        ) {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+                String sqlstmt = "INSERT INTO ProductOrder  VALUES (?,?,?,?,?)";
+
+                PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+
+                stmt.setInt(1, IdOrder);
+                stmt.setInt(2, ProductIDSupplier_ProductID_Store.get(PId_num.getKey()));
+                stmt.setInt(3, PId_num.getKey());
+                stmt.setInt(4, PId_num.getValue());
+                stmt.setString(5, storeId);
+
+                stmt.executeUpdate();
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void DeleteProductOrder(String storeId, int orderId, int ID_P_Sup){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE From ProductOrder"+
+                    "WHERE OID = '"+orderId+ "' AND StoreId = '"+storeId+ "' AND PSupplierOD = '"+ID_P_Sup+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public Map<Integer, Integer> GetItemsID_ItemsIDVendor(String StoreId,int OId){
+        Map<Integer, Integer> list=new HashMap<Integer, Integer>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM ProductOrder " +
+                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while(rs.next())
+                list.put(rs.getInt(2),rs.getInt(3));
+            return list;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return list;
+    }
+
+    public  Map<Integer, Integer> GetItemsID_NumberOfItems(String StoreId,int OId){
+        Map<Integer, Integer> list=new HashMap<Integer, Integer>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM ProductOrder " +
+                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while(rs.next())
+                list.put(rs.getInt(2),rs.getInt(4));
+            return list;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return list;
+    }
+
+}
+
+
 

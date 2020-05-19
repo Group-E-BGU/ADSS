@@ -131,7 +131,6 @@ public class MapperItemRecord {
 
     }
 
-
     public boolean DeleteItem(String name, int id, String storeId) {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -220,7 +219,6 @@ public class MapperItemRecord {
         return "";
     }
 
-
     public List<Integer> geItemIdsByName(String name, String storeId) {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -279,6 +277,7 @@ public class MapperItemRecord {
         }
             return 0;
     }
+
     public int getMaxItemId() {
         try {
             Class.forName("org.sqlite.JDBC");

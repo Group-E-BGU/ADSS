@@ -29,8 +29,6 @@ public class Order {
         ItemsID_NumberOfItems = itemsID_NumberOfItems;
         TotalPrice = totalPrice;
         Status = "Waiting";
-        //VendorContacts = vendorContacts;
-        // LeadersContacts = leadersContacts;
     }
 
     public boolean isAuto() {

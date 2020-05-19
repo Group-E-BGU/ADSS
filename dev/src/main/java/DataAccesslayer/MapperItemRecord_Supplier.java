@@ -5,6 +5,7 @@ import java.sql.*;
 public class MapperItemRecord_Supplier
 {
     private static Connection conn;
+
     public void WriteItemRecord_Supplier(String storeId, int PId, String MainCategory, String SubCategory, String SubSubCategory, String name ){
         try {
             Class.forName("org.sqlite.JDBC");

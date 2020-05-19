@@ -151,7 +151,6 @@ public class Mapper {
                     "id int NOT NULL," +
                     "SID int NOT NULL," +
                     "auto boolean," +
-                    "day int,"+
                     "orderDate date," +
                     "arrivalTime date," +
                     "totalPrice double,"+
@@ -159,6 +158,14 @@ public class Mapper {
                     "StoreId varchar," +
                     "PRIMARY KEY(id,StoreId)," +
                     "FOREIGN KEY(SID) REFERENCES Supplier(id),"+
+                    "FOREIGN KEY(StoreId) REFERENCES Store(email));";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS DayForOrders(" +
+                    "OID int NOT NULL," +
+                    "day int,"+
+                    "StoreId varchar," +
+                    "PRIMARY KEY(id,StoreId)," +
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
             //todo add OID,PSupplierOD to the praymery key in every table..

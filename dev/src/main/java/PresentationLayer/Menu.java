@@ -7,7 +7,6 @@ import InterfaceLayer.InterfaceSupplier;
 import InterfaceLayer.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 public class Menu {
 
     private static SystemManager Sys = new SystemManager();
@@ -61,7 +60,7 @@ public class Menu {
                     "4. Make an Fix order\n" +
                     "5. Display the items in the super\n" +
                     "6. Display sll the supplier's details\n"+
-                    "7. Update Order Status\n"+
+                  //  "7. Update Order Status\n"+
                     "8. Edit supplier details\n"+
                     "9. Edit supplier's arrangement\n" +
                     "10. Edit \"Write Quantities\" of supplier\n" +
@@ -568,11 +567,10 @@ public class Menu {
                         MoreContact = false;
                     }
                 }
-                String Done;
                 if (status == 1) {
-                    Done = Sys.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                   Sys.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 } else {
-                    Done = Sys.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                    Sys.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 }
             }
         }
@@ -589,30 +587,18 @@ public class Menu {
             boolean fixeDays = false;
             LinkedList<Integer> Days = new LinkedList<Integer>();
             boolean leading = true;
-            Map<Integer,Integer>  ItemsID_ItemsIDSupplier=new ConcurrentHashMap<Integer, Integer>();
+            Map<Integer, Integer> ItemsID_ItemsIDSupplier = new ConcurrentHashMap<Integer, Integer>();
             Map<Integer, String> ProductIDVendor_Name = new ConcurrentHashMap<Integer, String>();
             Map<Integer, Double> ProducttemsIDVendor_Price = new ConcurrentHashMap<Integer, Double>();
-            boolean contiue=true;
+            boolean contiue = true;
 
             System.out.println("Please enter the Supplier's ID");
             suplaier_ID = myScanner.nextInt();
-            if(status==2){
-                String exist=Sys.CheckSAgreementExist(suplaier_ID);
-                while (!exist.equals("Done")){
+            if (status == 2) {
+                String exist = Sys.CheckSAgreementExist(suplaier_ID);
+                if (!exist.equals("Done")) {
                     System.out.println(exist);
-                    System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
-                    String ans=myScanner.next();
-                    if(ans.equals("y")){
-                        System.out.println("Please enter the Supplier's ID");
-                        suplaier_ID =myScanner.nextInt();
-                        exist=Sys.CheckSAgreementExist(suplaier_ID);
-                    }
-                    else{
-                        {
-                            contiue=false;
-                            exist="Done";
-                        }
-                    }
+                    contiue = false;
                 }
             }
             if (contiue) {
@@ -633,10 +619,9 @@ public class Menu {
                         else {
                             System.out.println("Please enter the extra day. in number");
                             day = myScanner.nextInt();
-                            if(day<8&&day>0) {
+                            if (day < 8 && day > 0) {
                                 Days.add(day);
-                            }
-                            else{
+                            } else {
                                 System.out.println("the day need to be between 0-7");
                             }
                         }
@@ -647,7 +632,6 @@ public class Menu {
                 if (ans.equals("n")) {
                     leading = false;
                 }
-
                 boolean MoreProduct = true;
                 while (MoreProduct) {
                     String Product_Name;
@@ -665,12 +649,12 @@ public class Menu {
                     sub_subcategory = myScanner.next();
                     System.out.println("Please enter its manufacturer");
                     manufacturer = myScanner.next();
-                    int Id_Store=Sys.FindId_P_Store(Product_Name,category,subcategory,sub_subcategory,manufacturer);
+                    int Id_Store = Sys.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer);
                     System.out.println("Please enter his Catalog Number");
                     int product_Id = myScanner.nextInt();
                     System.out.println("Please enter the price");
                     double Product_Price = myScanner.nextInt();
-                    ItemsID_ItemsIDSupplier.put(Id_Store,product_Id);
+                    ItemsID_ItemsIDSupplier.put(Id_Store, product_Id);
                     ProductIDVendor_Name.put(product_Id, Product_Name);
                     ProducttemsIDVendor_Price.put(product_Id, Product_Price);
                     System.out.println("Does the supplier provide another product? y/n");
@@ -679,13 +663,12 @@ public class Menu {
                         MoreProduct = false;
                     }
                 }
-                String Done;
                 switch (status) {
                     case 1:
-                        Done = Sys.AddContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        Sys.AddContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
                         break;
                     case 2:
-                        Done = Sys.EditContract(suplaier_ID, fixeDays, Days, leading,ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        Sys.EditContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
                         break;
                 }
             }
@@ -1017,8 +1000,7 @@ public class Menu {
             int ID;
             System.out.println("Pleas enter the Supplier's ID");
             ID = myScanner.nextInt();
-            String Done = Sys.DeleteSupplier(ID);
-
+            Sys.DeleteSupplier(ID);
         }
     }
 

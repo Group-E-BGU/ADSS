@@ -1,9 +1,6 @@
 package DataAccesslayer;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class MapperStore {
 
@@ -63,4 +60,30 @@ public class MapperStore {
         }
     }
 
+    public void UpdateStore(String email, int itemeId, int numOfProduct, int NumOfOrder ) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "UPDATE Store SET " +
+                    " itemId= " + itemeId + "," +
+                    " NumOfProduct = " + numOfProduct + "," +
+                    " NumOfOrder = " + NumOfOrder + "," +
+                    "WHERE StoreId = '" + email + "';";
+
+            Statement stmt = conn.createStatement();
+            stmt.execute(sqlstmt);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
 }
