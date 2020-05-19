@@ -36,6 +36,11 @@ public class Workers {
         return workers_map;
     }
 
+    public void setWorkers(Map<Integer,Worker> workers_map)
+    {
+        this.workers_map = workers_map;
+    }
+
     @Override
     public String toString()
     {

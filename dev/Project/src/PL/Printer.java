@@ -73,8 +73,17 @@ public class Printer {
         for (Worker worker : blService.getAllWorkers().values()) {
             workers_string = workers_string+worker.toString()+'\n';
         }
-        workers_string = workers_string.substring(0,workers_string.length()-1);
-        System.out.println(workers_string+'\n');
+        if(workers_string.equals(""))
+        {
+            System.out.println(workers_string);
+
+        }
+        else
+        {
+            workers_string = workers_string.substring(0,workers_string.length()-1);
+            System.out.println(workers_string+'\n');
+        }
+
 
         System.out.println("1) Register a worker");
         System.out.println("2) select a worker");

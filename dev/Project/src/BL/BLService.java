@@ -285,6 +285,23 @@ public class BLService {
 
     public boolean loadFromDataBase()
     {
+
+        List<StockKeeper> stockKeepers = new StockKeeperDAO().getAll();
+        List<Driver> drivers = new DriverDAO().getAll();
+        Map<Integer,Worker> workers_map = new HashMap<>();
+
+        for(StockKeeper sk : stockKeepers)
+        {
+            workers_map.put(sk.getId(),sk);
+        }
+        
+        for(Driver d : drivers)
+        {
+            workers_map.put(d.getId(),d);
+        }
+
+        workers.setWorkers(workers_map);
+
         List<Truck> trucks = new TruckDAO().getAll();
         Map<String,Truck> trucks_map = new HashMap<>();
         for(Truck truck : trucks)
