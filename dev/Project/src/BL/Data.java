@@ -54,4 +54,13 @@ public class Data
         this.products = products;
     }
 
+    public Truck getProperTruck(int totalWeight) {
+
+        return null;
+    }
+
+    public Driver getProperDriver(int totalWeight) {
+        return null;
+        // todo
+    }
 }

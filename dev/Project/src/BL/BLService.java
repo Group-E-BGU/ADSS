@@ -4,6 +4,8 @@ import DAL.*;
 import DAL.ShiftDAO;
 import javafx.util.Pair;
 
+import javax.print.Doc;
+import javax.swing.*;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -333,12 +335,29 @@ public class BLService {
         return true;
     }
 
-    public Delivery arrangeDelivery(String source, Map<String, Integer> deliveryGoods) {
-        return null;
+    public Delivery arrangeDelivery(String source, Map<String, Document> documents) {
+        Delivery delivery = new Delivery();
+        int totalWeight = getTotalWeight(documents);
+        Truck truck = Data.getInstance().getProperTruck(totalWeight);
+        Driver driver = Data.getInstance().getProperDriver(totalWeight);
+
+        delivery.setTruckSerialNumber(truck.getSerialNumber());
+        delivery.setDriverID(driver.getId());
+        delivery.setDocuments(documents);
+        delivery.setSource(source);
+
+
+        return delivery;    
+    }
+
+    private int getTotalWeight(Map<String, Document> deliveryGoods) {
+        return -1;
         // todo
     }
 
-    public void rearrangeDelivery(Delivery delivery, Map<String, Integer> deliveryGoods) {
+    public void rearrangeDelivery(Delivery delivery, Map<String, Document> deliveryGoods) {
         // todo
     }
+
+
 }

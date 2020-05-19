@@ -1,30 +1,24 @@
 package BL;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Delivery{
     private int delivery_id;
     private Date date;
-    private Address source;
-    private List<Address> destinations;
-    private String launchTime;
+    private String source;
     private String truckSerialNumber;
     private int driverID;
-    private List<Document> documents;
+    private Map<String, Document> documents;
     private List<String> logs;
     private int TruckWeight;
 
-    public Delivery(int delivery_id , Date date, Address source, List<Address> destinations, String launchTime, String truckSerialNumber, int driverID){
+    public Delivery(int delivery_id , Date date, String source, String truckSerialNumber, int driverID){
         this.delivery_id = delivery_id;
         this.date = date;
         this.source = source;
-        this.destinations = destinations;
-        this.launchTime = launchTime;
         this.truckSerialNumber = truckSerialNumber;
         this.driverID = driverID;
-        this.documents = new LinkedList<>();
+        this.documents = new HashMap<>();
     }
 
     public Delivery(){}
@@ -38,19 +32,15 @@ public class Delivery{
         this.date = date;
     }
 
-    public void setDestinations(List<Address> destinations) {
-        this.destinations = destinations;
-    }
+//    public void setDestinations(List<String> destinations) {
+//        this.destinations = destinations;
+//    }
 
     public void setDriverID(int driverID) {
         this.driverID = driverID;
     }
 
-    public void setLaunchTime(String launchTime) {
-        this.launchTime = launchTime;
-    }
-
-    public void setSource(Address source) {
+    public void setSource(String source) {
         this.source = source;
     }
 
@@ -58,7 +48,7 @@ public class Delivery{
         this.truckSerialNumber = truckSerialNumber;
     }
 
-    public Address getSource() {
+    public String getSource() {
         return source;
     }
 
@@ -70,24 +60,21 @@ public class Delivery{
         return driverID;
     }
 
-    public String getLaunchTime() {
-        return launchTime;
-    }
-
     public String getTruckSerialNumber() {
         return truckSerialNumber;
     }
 
-    public List<Address> getDestinations() {
-        return destinations;
-    }
+//    public List<String> getDestinations() {
+//        return destinations;
+//    }
 
-    public List<Document> getDocuments() {
-        return documents;
-    }
 
-    public void setDocuments(List<Document> documents) {
+    public void setDocuments(Map<String, Document> documents) {
         this.documents = documents;
+    }
+
+    public Map<String, Document> getDocuments() {
+        return documents;
     }
 
     public void log(String s) {

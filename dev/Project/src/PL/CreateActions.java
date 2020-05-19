@@ -2,6 +2,7 @@ package PL;
 
 import BL.*;
 
+import javax.print.Doc;
 import javax.swing.*;
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -352,7 +353,7 @@ public class CreateActions {
         Delivery delivery;
         String source = getSource();
         List<String> destinations = getDestinations();
-        Map<String, Integer> deliveryGoods = getDeliveryGoods(destinations);
+        Map<String, Document> deliveryGoods = getDeliveryGoods(destinations);
 
         delivery =  blService.arrangeDelivery(source, deliveryGoods);
 
@@ -371,7 +372,7 @@ public class CreateActions {
         delivery.log("Some changes occurred to the delivery goods due to weight over-weight problems");
         // get the destinations and the products again
         List<String> destinations = getDestinations();
-        Map<String, Integer> deliveryGoods = getDeliveryGoods(destinations);
+        Map<String, Document> deliveryGoods = getDeliveryGoods(destinations);
 
         blService.rearrangeDelivery(delivery, deliveryGoods);
 
@@ -381,7 +382,7 @@ public class CreateActions {
             rearrangeDelivery(delivery);
     }
 
-    private static Map<String, Integer> getDeliveryGoods(List<String> destinations) {
+    private static Map<String, Document> getDeliveryGoods(List<String> destinations) {
         // TODO
         return null;
     }

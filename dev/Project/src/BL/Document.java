@@ -13,14 +13,6 @@ public class Document{
     public Document(){
     }
 
-    public int getTruckWeight() {
-        return TruckWeight;
-    }
-
-    public void setTruckWeight(int truckWeight) {
-        TruckWeight = truckWeight;
-    }
-
     public int getDocumentID()
     {
         return document_id;
