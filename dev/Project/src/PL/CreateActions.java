@@ -352,7 +352,8 @@ public class CreateActions {
         //Delivery delivery;
         String source = getSource();
         List<String> destinations = getDestinations();
-;
+
+
 
 
 
@@ -360,12 +361,14 @@ public class CreateActions {
 
     private static List<String> getDestinations() {
         Scanner scanner = new Scanner(System.in);
-        return null;
+        String[] destinations = scanner.nextLine().split(",");
+
+        return new LinkedList<>(Arrays.asList(destinations));
     }
 
     private static String getSource() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the source of the delivery :");
-        return scanner.next();
+        return scanner.nextLine();
     }
 }
