@@ -13,9 +13,8 @@ import java.util.Date;
 
 
 
-public class ShiftDAO {
+public class ShiftDAO implements DAO<Shift> {
 
-/*
     @Override
     public Shift get(int id) {
 
@@ -24,7 +23,7 @@ public class ShiftDAO {
         Date shift_date;
         Worker boss;
         Shift.ShiftTime shift_time;
-        Map<WorkPolicy.WorkingType, List<Worker>> work_team;
+        Map<WorkPolicy.WorkingType, List<Integer>> work_team;
 
         String sql = "SELECT * FROM Shifts WHERE id = ?";
 
@@ -37,11 +36,13 @@ public class ShiftDAO {
             // loop through the result set
             if (rs.next()) {
                 shift_date = rs.getDate("date");
-                boss = getStockKeeper(rs.getInt("boss")).getResult();
+                StockKeeper s = getStockKeeper(rs.getInt("boss")).getResult();
+                boss = s != null ? s : getDriver(rs.getInt("boss")).getResult();
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
                 work_team = decodeWorkTeam(rs.getString("workTeam"));
+                Address address = (new AddressDAO()).get(rs.getString("address"));
 
-                shift = new Shift(shift_date, shift_time, boss, work_team);
+                shift = new Shift(address, shift_date, shift_time, boss, work_team);
                 shift.setShiftID(id);
 
             }
@@ -250,6 +251,13 @@ public class ShiftDAO {
         return decodedWorkTeam;
     }
 
+    private static Map<WorkPolicy.WorkingType, List<Integer>> decodeWorkingTeam(String workTeam){
+        // TODO
 
- */
+
+        return null;
+    }
+
+
+
 }
