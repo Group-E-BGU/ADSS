@@ -64,7 +64,19 @@ public class BLService {
 
         workers.getAllWorkers().put(worker.getId(), worker);
 
-        // add DAL
+        WorkPolicy.WorkingType working_type = worker.getType();
+
+        switch (working_type)
+        {
+            case StockKeeper:
+                new StockKeeperDAO().save((StockKeeper)worker);
+                break;
+            case Driver:
+                new DriverDAO().save((Driver)worker);
+                break;
+        }
+
+
         return true;
     }
 
@@ -99,7 +111,6 @@ public class BLService {
 
     public boolean removeWorker(int worker_id) {
 
-        // add DAL
 
         return false;
     }
@@ -182,9 +193,7 @@ public class BLService {
 
 
         ShiftDAO s = new ShiftDAO();
-
-
-        // add DAL
+        s.save(shift);
 
         return true;
     }
