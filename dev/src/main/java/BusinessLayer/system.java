@@ -1,25 +1,29 @@
 package BusinessLayer;
 
 import DataAccesslayer.Mapper;
+import DataAccesslayer.MapperStore;
+import DataAccesslayer.MapperUser;
 
 public class system {
 
-    Mapper Map;
+    MapperUser MapUser;
+    MapperStore MapStore;
 
     public system() {
-        Map = new Mapper();
+        MapUser = new MapperUser();
+        MapStore= new MapperStore();
     }
 
     public String CheckEmailExist(String email) {
-        String s=Map.CheckEmailExist(email);
+        String s= MapUser.CheckEmailExist(email);
         return s;
     }
 
     public String Register(String email, String password) {
     String s=CheckEmailExist(email);
     if(s.equals("Not Exist")){
-        Map.WriteUser(email,password);
-        Map.WriteStore(email, 0, 0, 0 );
+        MapUser.WriteUser(email,password);
+        MapStore.WriteStore(email, 0, 0, 0 );
         return "Done";
     }
     return s;
@@ -28,12 +32,14 @@ public class system {
     public String Login(String email, String password) {
         String s=CheckEmailExist(email);
         if(s.equals("Exist")){
-            s=Map.CheckCorrectPassword(email,password);
+            s= MapUser.CheckCorrectPassword(email,password);
             if(s.equals("correct")){
                 return "Done";
             }
         }
         return s;
     }
+
+
 
 }

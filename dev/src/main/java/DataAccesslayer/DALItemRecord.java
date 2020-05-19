@@ -1,7 +1,7 @@
 package DataAccesslayer;
 
-import BusinessLayer.Item;
-import BusinessLayer.ItemRecord;
+import BusinessLayer.*;
+//import BusinessLayer.ItemRecord;
 
 import java.sql.*;
 import java.util.LinkedList;

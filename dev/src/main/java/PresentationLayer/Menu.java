@@ -4,7 +4,7 @@ import BusinessLayer.Order;
 import InterfaceLayer.InterfaceContract;
 import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
-import InterfaceLayer.SystemManager;
+import InterfaceLayer.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,11 +13,9 @@ public class Menu {
     private static SystemManager Sys = new SystemManager();
 
     public static void main(String[] args) {
-        Sys.initializeDB();
-        if (args.length > 1 && args[1].equals("Arg")) {
+            Sys.initializeDB();
             AddArguments();
-            Sys.initialize();
-        }
+           // Sys.initialize();
         MainMenu();
     }
 
@@ -298,10 +296,10 @@ public class Menu {
     }
 
     private static void AddArguments() {
-        Sys.Register("Stor1@gmail.com","S1_superLi");
-        Sys.Register("Stor2@gmail.com","S2_superLi");
+        Sys.Register("Store1@gmail.com","S1_superLi");
+        Sys.Register("Store2@gmail.com","S2_superLi");
 
-        Sys.Login("Stor1@gmail.com","S1_superLi");
+        Sys.Login("Store1@gmail.com","S1_superLi");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);
@@ -329,7 +327,10 @@ public class Menu {
         ProductAli2.put(12313,499.9);
         ProductAli2.put(2314567,69.9);
         Map<Integer,Integer>  ProductAli3=new ConcurrentHashMap<Integer, Integer>();
-        Sys.AddContract(51345,false,null,true,ProductAli3,ProductAli1,ProductAli2);
+        LinkedList<Integer> Days=new LinkedList<>();
+        Days.add(1);
+        Days.add(4);
+        Sys.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA1.put(143,"table");
         ProductIKEA1.put(5432,"bed");
@@ -339,7 +340,7 @@ public class Menu {
         ProductIKEA2.put(5432,1399.9);
         ProductIKEA2.put(22,139.9);
         Map<Integer,Integer>  ProductIKEA3=new ConcurrentHashMap<Integer, Integer>();
-        Sys.AddContract(51321,false,null,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
+        Sys.AddContract(51321,false,Days,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
         Map<Integer,String> ProductXiaomi1 =new ConcurrentHashMap<Integer, String>();
         ProductAli1.put(142356,"smartPhone");
         ProductAli1.put(46288,"headphones");
@@ -349,13 +350,13 @@ public class Menu {
         ProductAli2.put(46288,29.9);
         ProductAli2.put(4328,79.9);
         Map<Integer,Integer>  ProductXiaomi3=new ConcurrentHashMap<Integer, Integer>();
-        Sys.AddContract(51328,false,null,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
+        Sys.AddContract(51328,false,Days,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
 
         Map<Integer,Integer> WriteAli1=new ConcurrentHashMap<Integer, Integer>();
         WriteAli1.put(12313,200);
         Map<Integer,Double> WriteAli2=new ConcurrentHashMap<Integer, Double>();
         WriteAli2.put(12313,10.0);
-        Sys.AddWrite(51328,WriteAli1,WriteAli2);
+        Sys.AddWrite(51345,WriteAli1,WriteAli2);
         Map<Integer,Integer> WriteIKEA1=new ConcurrentHashMap<Integer, Integer>();
         WriteIKEA1.put(5432,150);
         WriteIKEA1.put(22,200);
@@ -372,6 +373,7 @@ public class Menu {
         Sys.AddWrite(51328,WriteAli1,WriteAli2);
 
         Sys.Logout();
+   /*     Sys.Login("Store2@gmail.com","S2_superLi");
         Map<Integer,String> contactAli22=new ConcurrentHashMap<Integer, String>();
         contactAli22.put(2087564,"yoni");
         contactAli22.put(2453214,"roi");
@@ -387,7 +389,6 @@ public class Menu {
         contactIKEA11.put(4283214,0523546253);
         Sys.AddSupplier("IKEA",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA22,contactIKEA11);
 
-        Sys.Login("Stor2@gmail.com","S2_superLi");
         Map<Integer,String> ProductAli11 =new ConcurrentHashMap<Integer, String>();
         ProductAli11.put(1213,"blanket");
         ProductAli11.put(43567,"Pillow");
@@ -395,7 +396,7 @@ public class Menu {
         ProductAli22.put(1213,89.9);
         ProductAli22.put(43567,1399.9);
         Map<Integer,Integer>  ProductAli33=new ConcurrentHashMap<Integer, Integer>();
-        Sys.AddContract(51345,false,null,true,ProductAli33,ProductAli11,ProductAli22);
+        Sys.AddContract(51345,false,Days,true,ProductAli33,ProductAli11,ProductAli22);
         Map<Integer,String> ProductIKEA11 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA11.put(223,"Armchair");
         ProductIKEA11.put(345,"Desk");
@@ -405,7 +406,7 @@ public class Menu {
         ProductIKEA22.put(345,1399.9);
         ProductIKEA22.put(1687,139.9);
         Map<Integer,Integer>  ProductIKEA33=new ConcurrentHashMap<Integer, Integer>();
-        Sys.AddContract(51321,false,null,true,ProductIKEA33,ProductIKEA11,ProductIKEA22);
+        Sys.AddContract(51321,false,Days,true,ProductIKEA33,ProductIKEA11,ProductIKEA22);
 
         Map<Integer,Double> WriteAli22=new ConcurrentHashMap<Integer, Double>();
         WriteAli22.put(1213,13.0);
@@ -422,7 +423,7 @@ public class Menu {
 
 
         //todo add details!
-        Sys.Logout();
+        Sys.Logout();*/
     }
 
     private static void Register() {

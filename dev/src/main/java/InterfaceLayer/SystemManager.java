@@ -116,7 +116,7 @@ public class SystemManager {
             logged_user=new User(email,password);
             current_Store=Store.createInstance(email);
         }
-        initialize();
+        //initialize();
         return Done;
     }
 
