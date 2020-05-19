@@ -41,6 +41,7 @@ public class DriverDAO
                 contract = new WorkerDealDAO().get(id);
 
                 driver = new Driver(id, name, schedule, contract, license);
+                driver.setWorkerShifts(shifts);
 
             } else
                 System.out.println("No driver with id :" + driverId + " is found.");
@@ -174,7 +175,7 @@ public class DriverDAO
         String[] separatedDays = schedule.split("\n");
 
         for (String separatedDay : separatedDays) {
-            decodedSchedule.put(new Pair<DayOfWeek, Shift.ShiftTime>(DayOfWeek.of(separatedDay.charAt(0)), separatedDay.charAt(1) == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 1);
+            decodedSchedule.put(new Pair<DayOfWeek, Shift.ShiftTime>(DayOfWeek.of(separatedDay.charAt(0) - 48), separatedDay.charAt(1) == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 1);
         }
 
         return decodedSchedule;
