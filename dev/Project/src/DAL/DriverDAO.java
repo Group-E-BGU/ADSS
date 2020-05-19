@@ -55,7 +55,18 @@ public class DriverDAO
     }
 
     private List<Integer> getShiftsIds(String shifts) {
-        return Arrays.stream(shifts.split("\n")).map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+        //return Arrays.stream(shifts.split("\n")).map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+
+        List<Integer> shiftsId = new LinkedList<>();
+
+        if(shifts.compareTo("") == 0)
+            return shiftsId;
+
+        String[] separatedIds = shifts.split("\n");
+
+        for (String separatedId : separatedIds) shiftsId.add(Integer.parseInt(separatedId));
+
+        return shiftsId;
     }
 
     public List<Driver> getAll() {

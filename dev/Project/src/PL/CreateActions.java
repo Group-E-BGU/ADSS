@@ -349,7 +349,7 @@ public class CreateActions {
     }
 
     private static void arrangeDelivery(){
-        Delivery delivery;
+        //Delivery delivery;
         String source = getSource();
         List<String> destinations = getDestinations();
 ;
@@ -360,7 +360,7 @@ public class CreateActions {
 
     private static List<String> getDestinations() {
         Scanner scanner = new Scanner(System.in);
-        
+        return null;
     }
 
     private static String getSource() {
