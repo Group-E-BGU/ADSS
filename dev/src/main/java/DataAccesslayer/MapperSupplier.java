@@ -158,7 +158,7 @@ public class MapperSupplier {
         Contract c=getContract(ID,storeId);
         Wrotequantities w=GetWrotequantities(ID, storeId);
         Map<Integer, String> ContactsID_Name = GetContactsID_Name(storeId,ID);
-         Map<Integer, Integer> ContactsID_number = GetContactsID_number(storeId,ID);
+        Map<Integer, Integer> ContactsID_number = GetContactsID_number(storeId,ID);
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
@@ -259,7 +259,7 @@ public class MapperSupplier {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             while(rs.next())
-                list.put(rs.getInt(1),rs.getString(2));
+                list.put(rs.getInt(4),rs.getString(2));
             return list;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -289,7 +289,7 @@ public class MapperSupplier {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             while(rs.next())
-                list.put(rs.getInt(1),rs.getInt(3));
+                list.put(rs.getInt(4),rs.getInt(3));
             return list;
         } catch (Exception e) {
             System.out.println(e.getMessage());

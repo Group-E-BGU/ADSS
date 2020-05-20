@@ -7,24 +7,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
-import sun.util.calendar.LocalGregorianCalendar;
 
 public class Store {
 
     private static Store storeInstance;
-
-    private String email_ID;
-    private List<Supplier> list_of_Suplier;
-    private List<Order> list_of_Order;
-    private int NumOfOrder;
-    private int NumOfProduct=0;
-    private Transportrans Trans;
-    private static Mapper Map;
-    private HashMap<String,ItemRecord> itemRecords;
-    private HashMap<String,Category> categories;
-    private LinkedList<Discount> discounts;
-    private LinkedList<SimplePair> defects;
-    private static int itemId;
     private MapperItemRecord mapperItemRecord;
     private MapperCategory mapperCategory;
     private MapperDiscount mapperDiscount;
@@ -35,9 +21,20 @@ public class Store {
     private MapperWrotequantities MapWorte;
     private MapperOrder MapOrder;
     private MapperStore MapStore;
+    private String email_ID;
+    private int NumOfOrder=0;
+    private List<Supplier> list_of_Suplier;
+    private List<Order> list_of_Order;
+    private Transportrans Trans;
+    private static Mapper Map;
+    private HashMap<String,ItemRecord> itemRecords;
+    private HashMap<String,Category> categories;
+    private LinkedList<Discount> discounts;
+    private LinkedList<SimplePair> defects;
+    private static int itemId;
+
 
     public static Store createInstance(String email) {
-
         storeInstance = new Store(email);
         return storeInstance;
     }
@@ -51,19 +48,8 @@ public class Store {
 
     private Store(String email) {
     Map=new Mapper();
-    email_ID = email;
-    list_of_Suplier=new LinkedList<Supplier>();
-    list_of_Order=new LinkedList<Order>();
-    NumOfOrder=0;
-    NumOfProduct=0;
-    Trans=new Transportrans();
-    itemRecords=new HashMap<String,ItemRecord>();
-    categories=new HashMap<String,Category>();
-    discounts=new LinkedList<Discount>();
-    defects=new LinkedList<SimplePair>();
-    mapperItemRecord = new MapperItemRecord();
-    itemId = mapperItemRecord.getMaxItemRecordId();
     mapperCategory = new MapperCategory();
+    mapperItemRecord = new MapperItemRecord();
     mapperDiscount = new MapperDiscount();
     mapperPrice = new MapperPrice();
     MapSupplier=new MapperSupplier();
@@ -72,6 +58,17 @@ public class Store {
     MapIRS=new MapperItemRecord_Supplier();
     MapOrder=new MapperOrder();
     MapStore=new MapperStore();
+    email_ID = email;
+    list_of_Suplier=new LinkedList<Supplier>();
+    list_of_Order=new LinkedList<Order>();
+    NumOfOrder=MapStore.getNumOfOrder(email);
+    Trans = new Transportrans();
+    itemRecords=new HashMap<String,ItemRecord>();
+    categories=new HashMap<String,Category>();
+    discounts=new LinkedList<Discount>();
+    defects=new LinkedList<SimplePair>();
+    itemId = mapperItemRecord.getMaxItemRecordId();
+
     }
 
     public String getEmail_ID(){
@@ -200,11 +197,6 @@ public class Store {
         if(sup==null){
             sup=MapSupplier.GetSupplier(id_suplaier,email_ID);
             if(sup!=null){
-                //todo change it
-                Contract c=MapContract.getContract(id_suplaier,email_ID);
-                Wrotequantities w=MapWorte.GetWrotequantities(id_suplaier,email_ID);
-                sup.setWorte(w);
-                sup.setContract(c);
                 list_of_Suplier.add(sup);
             }
         }
@@ -216,9 +208,6 @@ public class Store {
                 ProductID_IDSupplier.put(Id_Product, e.getKey());
                 double Price =sup.getPric(e.getKey(), e.getValue());
                 TotalPrice.set(TotalPrice.get()+Price);
-                //Sale = (100 - Sale) / 100;
-                //double Price = sup.GetPricProduct(id_suplaier, Id);
-                //TotalPrice.set(TotalPrice.get() + num * Price * Sale);
             }
             Order O = new Order(id_suplaier, NumOfOrder,false, day, ProductID_IDSupplier, ProductIDSupplier_numberOfItems, TotalPrice.get());
             Map<Integer, Integer> ProductIDSupplier_IDStore = new ConcurrentHashMap<Integer, Integer>();
@@ -235,11 +224,13 @@ public class Store {
 
     }
 
-    public String ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    public InterfaceOrder ChangeOrder(int id_order, int id_suplaier, LinkedList<Integer> day, java.util.Map<Integer, Integer> itemsIDVendor_numberOfItems) {
         Supplier sup = MapSupplier.GetSupplier(id_suplaier, email_ID);
+       InterfaceOrder ord=null;
         if (sup != null) {
             Order order = MapOrder.GetOrder(id_order, email_ID);
             if (order != null) {
+                LinkedList<Integer> OldDays = order.getDay();
 
                 Map<Integer, Integer> ProductID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
                 for (Map.Entry<Integer, Integer> e : itemsIDVendor_numberOfItems.entrySet()) {
@@ -252,8 +243,8 @@ public class Store {
                 ) {
                     ProductIDSupplier_IDStore.put(e.getValue(), e.getKey());
                 }
-
-                AtomicReference<Double> TotalPrice = new AtomicReference<>((double) 0);
+                Double tot=order.getTotalPrice();
+                AtomicReference<Double> TotalPrice = new AtomicReference<>(tot);
                 for (Map.Entry<Integer, Integer> e : order.getItemsID_NumberOfItems().entrySet()) {
                     double Price = sup.getPric(e.getKey(), e.getValue()); //todo check if works
                     TotalPrice.set(TotalPrice.get() + Price);
@@ -262,16 +253,18 @@ public class Store {
                 for (Order o : list_of_Order
                 ) {
                     if (o.getID_Invitation() == id_order) {
-                        o.ChangeOrder(id_order, id_suplaier, day, ProductID_IDSupplier, itemsIDVendor_numberOfItems);
+                        o.ChangeOrder(id_order, id_suplaier,OldDays, day, ProductID_IDSupplier, itemsIDVendor_numberOfItems);
                         o.setTotalPrice(TotalPrice.get());
                     }
-                    }
-                MapOrder.UpdateOrder(email_ID, id_order, day, ProductID_IDSupplier, itemsIDVendor_numberOfItems);
-                return "Done";
+                }
+                MapOrder.UpdateOrder(email_ID, id_order,OldDays, day, ProductIDSupplier_IDStore, itemsIDVendor_numberOfItems);
+                order = MapOrder.GetOrder(id_order, email_ID);
+                ord=new InterfaceOrder( order.getID_Vendor(),order.getID_Invitation(),order.getDay(),order.getOrderDate(),order.getArrivalTime(),order.getItemsID_ItemsIDVendor(),order.getItemsID_NumberOfItems(),order.getTotalPrice(),order.getStatus());
+                return ord;
             }
-            return "The order is not exist in the system";
+            return ord;
         }
-            return "the Supplier is not exist in the system";
+            return ord;
         }
 
     public String AutomaticProductOrdering(int IdProduct, int amount){
@@ -279,7 +272,6 @@ public class Store {
         int Id_p_sup=-1;
         Supplier sup=null;
         double FinalPrice= Integer.MAX_VALUE;
-        //todo change it. add contract iworte!
         LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
         for (Supplier s:suppliers
         ) {
@@ -295,11 +287,10 @@ public class Store {
         }
         if(sup!=null) {
             LinkedList<Integer> day = new LinkedList<Integer>();
-            day.add(LocalDate.now().getDayOfWeek().getValue()+1);
+            day.add(LocalDate.now().getDayOfWeek().getValue()+2);
 
             Map<Integer, Integer> ProductStoreID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
             Map<Integer, Integer> ProductIDSupplier_numberOfItems = new ConcurrentHashMap<Integer, Integer>();
-            Id_p_sup=sup.GetIdProduct(IdProduct);
             ProductStoreID_IDSupplier.put(IdProduct, Id_p_sup);
             ProductIDSupplier_numberOfItems.put(Id_p_sup, amount);
 
@@ -375,9 +366,9 @@ public class Store {
     public String CheckSuplierExit(int id) {
         Supplier s=MapSupplier.GetSupplier(id,email_ID);
              if(s!=null){
-                return "Exit";
+                return "Exist";
             }
-        return "Not Exit";
+        return "Not Exist";
     }
 
     public String CheckSAgreementExit(int suplaier_id) {
@@ -839,28 +830,6 @@ public class Store {
     public String printDefectedReport(java.sql.Date beginDate, java.sql.Date endDate){
 
         return mapperItemRecord.printDefectedItems(beginDate, endDate, this.email_ID);
-    /*    String report ="";
-        for(SimplePair pair: defects){
-            if(pair.getDate().compareTo(beginDate)>=0 && pair.getDate().compareTo(endDate)<=0){
-                report = report + pair.getItem().toString() ;
-            }
-            for (ItemRecord ir: itemRecords.values()) {
-                if(ir.getItems().contains(pair.getItem())) {
-                    report = report + " shelf: " + ir.getShelfNumber() +" Item: "+ir.getName()+ "\n";
-                }
-            }
-        }
-        for (ItemRecord ir: itemRecords.values()) {
-            for (Item item: ir.getItems()) {
-                if(!item.isDefective()) {
-                    if (item.getExpirationDate().getTime() > beginDate.getTime() && item.getExpirationDate().getTime() < endDate.getTime()) {
-                        report = report + item.toString() + " shelf: " + ir.getShelfNumber() + " Item: " + ir.getName() + "\n";
-                    }
-                }
-            }
-        }
-        return report;
-*/
     }
 
     public void sendWarning(ItemRecord itemRecord) {
@@ -935,18 +904,10 @@ public class Store {
     public InterfaceOrder getOrderDetails(int orderID) {
         InterfaceOrder ord = null;
         Order o = null;
-        for (Order order : list_of_Order
-        ) {
-            if (order.getID_Invitation() == orderID) {
-                o=order;
-            }
-        }
-        if(o==null){
             o=MapOrder.GetOrder(orderID,email_ID);
             if(o!=null){
                 ord=new InterfaceOrder(o.getID_Vendor(),o.getID_Invitation(),o.getDay(),o.getOrderDate(),o.getArrivalTime(),o.getItemsID_ItemsIDVendor(),o.getItemsID_NumberOfItems(),o.getTotalPrice(),o.getStatus());
             }
-        }
         return ord;
     }
 
@@ -1047,7 +1008,6 @@ public class Store {
     }
 
     public void Logout(){
-
-        MapStore.UpdateStore(email_ID,itemId,NumOfProduct,NumOfOrder);
+        MapStore.UpdateStore(email_ID,itemId,NumOfOrder);
  }
 }
