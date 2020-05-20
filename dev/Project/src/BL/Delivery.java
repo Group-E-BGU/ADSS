@@ -10,7 +10,7 @@ public class Delivery{
     private int driverID;
     private Map<String, Document> documents;
     private List<String> logs;
-    private int TruckWeight;
+    private int truckWeight;
 
     public Delivery(int delivery_id , Date date, String source, String truckSerialNumber, int driverID){
         this.delivery_id = delivery_id;
@@ -79,5 +79,21 @@ public class Delivery{
 
     public void log(String s) {
         this.logs.add(s);
+    }
+
+    public void setTruckWeight(int truckWeight) {
+        this.truckWeight = truckWeight;
+    }
+
+    public int getTruckWeight(){
+        return this.truckWeight;
+    }
+
+    public void setLogs(List<String> logs) {
+        this.logs = logs;
+    }
+
+    public List<String> getLogs() {
+        return logs;
     }
 }

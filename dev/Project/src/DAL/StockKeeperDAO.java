@@ -73,7 +73,7 @@ public class StockKeeperDAO {
                 schedule = decodeSchedule(rs.getString("schedule"));
                 contract = new WorkerDealDAO().get(id);
 
-                tmpStockKeeper = new StockKeeper(id, name, schedule, contract);//TODO - ask mohammad about the shifts field
+                tmpStockKeeper = new StockKeeper(id, name, schedule, contract);
 
                 stockKeepers.add(tmpStockKeeper);
             }

@@ -7,11 +7,13 @@ import BL.Truck;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class DeliveryDAO {
-    /*
+
     public Delivery get(int id) {
 
         Delivery delivery;
@@ -19,58 +21,67 @@ public class DeliveryDAO {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         Date date;
-        Address source;
-        List<Address> destinations;
-        String launchTime;
+        String source;
         String truckSerialNumber;
         int driverID;
-        Document document;
+        List<String> logs;
+        int truckWeight;
+        Map<String, Document> documents;
 
-        String sql = "SELECT * FROM Deliveries WHERE documentId = ?";
+        String sql = "SELECT * FROM Deliveries WHERE id = ?";
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, documentId);
+            pstmt.setInt(1, id);
 
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 date = rs.getDate("date");
-                source = getAddress(rs.getString("source")).getResult();
-                destinations = decodeDestinations(rs.getString("destinations")); // TODO - ask mohammad
-                launchTime = rs.getString("launchTime"); // TODO - ask mohammad
+                source = rs.getString("source");
+                documents = decodeDocuments(rs.getString("documents"));
                 truckSerialNumber = rs.getString("truckSerialNumber");
                 driverID = rs.getInt("driverId");
-                document = getDocument(rs.getInt("documentId")).getResult();
+                truckWeight = rs.getInt("truckWeight");
+                logs = decodeLogs(rs.getString("logs"));
 
-                delivery = new Delivery(0, date, source, destinations, launchTime, truckSerialNumber, driverID);
+                delivery = new Delivery(id, date, source, truckSerialNumber,driverID);
 
-                result.complete(delivery);
+                delivery.setDocuments(documents);
+                delivery.setTruckWeight(truckWeight);
+                delivery.setLogs(logs);
+
+                return delivery;
             } else
-                result.error("No delivery with document ID: " + documentId + " was found.");
+                System.out.println("No delivery with ID: " + id + " was found.");
         } catch (SQLException e) {
-            result.error("Could not connect to database.");
+            System.out.println(e.toString());
         }
 
-        return result;
+        return null;
+    }
+
+    private Map<String, Document> decodeDocuments(String documents) {
+        // todo
+        return null;
     }
 
     public List<Delivery> getAll() {
-        Result<List<Delivery>> result = new Result<>();
+        List<Delivery> result = new LinkedList<>();
         String sql = "SELECT * FROM Deliveries";
-        Delivery tmpDelivery;
+        Delivery delivery;
         List<Delivery> deliveries = new LinkedList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         Date date;
-        Address source;
-        List<Address> destinations;
-        String launchTime;
+        String source;
         String truckSerialNumber;
         int driverID;
-        Document document;
+        Map<String, Document> documents;
+        int deliveryId;
+
 
         try (Connection conn = DAL.connect();
              Statement stmt = conn.createStatement();
@@ -79,76 +90,81 @@ public class DeliveryDAO {
             // loop through the result set
             while (rs.next()) {
                 date = rs.getDate("date");
-                source = getAddress(rs.getString("source")).getResult();
-                destinations = decodeDestinations(rs.getString("destinations")); // TODO - ask mohammad
-                launchTime = rs.getString("launchTime"); // TODO - ask mohammad
+                source = rs.getString("source");
+                documents = decodeDocuments(rs.getString("documents"));
                 truckSerialNumber = rs.getString("truckSerialNumber");
                 driverID = rs.getInt("driverId");
-                document = getDocument(rs.getInt("documentId")).getResult();
+                int truckWeight = rs.getInt("truckWeight");
+                List<String> logs = decodeLogs(rs.getString("logs"));
+                deliveryId = rs.getInt("id");
 
-                tmpDelivery = new Delivery(0, date, source, destinations, launchTime, truckSerialNumber, driverID);
+                delivery = new Delivery(deliveryId, date, source, truckSerialNumber,driverID);
 
-                deliveries.add(tmpDelivery);
+                delivery.setDocuments(documents);
+                delivery.setTruckWeight(truckWeight);
+                delivery.setLogs(logs);
+
+                deliveries.add(delivery);
             }
-
-            result.complete(deliveries);
         } catch (SQLException e) {
-            result.error("Could not connect to database.");
+            System.out.println(e.toString());
         }
 
-        return result;
+        return deliveries;
     }
 
     public void save(Delivery delivery) {
 
-        String sql = "INSERT INTO Deliveries(documentId, date, source, destinations, launchTime, truckSerialNumber, driverId) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight) VALUES(?, ?, ?, ?, ?, ?, ?)";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
-        int documentId = delivery.getDocument().getDocumentID();
         String date = sdf.format(delivery.getDate());
-        String address = delivery.getSource().getLocation();
-        String destinations = encodeDestinations(delivery.getDestinations());
-        String launchTime = delivery.getLaunchTime();
+        String source = delivery.getSource();
         String truckSerialnumber = delivery.getTruckSerialNumber();
         int driverId = delivery.getDriverID();
+        List<String> logs = delivery.getLogs();
+        int truckWeight = delivery.getTruckWeight();
+        Map<String, Document> documents = delivery.getDocuments();
+
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, documentId);
             pstmt.setString(2, date);
-            pstmt.setString(3, address);
-            pstmt.setString(4, destinations);
-            pstmt.setString(5, launchTime);
-            pstmt.setString(6, truckSerialnumber);
-            pstmt.setInt(7, driverId);
+            pstmt.setString(3, source);
+            pstmt.setString(4, truckSerialnumber);
+            pstmt.setInt(5, driverId);
+            pstmt.setString(6, encodeDocuments(documents));
+            pstmt.setString(6, encodeLogs(logs));
+            pstmt.setInt(6, truckWeight);
             pstmt.executeUpdate();
         } catch (SQLException ignored) {
         }
 
     }
 
+    private String encodeDocuments(Map<String, Document> documents) {
+        // todo
+        return null;
+    }
+
     public void update(Delivery delivery, String[] params) {
 
     }
 
-    public void delete(Delivery delivery)
-    {
-        String sql = "DELETE FROM Deliveries WHERE documentId = ?";
+    public void delete(int id) {
+        String sql = "DELETE FROM Deliveries WHERE id = ?";
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, documentId);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
 
-            result.complete("Delivery with document ID: " + documentId + " has been removed.");
+            System.out.println(("Delivery with ID: " + id + " has been removed."));
         } catch (SQLException e) {
-            result.error("No delivery with document ID: " + documentId + " is found.");
+            System.out.println(("No delivery with document ID: " + id + " is found."));
         }
-
-        return result;
-    }
     }
 
     private static String encodeDestinations(List<Address> destinations) {
@@ -200,5 +216,23 @@ public class DeliveryDAO {
         return decodedDestinations;
     }
 
-     */
+    private static String encodeLogs(List<String> logs) {
+        // combine (encode) the logs into one string
+        // \n is the char that separates between two different logs
+        StringBuilder output = new StringBuilder();
+
+        for (String log : logs)
+            output.append(log).append('\n');
+
+        return output.toString();
+    }
+
+    private static List<String> decodeLogs(String logs) {
+        List<String> decodedLogs = new LinkedList<>();
+        String[] splicedLogs = logs.split("\n", -1);
+
+        Collections.addAll(decodedLogs, splicedLogs);
+
+        return decodedLogs;
+    }
 }
