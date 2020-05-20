@@ -23,7 +23,7 @@ public class MapperContract {
 
         for (Map.Entry<Integer,Integer> IDS_IDV: ItemsID_ItemsIDSupplier.entrySet()
         ) {
-            WriteProductToSupplier(storeId,suplaier_ID,IDS_IDV.getKey(),IDS_IDV.getValue(),productIDVendor_Price.get(IDS_IDV.getKey()),ProductIDVendor_Name.get(IDS_IDV.getKey()));
+        //    WriteProductToSupplier(storeId,suplaier_ID,IDS_IDV.getKey(),IDS_IDV.getValue(),productIDVendor_Price.get(IDS_IDV.getKey()),ProductIDVendor_Name.get(IDS_IDV.getKey()));
         }
 
         try {

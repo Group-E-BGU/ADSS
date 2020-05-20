@@ -344,13 +344,18 @@ public class Menu {
         contactXiaomi2.put(45337561,"Or");
         Sys.AddSupplier("Xiaomi",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
 
+
         Map<Integer,String> ProductAli1 =new ConcurrentHashMap<Integer, String>();
-        ProductAli1.put(12313,"pajamas");
+        ProductAli1.put(12313,"pijamas");
+        int Id_Store = Sys.FindId_P_Store("pijamas", "clothes", "night", "shirt", "Delta",100, 5 );
         ProductAli1.put(2314567,"slippers");
+        int Id_Store1 = Sys.FindId_P_Store("slippers", "clothes", "night", "wool", "Delta",100, 6 );
         Map<Integer,Double> ProductAli2 =new ConcurrentHashMap<Integer,Double>();
         ProductAli2.put(12313,499.9);
         ProductAli2.put(2314567,69.9);
         Map<Integer,Integer>  ProductAli3=new ConcurrentHashMap<Integer, Integer>();
+        ProductAli3.put(Id_Store,12313);
+        ProductAli3.put(Id_Store1,2314567);
         LinkedList<Integer> Days=new LinkedList<>();
         Days.add(1);
         Days.add(4);
@@ -358,23 +363,36 @@ public class Menu {
 
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA1.put(143,"table");
+        int Id_Store2 = Sys.FindId_P_Store("table", "furniture", "Living room", "meeting", "Deblin",100, 17 );
         ProductIKEA1.put(5432,"bed");
+        int Id_Store3 = Sys.FindId_P_Store("bed", "Bedroom", "Children", "Stars", "Una",100, 18 );
         ProductIKEA1.put(22,"lamp");
+        int Id_Store4 = Sys.FindId_P_Store("lamp", "Bedroom", "Children", "nion", "Light",100, 19 );
         Map<Integer,Double> ProductIKEA2 =new ConcurrentHashMap<Integer,Double>();
         ProductIKEA2.put(143,499.9);
         ProductIKEA2.put(5432,1399.9);
         ProductIKEA2.put(22,139.9);
         Map<Integer,Integer>  ProductIKEA3=new ConcurrentHashMap<Integer, Integer>();
+        ProductIKEA3.put(Id_Store2,143);
+        ProductIKEA3.put(Id_Store3,5432);
+        ProductIKEA3.put(Id_Store4,22);
         Sys.AddContract(51321,false,Days,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
+
         Map<Integer,String> ProductXiaomi1 =new ConcurrentHashMap<Integer, String>();
         ProductAli1.put(142356,"smartPhone");
-        ProductAli1.put(46288,"headphones");
+        int Id_Store5 = Sys.FindId_P_Store("smartPhone", "communication", "phones", "Mobile", "Xiaomi",100, 13 );
+         ProductAli1.put(46288,"headphones");
+        int Id_Store6 = Sys.FindId_P_Store("headphones", "communication", "Audio", "Mobile", "Xiaomi",100, 14 );
         ProductAli1.put(4328,"Screen Protector");
+        int Id_Store7= Sys.FindId_P_Store("Screen Protector", "communication", "phones", "Stars", "Xiaomi",100, 14 );
         Map<Integer,Double> ProductXiaomi2 =new ConcurrentHashMap<Integer,Double>();
         ProductAli2.put(142356,2499.9);
         ProductAli2.put(46288,29.9);
         ProductAli2.put(4328,79.9);
         Map<Integer,Integer>  ProductXiaomi3=new ConcurrentHashMap<Integer, Integer>();
+        ProductXiaomi3.put(Id_Store5,142356);
+        ProductXiaomi3.put(Id_Store6,46288);
+        ProductXiaomi3.put(Id_Store7,4328);
         Sys.AddContract(51328,false,Days,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
 
         Map<Integer,Integer> WriteAli1=new ConcurrentHashMap<Integer, Integer>();
@@ -398,7 +416,7 @@ public class Menu {
         Sys.AddWrite(51328,WriteAli1,WriteAli2);
 
         Sys.Logout();
-        Sys.Login("Store2@gmail.com","S2_superLi");
+     /*   Sys.Login("Store2@gmail.com","S2_superLi");
         Map<Integer,String> contactAli22=new ConcurrentHashMap<Integer, String>();
         contactAli22.put(2087564,"yoni");
         contactAli22.put(2453214,"roi");
@@ -448,7 +466,7 @@ public class Menu {
 
 
         //todo add details!
-        Sys.Logout();
+        Sys.Logout();*/
     }
 
     private static void Register() {
