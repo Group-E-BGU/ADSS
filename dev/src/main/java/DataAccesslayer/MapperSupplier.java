@@ -104,12 +104,39 @@ public class MapperSupplier {
     }
 
     public void DeleteSupplier(int ID, String storeId) {
+        DeleteContacts(ID,storeId);
+        DeleteContract(ID,storeId);
+        DeleteWrote(ID,storeId);
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From Supplier" +
-                    "WHERE id = '" + ID + "' AND StoreId = '" + storeId + "';";
+                    " WHERE id = '" + ID + "' AND StoreId = '" + storeId + "';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    private void DeleteContacts(int id, String storeId) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE From Contact" +
+                    " WHERE sid = '" + id + "' AND StoreId = '" + storeId + "';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -128,6 +155,8 @@ public class MapperSupplier {
     }
 
     public Supplier GetSupplier(int ID, String storeId) {
+        Contract c=getContract(ID,storeId);
+        Wrotequantities w=GetWrotequantities(ID, storeId);
         Map<Integer, String> ContactsID_Name = GetContactsID_Name(storeId,ID);
          Map<Integer, Integer> ContactsID_number = GetContactsID_number(storeId,ID);
         try {
@@ -140,9 +169,12 @@ public class MapperSupplier {
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
-            if (rs.next())
-                return new Supplier(rs.getString(2), rs.getInt(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6), rs.getString(7), ContactsID_Name, ContactsID_number);
-            else
+            if (rs.next()) {
+                Supplier s = new Supplier(rs.getString(2), rs.getInt(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6), rs.getString(7), ContactsID_Name, ContactsID_number);
+                s.setContract(c);
+                s.setWorte(w);
+                return s;
+            }else
                 return null;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -157,7 +189,6 @@ public class MapperSupplier {
         }
         return null;
     }
-
 
     public void WriteContact(String storeId, int supId, String name, int number, int id){
 
@@ -196,7 +227,7 @@ public class MapperSupplier {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE * From Contact"+
-                    "WHERE sid = '"+supId+ "' AND StoreId = '"+storeId+ "' AND ID = '"+id+"';";
+                    " WHERE sid = '"+supId+ "' AND StoreId = '"+storeId+ "' AND ID = '"+id+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -214,7 +245,6 @@ public class MapperSupplier {
             }
         }
     }
-
 
     public  Map<Integer, String> GetContactsID_Name(String storeId, int supId){
         Map<Integer, String> list=new HashMap<Integer, String>();
@@ -306,15 +336,10 @@ public class MapperSupplier {
     }
 
 
-    //todo check Supplier exist in the system? addsupplier
-
-
-
-
-    /****************MapContract**************
-    public void WriteContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId) {
+    /****************MapContract**************/
+    /*public void WriteContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId) {
      MapContract.WriteContract(suplaier_ID,fixeDays,leading,storeId);
-    }
+    }*/
 
     public void DeleteContract(int suplaier_ID,String StoreId) {
     MapContract.DeleteContract(suplaier_ID,StoreId);
@@ -324,12 +349,12 @@ public class MapperSupplier {
         return MapContract.getContract(suplaier_ID,StoreId);
     }
 
-    public void UpdateContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId){
+   /*public void UpdateContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId){
         MapContract.UpdateContract(suplaier_ID,fixeDays,leading,storeId);
-    }
+    }*/
 
 
-    /****************MapWorte**************
+    /****************MapWorte**************/
 
     public void WriteWrote(String storeId ,int suplaier_ID, java.util.Map<Integer, Integer> itemsID_amount, Map<Integer,Double> itemsID_assumption){
         MapWorte.WriteWrote(storeId ,suplaier_ID, itemsID_amount,itemsID_assumption);
@@ -350,6 +375,5 @@ public class MapperSupplier {
     public Wrotequantities GetWrotequantities (int suplaier_ID, String storeId){
       return MapWorte.GetWrotequantities(suplaier_ID,storeId);
     }
-*/
 
 }

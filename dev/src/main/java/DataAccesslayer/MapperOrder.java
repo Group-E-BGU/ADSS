@@ -80,13 +80,42 @@ public class MapperOrder {
         }
     }
 
+    private LinkedList<Integer> GetDays(String storeId, int Id){
+        LinkedList<Integer> Days= new LinkedList<Integer>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM DayForOrders " +
+                    "WHERE OID = '"+Id+ "' AND StoreId = '"+storeId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while(rs.next())
+                Days.add(rs.getInt(2));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return Days;
+    }
+
     public void DeleteOrder(String storeId, int OrderId) {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From Orders" +
-                    "WHERE id = '" + OrderId + "' AND StoreId = '" + storeId + "';";
+                    " WHERE id = '" + OrderId + "' AND StoreId = '" + storeId + "';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -104,7 +133,40 @@ public class MapperOrder {
         }
     }
 
+    public void DeleteOrder_Supplier(String storeId, int supId) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Orders " +
+                    "WHERE SID = '" + supId + "' AND StoreId = '" + storeId + "';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while (rs.next()) {
+                DeleteAllProductOrder(storeId,rs.getInt(1));
+                DeleteOrder(storeId,rs.getInt(1));
+            }
+        }
+        catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        finally{
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
     public Order GetOrder(int OrderdId, String StoreId){
+        Map<Integer, Integer> ItemsID_ItemsIDVendor=GetItemsID_ItemsIDVendor(StoreId,OrderdId);
+        Map<Integer, Integer> ItemsID_NumberOfItems=GetItemsID_NumberOfItems(StoreId,OrderdId);
+        LinkedList<Integer> Days=GetDays(StoreId,OrderdId);
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
@@ -116,7 +178,7 @@ public class MapperOrder {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             if(rs.next())
-                return new Order(rs.getInt(2),rs.getInt(1),rs.getBoolean(3),null,null,null,rs.getDouble(7));
+                return new Order(rs.getInt(2),rs.getInt(1),rs.getBoolean(3),Days,ItemsID_ItemsIDVendor,ItemsID_NumberOfItems,rs.getDouble(7));
             else
                 return null;
         } catch (Exception e) {
@@ -206,6 +268,31 @@ public class MapperOrder {
 
             String sqlstmt = "DELETE From ProductOrder"+
                     "WHERE OID = '"+orderId+ "' AND StoreId = '"+storeId+ "' AND PSupplierOD = '"+ID_P_Sup+"';";
+
+            PreparedStatement stmt = conn.prepareStatement(sqlstmt);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void DeleteAllProductOrder(String storeId, int orderId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "DELETE From ProductOrder"+
+                    " WHERE OID = '"+orderId+ "' AND StoreId = '"+storeId+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();

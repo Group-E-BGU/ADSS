@@ -49,7 +49,7 @@ public class MapperWrotequantities {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From quantityWrote"+
-                    "WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+storeId+"';";
+                    " WHERE SID = '"+suplaier_ID+ "' AND StoreId = '"+storeId+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();

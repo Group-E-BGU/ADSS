@@ -6,21 +6,22 @@ public class MapperItemRecord_Supplier
 {
     private static Connection conn;
 
-    public void WriteItemRecord_Supplier(String storeId, int PId, String MainCategory, String SubCategory, String SubSubCategory, String name ){
+    public void WriteItemRecord_Supplier(String storeId, int PId, String MainCategory, String SubCategory, String SubSubCategory, String name,String manufacturer ){
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "INSERT INTO ItemRecord_Supplier VALUES (?,?,?,?,?,?)";
+            String sqlstmt = "INSERT INTO ItemRecord_Supplier VALUES (?,?,?,?,?,?,?)";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
             stmt.setString(1, MainCategory);
             stmt.setString(2, SubCategory);
             stmt.setString(3, SubSubCategory);
-            stmt.setInt(4,PId);
-            stmt.setString(5, storeId);
-            stmt.setString(6, name);
+            stmt.setString(4,manufacturer);
+            stmt.setInt(5,PId);
+            stmt.setString(6, storeId);
+            stmt.setString(7, name);
 
             stmt.executeUpdate();
         }
@@ -69,14 +70,17 @@ public class MapperItemRecord_Supplier
 
             String sqlstmt = "SELECT * " +
                     "FROM ItemRecord_Supplier " +
-                    "WHERE MainCategory = '"+category+"' AND SubCategory = '"+subcategory+
-                    "' AND SubSubCategory = '"+sub_subcategory+"' AND StoreId = '"+storeId+
-                    "' AND name = '"+product_name+"';";
+                    "WHERE MainCategory = '"+category+"'" +
+                    " AND SubCategory = '"+subcategory+"' "+
+                    " AND SubSubCategory = '"+sub_subcategory+"' " +
+                    " AND Manufacturer = '"+manufacturer+"' "+
+                    " AND StoreId = '"+storeId+"' "+
+                    " AND name = '"+product_name+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             if(rs.next())
-                return rs.getInt(4);
+                return rs.getInt(5);
             else
                 return -1;
         } catch (Exception e) {

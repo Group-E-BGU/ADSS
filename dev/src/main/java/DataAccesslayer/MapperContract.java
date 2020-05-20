@@ -16,15 +16,21 @@ public class MapperContract {
     public void WriteContract(int suplaier_ID, boolean fixeDays, boolean leading,String storeId,
                               LinkedList<Integer> Days,Map<Integer, Integer> ItemsID_ItemsIDSupplier,
                               Map<Integer, String> ProductIDVendor_Name,Map<Integer, Double> productIDVendor_Price){
+
+        for (Map.Entry<Integer,Integer> IDS_IDV: ItemsID_ItemsIDSupplier.entrySet()
+        ) {
+           int hh=IDS_IDV.getKey();
+           int ee=IDS_IDV.getValue();
+           Double pp=productIDVendor_Price.get(IDS_IDV.getValue());
+           String oo=ProductIDVendor_Name.get(IDS_IDV.getValue());
+           WriteProductToSupplier(storeId,suplaier_ID,hh,ee,pp,oo);
+        }
+
         for (int day:Days
              ) {
             WriteDayToContract(storeId,suplaier_ID,day);
         }
 
-        for (Map.Entry<Integer,Integer> IDS_IDV: ItemsID_ItemsIDSupplier.entrySet()
-        ) {
-        //    WriteProductToSupplier(storeId,suplaier_ID,IDS_IDV.getKey(),IDS_IDV.getValue(),productIDVendor_Price.get(IDS_IDV.getKey()),ProductIDVendor_Name.get(IDS_IDV.getKey()));
-        }
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -63,7 +69,7 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From Contract"+
-                    "WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+StoreId+"';";
+                    " WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+StoreId+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -149,7 +155,6 @@ public class MapperContract {
     }
 }
 
-
     public void WriteDayToContract(String storeId, int supplierId, int day){
         try {
             Class.forName("org.sqlite.JDBC");
@@ -184,7 +189,7 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From Days"+
-                    "WHERE sid = '"+supplierId+ "' AND StoreId = '"+storeId+"';";
+                    " WHERE sid = '"+supplierId+ "' AND StoreId = '"+storeId+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -233,7 +238,6 @@ public class MapperContract {
         return list;
     }
 
-
     public void WriteProductToSupplier(String storeId, int supId, int P_store_Id, int P_sup_Id, double price, String name){
         try {
             Class.forName("org.sqlite.JDBC");
@@ -271,7 +275,7 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE From ProductSupplier"+
-                    "WHERE SupId = '"+suplaier_id+ "' AND StoreId = '"+storeId+"';";
+                    " WHERE SupId = '"+suplaier_id+ "' AND StoreId = '"+storeId+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -295,8 +299,8 @@ public class MapperContract {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "DELETE From ProductSuppliet"+
-                    "WHERE SupId = '"+supId+ "' AND StoreId = '"+storeId+ "' AND psid = '"+P_sup_Id+"';";
+            String sqlstmt = "DELETE From ProductSupplier"+
+                    " WHERE SupId = '"+supId+ "' AND StoreId = '"+storeId+ "' AND psid = '"+P_sup_Id+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
             stmt.executeUpdate();
@@ -322,7 +326,7 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
-                    "FROM ProductSuppliet " +
+                    "FROM ProductSupplier " +
                     "WHERE SupId = '"+SupId+ "' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
@@ -352,7 +356,7 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
-                    "FROM ProductSuppliet " +
+                    "FROM ProductSupplier " +
                     "WHERE SupId = '"+SupId+ "' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
@@ -382,13 +386,13 @@ public class MapperContract {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
-                    "FROM ProductSuppliet " +
+                    "FROM ProductSupplier " +
                     "WHERE SupId = '"+SupId+ "' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             while(rs.next())
-                list.put(rs.getInt(1),rs.getDouble(3));
+                list.put(rs.getInt(4),rs.getDouble(3));
             return list;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -404,4 +408,5 @@ public class MapperContract {
         }
         return list;
     }
+
 }

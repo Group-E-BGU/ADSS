@@ -152,13 +152,14 @@ public class SystemManager {
     }
 
     public String Logout() {
+        //todo changed
         if(logged_user==null| current_Store==null){
             return "you need to Login before you logout";
         }
         current_Store.Logout();
         current_Store=null;
         logged_user=null;
-        return "login successfully";
+        return "logout successfully";
     }
 
     public boolean CheckConected() {

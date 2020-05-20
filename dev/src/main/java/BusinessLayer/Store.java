@@ -37,9 +37,10 @@ public class Store {
     private MapperStore MapStore;
 
     public static Store createInstance(String email) {
-        if (storeInstance == null) {
+      //todo changed!
+       // if (storeInstance == null) {
             storeInstance = new Store(email);
-        }
+       // }
         return storeInstance;
     }
 
@@ -106,12 +107,12 @@ public class Store {
     }
 
     public String Delete(int id) {
+       //todo change
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id){
                 list_of_Suplier.remove(s);
-                MapWorte.DeleteWrote(id,email_ID);
-                MapContract.DeleteContract(id,email_ID);
+                MapOrder.DeleteOrder_Supplier(email_ID,id);
                 MapSupplier.DeleteSupplier(id,email_ID);
                 return "Done";
             }
@@ -119,8 +120,7 @@ public class Store {
 
         Supplier s=MapSupplier.GetSupplier(id,email_ID);
         if(s!=null){
-            MapWorte.DeleteWrote(id,email_ID);
-            MapContract.DeleteContract(id,email_ID);
+            MapOrder.DeleteOrder_Supplier(email_ID,id);
             MapSupplier.DeleteSupplier(id,email_ID);
             return "Done";
         }
@@ -192,7 +192,7 @@ public class Store {
     }
 
     public int MakeOrder(int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
-        Supplier sup=null;//todo check mayby it not necessary
+        Supplier sup=null;
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id_suplaier){
@@ -202,6 +202,11 @@ public class Store {
         if(sup==null){
             sup=MapSupplier.GetSupplier(id_suplaier,email_ID);
             if(sup!=null){
+                //todo change it
+                Contract c=MapContract.getContract(id_suplaier,email_ID);
+                Wrotequantities w=MapWorte.GetWrotequantities(id_suplaier,email_ID);
+                sup.setWorte(w);
+                sup.setContract(c);
                 list_of_Suplier.add(sup);
             }
         }
@@ -211,7 +216,7 @@ public class Store {
             for (Map.Entry<Integer,Integer> e : ProductIDSupplier_numberOfItems.entrySet()) {
                 int Id_Product = sup.GetIdProduct(e.getKey());
                 ProductID_IDSupplier.put(Id_Product, e.getKey());
-                double Price =sup.getPric(e.getKey(), e.getValue()); //todo check if works
+                double Price =sup.getPric(e.getKey(), e.getValue());
                 TotalPrice.set(TotalPrice.get()+Price);
                 //Sale = (100 - Sale) / 100;
                 //double Price = sup.GetPricProduct(id_suplaier, Id);
@@ -276,8 +281,9 @@ public class Store {
         int Id_p_sup=-1;
         Supplier sup=null;
         double FinalPrice= Integer.MAX_VALUE;
-        //todo how to do that?
-        for (Supplier s:list_of_Suplier
+        //todo change it. add contract iworte!
+        LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
+        for (Supplier s:suppliers
         ) {
             Id_p_sup=s.GetIdProduct(IdProduct);
             if(Id_p_sup!=-1) {
@@ -439,13 +445,14 @@ public class Store {
     }
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
-        int id=MapIRS.getProductId(email_ID,category,subcategory,sub_subcategory,product_name,manufacturer);
+        //todo change here!
+        int id=MapIRS.getProductId(email_ID,product_name,category,subcategory,sub_subcategory,manufacturer);
         ItemRecord ir = itemRecords.get(product_name);
         if(ir == null)
             ir = mapperItemRecord.getItemRecord(product_name,email_ID);
         if(id==-1) {
             id = itemId++;
-            MapIRS.WriteItemRecord_Supplier(email_ID, id, category, subcategory, sub_subcategory, product_name);
+            MapIRS.WriteItemRecord_Supplier(email_ID, id, category, subcategory, sub_subcategory, product_name,manufacturer);
             ir = new ItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer);
             mapperItemRecord.InsertItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer, email_ID);
         }
@@ -1049,7 +1056,7 @@ public class Store {
         LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
         for (Supplier s:suppliers
         ) {
-            Id_p_sup=s.GetIdProduct(produdtId);
+            Id_p_sup=s.GetIdProductPerStore(produdtId);
             if(Id_p_sup!=-1) {
                 double price = s.getPric(produdtId, amount);
                 if (price < FinalPrice) {
@@ -1075,8 +1082,9 @@ public class Store {
         }
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
+     //todo changed
      LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
-     int today = LocalDate.now().getDayOfWeek().getValue();
+     int today = LocalDate.now().getDayOfWeek().getValue()+1;
      LinkedList<Integer> ooo=MapOrder.GetOrdersId(today,email_ID);
         for (int order: ooo
              ) {
@@ -1088,6 +1096,7 @@ public class Store {
     }
 
     public void Logout(){
+
         MapStore.UpdateStore(email_ID,itemId,NumOfProduct,NumOfOrder);
  }
 }

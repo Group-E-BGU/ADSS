@@ -87,6 +87,7 @@ public class Mapper {
                     "MainCategory varchar," +
                     "SubCategory varchar," +
                     "SubSubCategory varchar," +
+                    "Manufacturer varchar," +
                     "IRID int NOT NULL," +
                     "StoreId varchar," +
                     "name varchar,"+
@@ -165,7 +166,7 @@ public class Mapper {
                     "OID int NOT NULL," +
                     "day int,"+
                     "StoreId varchar," +
-                    "PRIMARY KEY(OID,StoreId)," +
+                    "PRIMARY KEY(OID,StoreId,day)," +
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
             stmt.execute(sqlStmt);
             //todo add OID,PSupplierOD to the praymery key in every table..
