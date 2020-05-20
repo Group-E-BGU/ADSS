@@ -125,6 +125,10 @@ public class Printer {
                 if (worker.getType() == WorkPolicy.WorkingType.Driver) {
                     System.out.println("License : " + ((Driver) worker).getLicense() + '\n');
                 }
+                else
+                {
+                    System.out.println("\n");
+                }
 
             }
         }
@@ -140,7 +144,8 @@ public class Printer {
     }
 //------------------------------------ Shifts ---------------------------------//
 
-    public static void printAvailableWorkers(Shift shift) {
+    public static void printAvailableWorkers(int shift_id) {
+        Shift shift = blService.getShift(shift_id);
         String available_workers = blService.AvilableWorkerstoString(shift.getShiftDate(), shift.getShiftTime());
         System.out.println(available_workers);
     }

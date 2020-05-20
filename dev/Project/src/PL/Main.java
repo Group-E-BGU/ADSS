@@ -182,7 +182,7 @@ public class Main {
             int first_choice = getChoice(1, 2);
             switch (first_choice) {
                 case 1:
-                    Printer.printAvailableWorkers(shift);
+                    Printer.printAvailableWorkers(shift_id);
                     System.out.println("1) add a worker to this shift");
                     System.out.println("2) return");
                     int second_choice = getChoice(1, 2);
@@ -194,7 +194,7 @@ public class Main {
                         Worker w = blService.getWorker(worker_id);
                         if (w == null) {
                             System.out.println("Error : no worker with such id");
-                        } else if (!blService.addToWorkingTeam(shift, w, w.getType())) {
+                        } else if (!blService.addToWorkingTeam(shift_id, worker_id, w.getType())) {
                             System.out.println("Error : " + w.getName() + " is not available to work in this shift!");
                         } else {
                             System.out.println("worker added successfully to shift");

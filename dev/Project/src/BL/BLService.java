@@ -29,22 +29,22 @@ public class BLService {
         return workers.getAllWorkers();
     }
 
-    public List<Worker> getAvailableWorkers(Date date, Shift.ShiftTime time) {
-        List<Worker> available_workers = new LinkedList<>();
+    public List<Integer> getAvailableWorkers(Date date, Shift.ShiftTime time) {
+        List<Integer> available_workers = new LinkedList<>();
         for (Worker w : workers.getAllWorkers().values()) {
-            if (isAvailable(w, date, time)) {
-                available_workers.add(w);
+            if (isAvailable(w.getId(), date, time)) {
+                available_workers.add(w.getId());
             }
         }
 
         return available_workers;
     }
 
-    public List<Worker> getAvailableWorkers(Date date, Shift.ShiftTime time, WorkPolicy.WorkingType job) {
-        List<Worker> available_workers = new LinkedList<>();
+    public List<Integer> getAvailableWorkers(Date date, Shift.ShiftTime time, WorkPolicy.WorkingType job) {
+        List<Integer> available_workers = new LinkedList<>();
         for (Worker w : workers.getAllWorkers().values()) {
-            if (w.getType() == job && isAvailable(w, date, time)) {
-                available_workers.add(w);
+            if (w.getType() == job && isAvailable(w.getId(), date, time)) {
+                available_workers.add(w.getId());
             }
         }
 
@@ -60,12 +60,12 @@ public class BLService {
     public List<Integer> getDeliveryDriver(Date shiftDate, Shift.ShiftTime shiftTime, String license)
     {
         List<Integer> delivery_drivers = new LinkedList<>();
-        List<Worker> potential_drivers = getAvailableWorkers(shiftDate,shiftTime, WorkPolicy.WorkingType.Driver);
-        for(Worker worker : potential_drivers)
+        List<Integer> potential_drivers = getAvailableWorkers(shiftDate,shiftTime, WorkPolicy.WorkingType.Driver);
+        for(Integer driver_id : potential_drivers)
         {
-            if(((Driver)worker).getLicense().equals(license))
+            if(((Driver)getWorker(driver_id)).getLicense().equals(license))
             {
-                delivery_drivers.add(worker.getId());
+                delivery_drivers.add(driver_id);
             }
         }
 
@@ -131,7 +131,7 @@ public class BLService {
     }
 
 
-    public boolean isAvailable(Worker worker, Date date, Shift.ShiftTime shiftTime) {
+    public boolean isAvailable(int worker_id, Date date, Shift.ShiftTime shiftTime) {
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -141,8 +141,8 @@ public class BLService {
         }//to make sure that the day index is correct
 
         Pair<DayOfWeek, Shift.ShiftTime> pair = new Pair<>(DayOfWeek.of(dayOfWeek), shiftTime);
-        if (worker.getSchedule().get(pair)) {
-            for (Integer shift_id : worker.getWorker_shifts()) {
+        if (getWorker(worker_id).getSchedule().get(pair)) {
+            for (Integer shift_id : getWorker(worker_id).getWorker_shifts()) {
                 Shift shift = getShift(shift_id);
                 if (shift.getShiftDate() == date && shift.getShiftTime() == shiftTime) {
                     return false;
@@ -157,7 +157,7 @@ public class BLService {
     public String AvilableWorkerstoString(Date date, Shift.ShiftTime shiftTime) {
         String workers_string = "";
         for (Worker worker : Workers.getInstance().getAllWorkers().values()) {
-            if (isAvailable(worker, date, shiftTime)) {
+            if (isAvailable(worker.getId(), date, shiftTime)) {
                 workers_string = workers_string + worker.toString() + '\n';
             }
         }
@@ -168,9 +168,9 @@ public class BLService {
         return workers_string;
     }
 
-    public boolean work(Worker worker, Shift shift) {
-        if (isAvailable(worker, shift.getShiftDate(), shift.getShiftTime())) {
-            worker.getWorker_shifts().add(shift.getShiftId());
+    public boolean work(Integer worker_id, Integer shift_id) {
+        if (isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime())) {
+            getWorker(worker_id).getWorker_shifts().add(shift_id);
             return true;
         }
 
@@ -213,16 +213,16 @@ public class BLService {
         return true;
     }
 
-    public boolean addToWorkingTeam(Shift shift, Worker worker, WorkPolicy.WorkingType workingType) {
+    public boolean addToWorkingTeam(Integer shift_id, Integer worker_id, WorkPolicy.WorkingType workingType) {
 
-        if (!isAvailable(worker, shift.getShiftDate(), shift.getShiftTime()) || worker.getType() != workingType)
+        if (!isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime()) || getWorker(worker_id).getType() != workingType)
             return false;
 
-        work(worker, shift);
-        if (!shift.getWorkingTeam().containsKey(workingType))
-            shift.getWorkingTeam().put(workingType, new LinkedList<>());
+        work(worker_id, shift_id);
+        if (!getShift(shift_id).getWorkingTeam().containsKey(workingType))
+            getShift(shift_id).getWorkingTeam().put(workingType, new LinkedList<>());
 
-        shift.getWorkingTeam().get(workingType).add(worker.getId());
+        getShift(shift_id).getWorkingTeam().get(workingType).add(worker_id);
         return true;
     }
 

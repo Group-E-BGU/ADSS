@@ -2,8 +2,7 @@ package PL;
 
 import BL.*;
 
-import javax.print.Doc;
-import javax.swing.*;
+
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,14 +67,14 @@ public class CreateActions {
 
                 }
 
-                List<Worker> available_boss = blService.getAvailableWorkers(date, shiftTime);
+                List<Integer> available_boss = blService.getAvailableWorkers(date, shiftTime);
 
                 if (available_boss.isEmpty()) {
                     System.out.println("Error : no available boss for this shift! returning to shifts view screen...");
                     return;
                 }
 
-                System.out.println(available_boss.toString());
+                Printer.printWorkers(available_boss);
                 System.out.println("enter the id of the worker who you wish to appoint as a boss");
                 int boss_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
                 Worker boss = blService.getWorker(boss_id);
@@ -83,7 +82,7 @@ public class CreateActions {
                     System.out.println("Error : no worker with such id");
                     return;
                 }
-                if (!blService.isAvailable(boss, date, shiftTime)) {
+                if (!blService.isAvailable(boss.getId(), date, shiftTime)) {
                     System.out.println("Error : this worker is not available to work in this shift!");
                     return;
                 }
