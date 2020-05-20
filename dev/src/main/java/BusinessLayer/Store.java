@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
-import sun.util.calendar.LocalGregorianCalendar;
 
 public class Store {
 
@@ -37,10 +36,8 @@ public class Store {
     private MapperStore MapStore;
 
     public static Store createInstance(String email) {
-      //todo changed!
-       // if (storeInstance == null) {
-            storeInstance = new Store(email);
-       // }
+
+        storeInstance = new Store(email);
         return storeInstance;
     }
 
@@ -276,7 +273,7 @@ public class Store {
         LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
         for (Supplier s:suppliers
         ) {
-            Id_p_sup=s.GetIdProduct(IdProduct);
+            Id_p_sup=s.GetIdProductPerStore(IdProduct);
             if(Id_p_sup!=-1) {
                 double price = s.getPric(IdProduct, amount);
                 if (price < FinalPrice) {
@@ -303,7 +300,7 @@ public class Store {
             ) {
                 ProductIDSupplier_IDStore.put(e.getValue(),e.getKey());
             }
-            MapOrder.WriteOrder(email_ID, NumOfOrder, NumOfOrder,true, day, java.sql.Date.valueOf(LocalDate.now()),java.sql.Date.valueOf(LocalDate.now()) ,O.getTotalPrice(),"Waiting",ProductIDSupplier_IDStore,ProductIDSupplier_numberOfItems);
+            MapOrder.WriteOrder(email_ID, sup.getID(),NumOfOrder,true, day, java.sql.Date.valueOf(LocalDate.now()),java.sql.Date.valueOf(LocalDate.now()) ,O.getTotalPrice(),"Waiting",ProductIDSupplier_IDStore,ProductIDSupplier_numberOfItems);
             NumOfOrder++;
             return "Done";
         }
@@ -435,7 +432,6 @@ public class Store {
     }
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
-        //todo change here!
         int id=MapIRS.getProductId(email_ID,product_name,category,subcategory,sub_subcategory,manufacturer);
         ItemRecord ir = itemRecords.get(product_name);
         if(ir == null)
@@ -447,37 +443,40 @@ public class Store {
             mapperItemRecord.InsertItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer, email_ID);
         }
         Category main = categories.get(category);
-        if(main == null){
-            main = mapperCategory.getCategory(category,email_ID);
-            if(main == null) {
+        if(main == null) {
+            main = mapperCategory.getCategory(category, email_ID);
+            if (main == null) {
                 main = new Category(Category.CategoryRole.MainCategory, category);
                 categories.put(category, main);
                 mapperCategory.InsertCategory(category, 1, email_ID);
             }
-            main.addItem(ir); //addItem is safe
         }
+            main.addItem(ir); //addItem is safe
+
 
         Category sub = categories.get(subcategory);
-        if(sub == null){
-             sub = mapperCategory.getCategory(subcategory,email_ID);
-            if(sub == null) {
+        if(sub == null) {
+            sub = mapperCategory.getCategory(subcategory, email_ID);
+            if (sub == null) {
                 sub = new Category(Category.CategoryRole.SubCategory, subcategory);
                 categories.put(subcategory, sub);
-                mapperCategory.InsertCategory(subcategory, 1, email_ID);
+                mapperCategory.InsertCategory(subcategory, 2, email_ID);
             }
-            sub.addItem(ir);
         }
+            sub.addItem(ir);
+
 
         Category subsub = categories.get(sub_subcategory);
-        if(subsub == null){
-            subsub = mapperCategory.getCategory(sub_subcategory,email_ID);
-            if(subsub == null) {
-                subsub = new Category(Category.CategoryRole.MainCategory, sub_subcategory);
+        if(subsub == null) {
+            subsub = mapperCategory.getCategory(sub_subcategory, email_ID);
+            if (subsub == null) {
+                subsub = new Category(Category.CategoryRole.SubSubCategory, sub_subcategory);
                 categories.put(sub_subcategory, subsub);
-                mapperCategory.InsertCategory(sub_subcategory, 1, email_ID);
+                mapperCategory.InsertCategory(sub_subcategory, 3, email_ID);
             }
-            subsub.addItem(ir);
         }
+            subsub.addItem(ir);
+
 
 
         return id;
@@ -807,16 +806,18 @@ public class Store {
 
     private void loadItemRecordsOfCategory(Category c) {
         List<ItemRecord> l = mapperItemRecord.getItemRecordByCategoryName(c.getName(),email_ID);
-        for (ItemRecord ir:l) {
-            boolean inList = false;
-            for (ItemRecord ir2: c.getItemRecords()) {
-                if(ir.getId() == ir2.getId()) {
-                    inList = true;
-                    break;
+        if(l != null) {
+            for (ItemRecord ir : l) {
+                boolean inList = false;
+                for (ItemRecord ir2 : c.getItemRecords()) {
+                    if (ir.getId() == ir2.getId()) {
+                        inList = true;
+                        break;
+                    }
                 }
+                if (!inList)
+                    c.addItem(ir);
             }
-            if(!inList)
-                c.addItem(ir);
         }
     }
 
@@ -830,8 +831,9 @@ public class Store {
                     break;
                 }
             }
-            if(!inList)
-                categories.put(c.getName(),c);
+            if(!inList || categories.containsKey(c.getName())) {
+                categories.put(c.getName(), c);
+            }
                 c.addItem(record);//addItem is safe
         }
     }
@@ -844,7 +846,7 @@ public class Store {
         loadCategoryOfItem(record);
         for (Category category:categories.values()) {
 
-            if(category.getItemRecords().contains(record)){
+            if(category.containsRecId(record)){
                 if(category.isMain())
                     main = main + category.getName()+" ";
                 else if(category.isSub())
@@ -905,7 +907,7 @@ public class Store {
     public void sendWarning(ItemRecord itemRecord) {
         SystemManager.sendWarning("Making new order of "+itemRecord.getName()+" after reaching total amount of : "+itemRecord.getTotalAmount()+" " +
                 " while min amount is : " +itemRecord.getMinAmount()+ "\n");
-        createAutomaticOrder(itemRecord.getId(),itemRecord.getMinAmount()*2);
+        AutomaticProductOrdering(itemRecord.getId(),itemRecord.getMinAmount()*2);
     }
 
     public int getPrice(String itemRecord) {

@@ -28,6 +28,13 @@ public class Category {
             return items;
     }
 
+    public boolean containsRecId(ItemRecord itemRecord) {
+        for (ItemRecord ir:itemRecords) {
+            if(ir.getId() == itemRecord.getId())
+                return true;
+        }
+        return false;
+    }
     public LinkedList<ItemRecord> getItemRecords() {
         return itemRecords;
     }

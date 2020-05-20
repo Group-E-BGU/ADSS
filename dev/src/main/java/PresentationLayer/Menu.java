@@ -1,6 +1,5 @@
 package PresentationLayer;
 
-import BusinessLayer.Order;
 import InterfaceLayer.InterfaceContract;
 import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
@@ -13,8 +12,7 @@ public class Menu {
 
     public static void main(String[] args) {
             Sys.initializeDB();
-            AddArguments();
-           // Sys.initialize();
+        AddArguments();
         MainMenu();
     }
 
@@ -286,12 +284,11 @@ public class Menu {
             }
         }
     }
-
     private static void AddArguments() {
-        Sys.Register("a","a");
+        Sys.Register("A","A");
         Sys.Register("Store2@gmail.com","S2_superLi");
 
-        Sys.Login("a","a");
+        Sys.Login("A","A");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);
@@ -349,7 +346,7 @@ public class Menu {
         ProductXiaomi1.put(142356,"Potatoes");
         int Id_Store5 = Sys.FindId_P_Store("Potatoes", "vegetables", "whites", "bag", "Harez",100, 13 );
         ProductXiaomi1.put(46288,"Carrots");
-        int Id_Store6 = Sys.FindId_P_Store("Carrots", "vegetables", "bag", "kilo", "Harez",100, 14 );
+        int Id_Store6 = Sys.FindId_P_Store("Carrots", "vegetables", "orange", "bag", "Harez",100, 14 );
         ProductXiaomi1.put(4328,"Potatoes");
         int Id_Store7= Sys.FindId_P_Store("RedPotatoes", "vegetables", "red", "bag", "Harez",100, 14 );
         Map<Integer,Double> ProductXiaomi2 =new ConcurrentHashMap<Integer,Double>();
@@ -491,6 +488,7 @@ public class Menu {
             GetOrderDetails();
             System.out.println("");
             Action();
+
         }
     }
 
