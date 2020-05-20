@@ -79,7 +79,14 @@ public class ItemRecord {
         }
         storageAmount--;
         totalAmount--;
-        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        if(totalAmount < minAmount){
+            Store store = Store.getInstance();
+            if (store != null) {
+                store.sendWarning(this);
+                store.createAutomaticOrder(id,minAmount);
+            }
+        }
+        mapperItemRecord.updateAmounts(this.id,storageAmount,shelfAmount,totalAmount);
 
     }
 
@@ -91,7 +98,7 @@ public class ItemRecord {
         }
         shelfAmount--;
         totalAmount--;
-        mapperItemRecord.updateAmounts(id,storageAmount,shelfAmount,totalAmount);
+        mapperItemRecord.updateAmounts(this.id,storageAmount,shelfAmount,totalAmount);
 
     }
 
@@ -138,11 +145,11 @@ public class ItemRecord {
     }
 
     public String getPrices() {
-        int currId = Price.getCurrId(id);
-        for (Price p :prices) {
-            if(p.getId() == currId)
-                return  p.toString();
-        }
+        Price currId = Price.getCurrId(id);
+        if(currId != null && currId.getStorePrice() != 0)
+            return currId.toString();
+
+
         return "";
     }
 

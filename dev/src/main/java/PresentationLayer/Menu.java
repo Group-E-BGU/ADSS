@@ -11,8 +11,7 @@ public class Menu {
     private static SystemManager Sys = new SystemManager();
 
     public static void main(String[] args) {
-            Sys.initializeDB();
-        AddArguments();
+        Sys.initializeDB();
         MainMenu();
     }
 
@@ -24,7 +23,8 @@ public class Menu {
                     "please enter the correct number\n" +
                     "1. Register\n" +
                     "2. Login\n" +
-                    "3. Exit");
+                    "3. Initialize data\n"+
+                    "4. Exit");
             Scanner myScanner = new Scanner(System.in);
             int Ask = myScanner.nextInt();
             myScanner.nextLine();
@@ -36,9 +36,13 @@ public class Menu {
                     Login();
                     break;
                 case 3:
+                    AddArguments();
+                    break;
+                case 4:
                     System.out.println("GoodBye!");
                     con = false;
                     break;
+
                 default:
                     System.out.println("Please enter a valid number from the menu");
                     break;
@@ -159,6 +163,7 @@ public class Menu {
                     String amount = Sys.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
+                        System.out.println(Sys.getItemIdsByName(name));
                         System.out.println("Please enter item id or -1 if done");
                         int id = myScanner.nextInt();
                         while (id != -1) {
@@ -402,6 +407,13 @@ public class Menu {
         Sys.setNewPrice("Potatoes","22","15");
         Sys.setNewPrice("Potatoes","20","13");
 
+        Sys.addAmounts("milk","50 50 30/05/2020");
+        Sys.addAmounts("cheese","80 50 30/05/2020");
+        Sys.addAmounts("Carrots","70 50 30/08/2020");
+        Sys.addAmounts("Potatoes","65 50 30/08/2020");
+        Sys.addAmounts("RedPotatoes","40 80 30/08/2020");
+        Sys.addAmounts("cottage","50 110 30/05/2020");
+
 
 
         Sys.Logout();
@@ -454,7 +466,14 @@ public class Menu {
         WriteIKEA22.put(345,12.0);
         Sys.AddWrite(51321, WriteIKEA11,WriteIKEA22);
 
-        //todo add details!
+        Sys.addNewItemDiscount("blanket","20","20/04/2020","20/06/2020");
+        Sys.addNewItemDiscount("Desk","30","20/03/2020","20/06/2021");
+
+        Sys.setNewPrice("blanket","15","5");
+        Sys.setNewPrice("blanket","10","5");
+        Sys.setNewPrice("Desk","15","10");
+        Sys.setNewPrice("Chair","22","15");
+
         Sys.Logout();
     }
 

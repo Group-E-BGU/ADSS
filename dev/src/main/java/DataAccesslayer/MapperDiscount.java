@@ -55,9 +55,6 @@ public class MapperDiscount {
         }
     }
 
-    public void DeleteItemDiscount() {
-
-    }
 
     public List<ItemDiscount> getItemDiscount(ItemRecord i, String storeId) {
         try {
@@ -66,7 +63,7 @@ public class MapperDiscount {
 
             String sqlstmt = "SELECT * " +
                     "FROM ItemDiscount "+
-                    "WHERE IRID = "+i.getId()+" StoreId = '"+storeId+"' ;";
+                    "WHERE IRID = "+i.getId()+" AND StoreId = '"+storeId+"' ;";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
@@ -178,7 +175,7 @@ public class MapperDiscount {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sqlstmt);
             if (rs.next())
-                id = rs.getInt(1);
+                id = Math.max(rs.getInt(1),id);
             return id;
         } catch (Exception e) {
             System.out.println(e.getMessage());

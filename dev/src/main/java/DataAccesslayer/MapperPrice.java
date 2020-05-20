@@ -1,5 +1,7 @@
 package DataAccesslayer;
 
+import BusinessLayer.Price;
+
 import java.sql.*;
 
 public class MapperPrice {
@@ -75,21 +77,21 @@ public class MapperPrice {
         return 0;
     }
 
-    public static int getCurrId(int IRID) {
+    public static Price getCurrId(int IRID) {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "SELECT MAX(id) " +
+            String sqlstmt = "SELECT MAX(id), RetailPrice, StorePrice " +
                     "FROM Price " +
                     "WHERE IRID = "+IRID+" ;";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             if(rs.next())
-                return rs.getInt(1);
+                return new Price(rs.getInt(1),rs.getInt(2),rs.getInt(3));
             else
-                return 0;
+                return null;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -102,6 +104,6 @@ public class MapperPrice {
                 System.out.println(ex.getMessage());
             }
         }
-        return 0;
+        return null;
     }
 }

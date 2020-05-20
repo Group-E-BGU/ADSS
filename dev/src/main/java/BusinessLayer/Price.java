@@ -22,11 +22,18 @@ public class Price {
         id = mapperPrice.getMaxPriceId()+1;
     }
 
+    public Price(int id,int retail, int store) {
+        mapperPrice = new MapperPrice();
+        retailPrice = retail;
+        storePrice = store;
+        this.id = id;
+    }
+
     public void savePrice(int IRID){
         mapperPrice.InsertPrice(id,IRID,storePrice,retailPrice);
     }
 
-    public static int getCurrId(int IRID) {
+    public static Price getCurrId(int IRID) {
         return MapperPrice.getCurrId(IRID);
     }
 

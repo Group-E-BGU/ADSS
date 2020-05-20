@@ -4,6 +4,7 @@ import BusinessLayer.*;
 //import BusinessLayer.ItemRecord;
 
 import java.sql.*;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,16 +52,16 @@ public class MapperItemRecord {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
-
-            String sqlstmt = "INSERT INTO Item VALUES (?,?,?,?,?)";
+            Date d = new Date(expDate.getTime());
+            String sqlstmt = "INSERT INTO Item VALUES (?,"+expDate+",?,?,?)";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
             stmt.setInt(1,id);
-            stmt.setDate(2,expDate);
-            stmt.setBoolean(3,false);
-            stmt.setDate(4, null);
-            stmt.setInt(5,IRID);
+            //stmt.setDate(2,expDate);
+            stmt.setBoolean(2,false);
+            stmt.setDate(3, null);
+            stmt.setInt(4,IRID);
 
             stmt.executeUpdate();
 
@@ -107,10 +108,11 @@ public class MapperItemRecord {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
-
-            String sqlstmt = "UPDATE Item WHERE id IN (SELECT Item.id FROM Item JOIN ItemRecord ON ItemRecord.id = itemRecId " +
-                    "SET defective = " + true + ", defectiveDate = " + date +
-                    "WHERE Item.id = "+itemId+" AND " + " ItemRecord.StoreId = '"+storeId+"')";;
+            Date utilDate = new Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            String sqlstmt = "UPDATE Item " +
+                    "SET defective = " + true + " , defectiveDate = "+sqlDate.toString()+
+                    " WHERE Item.id = "+itemId+";";
 
 
             Statement stmt = conn.createStatement();
@@ -133,8 +135,12 @@ public class MapperItemRecord {
 
     public boolean DeleteItem(String name, int id, String storeId) {
         try {
+            if(!geItemIdsByName(name,storeId).contains(id))
+                return false;
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+
 
             String sqlstmt = "DELETE FROM Item WHERE id IN (SELECT Item.id FROM Item JOIN ItemRecord ON ItemRecord.id = IRID WHERE ItemRecord.name = '"+name+"' AND " +
                     "Item.id = "+id+" AND ItemRecord.StoreId = '"+storeId+"')";
@@ -194,14 +200,14 @@ public class MapperItemRecord {
 
             String sqlstmt = "SELECT * " +
                     "FROM Item " +
-                    "WHERE defective =" + 1 +"  AND defectiveDate >="+ beginDate +" " +
-                    "AND defectiveDate <= '"+ endDate +"'+ AND StoreId = '"+storeId+"';";
+                    "WHERE defective =" + true +"  AND defectiveDate >="+ beginDate +" " +
+                    "AND defectiveDate <= '"+ endDate +"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             String l = "";
             while (rs.next()) {
-                l = l + ("Item ID " + rs.getInt(1) + " was Defected in " + rs.getDate(4) + "\n");
+                l = l + ("Item ID " + rs.getInt(1) + " is defected \n");
             }
             return l;
         } catch (Exception e) {
@@ -371,4 +377,36 @@ public class MapperItemRecord {
         }
         return null;
     }
+
+    public Item getItemById(int id) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Item " +
+                    "WHERE id = "+id+ ";";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return new Item(id,rs.getDate(2));
+            else
+                return null;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return null;
+    }
+
+
 }

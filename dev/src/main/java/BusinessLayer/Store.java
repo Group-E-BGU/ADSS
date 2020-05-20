@@ -530,56 +530,38 @@ public class Store {
         if(!(percentage>=1 && percentage<=100)){
             return "Discount percentage must be a number between 1-100";
         }
-        for( ItemRecord ir: itemRecords.values()){
-            if (ir.getName().equals(name)){         //checks if there is an item record with the given name
+        ItemRecord ir = itemRecords.get(name);
+        if (ir == null) {
+            ir = mapperItemRecord.getItemRecord(name, email_ID);
+            itemRecords.put(name,ir);
+        }
+        if(ir != null){
                 ItemDiscount d = new ItemDiscount(mapperDiscount.getMaxId()+1,ir, beginDate, endDate, percentage);
                 mapperDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
-                Price p = ir.getCurrPrice();
-                int beforeDiscount = p.getStorePrice();
-                int afterDiscount = (beforeDiscount/100) * percentage;
-                Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                mapperPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
-                //ir.addPrice(discountedPrice);
+
                 discounts.add(d);
                 return "The discount was added succesfully";
-            }
+
         }
         return "No such item";
     }
 
-    /*
-     if (itemRecords.containsKey(name) || mapperItemRecord.getItemRecord(name,email_ID) != null) {
-            return "This product name already exists";
-        }
-        else{
-            ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
-            itemRecords.put(name,ir);
-            mapperItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture,email_ID);
-            return name+" added successfully";
-       }
-     */
 
     public String addNewCategoryDiscount(String categoryName, int percentage, java.sql.Date beginDate, java.sql.Date endDate){
         if(!(percentage>=1 && percentage<=100)){
             return "Discount percentage must be a number between 1-100";
         }
-        for( Category cat: categories.values()){
-            if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
-                CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
+        Category c = categories.get(categoryName);
+        if (c == null) {
+            c = mapperCategory.getCategory(categoryName, email_ID);
+            categories.put(categoryName,c);
+        }
+        if(c != null){
+            CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,c, beginDate, endDate, percentage);
                 mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
-                /*for (ItemRecord itemRec: cat.getItemRecords() ){
-                    Price p = itemRec.getCurrPrice();
-                    int beforeDiscount = p.getStorePrice();
-                    int afterDiscount = (beforeDiscount/100) * percentage;
-                    Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                    mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
-                    //itemRec.addPrice(discountedPrice);
-
-
-                }*/
                 discounts.add(d);
                 return "The discount was added successfully";
-            }
+
         }
         return "No such item";
     }
@@ -587,6 +569,7 @@ public class Store {
     public String setDefectedItem(String name, int id){
         for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
+                ir.addItem(mapperItemRecord.getItemById(id));
                 LinkedList<Item> itemsList = ir.getItems();
                 for (Item item: itemsList){
                     if(item.getId()==id){
@@ -604,13 +587,16 @@ public class Store {
     }
 
     public String setNewPrice(String name, int price , int retailPrice){
-        for( ItemRecord ir: itemRecords.values()) {
-            if (ir.getName().equals(name)) {         //checks if there is an item record with the given name
-                Price p = ir.getCurrPrice();
+        ItemRecord ir = itemRecords.get(name);
+        if (ir == null) {
+            ir = mapperItemRecord.getItemRecord(name, email_ID);
+            itemRecords.put(name,ir);
+        }
+        if(ir != null){
                 Price newPr = new Price(retailPrice , price);
                 ir.addPrice(newPr);
                 return "added successfully";
-            }
+
         }
         return "No such item";
     }
@@ -742,31 +728,37 @@ public class Store {
     }
     private void loadItemDiscount(ItemRecord i) {
         List<ItemDiscount> l = mapperDiscount.getItemDiscount(i,email_ID);
-        for (ItemDiscount cd:l) {
-            boolean inList = false;
-            for (Discount d:discounts) {
-                if(d.getId() == cd.getId()) {
-                    inList = true;
-                    break;
+        if(l != null) {
+
+            for (ItemDiscount cd : l) {
+                boolean inList = false;
+                for (Discount d : discounts) {
+                    if (d.getId() == cd.getId()) {
+                        inList = true;
+                        break;
+                    }
                 }
+                if (!inList)
+                    discounts.add(cd);
             }
-            if(!inList)
-                discounts.add(cd);
         }
     }
 
     private void loadCategoryDiscount(Category c) {
         List<CategoryDiscount> l = mapperDiscount.getCategoryDiscounts(c,email_ID);
-        for (CategoryDiscount cd:l) {
-            boolean inList = false;
-            for (Discount d:discounts) {
-                if(d.getId() == cd.getId()) {
-                    inList = true;
-                    break;
+        if(l != null) {
+
+            for (CategoryDiscount cd : l) {
+                boolean inList = false;
+                for (Discount d : discounts) {
+                    if (d.getId() == cd.getId()) {
+                        inList = true;
+                        break;
+                    }
                 }
+                if (!inList)
+                    discounts.add(cd);
             }
-            if(!inList)
-                discounts.add(cd);
         }
     }
 

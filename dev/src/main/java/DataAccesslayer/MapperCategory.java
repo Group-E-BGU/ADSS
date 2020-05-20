@@ -67,13 +67,13 @@ public class MapperCategory {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             if(rs.next()) {
-                int role = rs.getInt(1);
+                int role = rs.getInt(2);
                 if (role == 1)
-                    return (new Category(Category.CategoryRole.MainCategory, rs.getString(2)));
+                    return (new Category(Category.CategoryRole.MainCategory, rs.getString(1)));
                 else if (role == 2)
-                    return (new Category(Category.CategoryRole.SubCategory, rs.getString(2)));
+                    return (new Category(Category.CategoryRole.SubCategory, rs.getString(1)));
                 else if (role == 3)
-                    return (new Category(Category.CategoryRole.SubSubCategory, rs.getString(2)));
+                    return (new Category(Category.CategoryRole.SubSubCategory, rs.getString(1)));
             }
             else
                 return null;

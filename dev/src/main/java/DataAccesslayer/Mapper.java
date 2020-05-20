@@ -123,7 +123,7 @@ public class Mapper {
             //todo-need to add  "StoreId varchar," +??
             sqlStmt = "CREATE TABLE IF NOT EXISTS Item(" +
                     "id int NOT NULL," +
-                    "expirationDate date," +
+                    "expirationDate String," +
                     "defective bit," +
                     "defectiveDate date," +
                     "IRID int," +

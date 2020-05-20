@@ -202,10 +202,10 @@ public class SystemManager {
             return current_Store.setDefectedItem(name, ID);
         }
         catch (Exception e){
-            return "Item's ID must be a number";
+            return "Item's ID is invalid";
         }
     }
-
+    @SuppressWarnings("depercation")
     public String addNewItemDiscount(String itemName, String percentage, String begDate, String enDate) {
         java.sql.Date beginDate, endDate;
         int perc;
