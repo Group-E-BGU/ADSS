@@ -80,7 +80,14 @@ public class Order {
     }
 
     public String CheckAbleToChangeOrder() {
-         //todo check the day
+         boolean able=true;
+         int today=LocalDate.now().getDayOfWeek().getValue();
+        for (int d:Day
+             ) {
+            if(d==today){
+                return "CantChange";
+            }
+        }
           return "Able";
     }
 

@@ -276,6 +276,35 @@ public class MapperSupplier {
         return list;
     }
 
+    public LinkedList<Supplier> GetSuppliers(String email_id) {
+        LinkedList<Supplier> suppliers=new LinkedList<Supplier>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Supplier " +
+                    "WHERE StoreId = '" + email_id + "';";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while (rs.next()) {
+               Supplier s=GetSupplier(rs.getInt(1),email_id);
+               suppliers.add(s);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return suppliers;
+    }
+
 
     //todo check Supplier exist in the system? addsupplier
 

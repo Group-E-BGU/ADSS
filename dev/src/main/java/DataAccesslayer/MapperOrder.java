@@ -134,8 +134,8 @@ public class MapperOrder {
         return null;
     }
 
-    public void UpdateOrder(String storeId, int IdOrder, LinkedList<Integer> days) {
-
+    public void UpdateOrder(String storeId, int IdOrder, LinkedList<Integer> days, Map<Integer,Integer> ProductIDSupplier_ProductID_Store, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
+        WriteProductOrder(storeId,IdOrder,ProductIDSupplier_ProductID_Store,ProductIDSupplier_numberOfItems);
         for (int day : days
         ) {
             try {
@@ -284,6 +284,36 @@ public class MapperOrder {
         return list;
     }
 
+    public LinkedList<Integer> GetOrdersId(int today, String email_id) {
+      LinkedList<Integer> oId=new LinkedList<Integer>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM DayForOrders " +
+                    "WHERE day = '"+today+ "' AND StoreId = '"+email_id+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            while (rs.next()) {
+               oId.add(rs.getInt(1));
+            }
+                return oId;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return oId;
+    }
 }
 
 

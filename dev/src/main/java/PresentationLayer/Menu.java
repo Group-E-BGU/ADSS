@@ -567,11 +567,13 @@ public class Menu {
                         MoreContact = false;
                     }
                 }
+                String Done="";
                 if (status == 1) {
-                   Sys.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                   Done=Sys.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 } else {
-                    Sys.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                    Done=Sys.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 }
+                System.out.println(Done);
             }
         }
     }
