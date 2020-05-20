@@ -105,9 +105,15 @@ public class SystemManager {
             logged_user=new User(email,password);
             current_Store=Store.createInstance(email);
         }
-        //initialize();
         return Done;
     }
+
+    public void initialize(){
+        current_Store.initializeCategories();
+        current_Store.initializeDiscounts();
+
+    }
+
 
     public LinkedList<InterfaceContract> GetContract() {
         LinkedList<InterfaceContract> list=new LinkedList<InterfaceContract>();

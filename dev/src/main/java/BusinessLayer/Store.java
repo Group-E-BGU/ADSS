@@ -625,7 +625,21 @@ public class Store {
                 return "The discount was added succesfully";
             }
         }
-        return "No such item";
+        for( ItemRecord ir: mapperItemRecord.getAllItemRecs()) {
+            if (ir.getName().equals(name)) {         //checks if there is an item record with the given name
+                ItemDiscount d = new ItemDiscount(mapperDiscount.getMaxId() + 1, ir, beginDate, endDate, percentage);
+                mapperDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
+                Price p = ir.getCurrPrice();
+                int beforeDiscount = p.getStorePrice();
+                int afterDiscount = (beforeDiscount / 100) * percentage;
+                Price discountedPrice = new Price(p.getRetailPrice(), afterDiscount);
+                mapperPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice(), discountedPrice.getRetailPrice());
+                //ir.addPrice(discountedPrice);
+                discounts.add(d);
+                return "The discount was added succesfully";
+            }
+        }
+            return "No such item";
     }
 
     /*
@@ -644,29 +658,25 @@ public class Store {
         if(!(percentage>=1 && percentage<=100)){
             return "Discount percentage must be a number between 1-100";
         }
-        for( Category cat: categories.values()){
-            if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
-                CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
-                mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
-                for (ItemRecord itemRec: cat.getItemRecords() ){
-                    Price p = itemRec.getCurrPrice();
-                    int beforeDiscount = p.getStorePrice();
-                    int afterDiscount = (beforeDiscount/100) * percentage;
-                    Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-                    mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
-                    //itemRec.addPrice(discountedPrice);
-
-
-                }
-                discounts.add(d);
-                return "The discount was added successfully";
-            }
+        Category cat = mapperCategory.getCategory(categoryName , this.email_ID);
+        if (cat == null){
+            return "No such category\n";
         }
-        return "No such item";
+        CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
+        mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
+        for (ItemRecord itemRec: cat.getItemRecords() ){
+            Price p = itemRec.getCurrPrice();
+            int beforeDiscount = p.getStorePrice();
+            int afterDiscount = (beforeDiscount/100) * percentage;
+            Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
+            mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
+        }
+        discounts.add(d);
+        return "The discount was added successfully";
     }
 
     public String setDefectedItem(String name, int id){
-        for( ItemRecord ir: itemRecords.values()){
+        for( ItemRecord ir: mapperItemRecord.getAllItemRecs()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
                 LinkedList<Item> itemsList = ir.getItems();
                 for (Item item: itemsList){
@@ -956,7 +966,7 @@ public class Store {
     }
 
     public boolean isDefective(String itemRecord, int itemId) {
-        for (Item item: itemRecords.get(itemRecord).getItems()) {
+        for (Item item: mapperItemRecord.getAllItems()) {
             if(item.getId() == itemId)
                 return item.isDefective();
 
@@ -1115,7 +1125,7 @@ public class Store {
         }
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
-     LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
+     LinkedList<InterfaceOrder> orders=new LinkedList<>();
      int today = LocalDate.now().getDayOfWeek().getValue();
      LinkedList<Integer> ooo=MapOrder.GetOrdersId(today,email_ID);
         for (int order: ooo

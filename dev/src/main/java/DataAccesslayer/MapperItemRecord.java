@@ -40,7 +40,35 @@ public class MapperItemRecord {
             }
         }
         return null;
+    }
 
+    public List<Item> getAllItems(){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * FROM Item;";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            List<Item> l = new LinkedList<>();
+            while (rs.next()) {
+                l.add(new Item(rs.getInt(1),rs.getDate(2)));
+            }
+            return l;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return null;
     }
 
     public void InsertItemRecord(String name,int id, int minAmount, int storageAmount, int shelfAmount, int totalAmount, int shelfNumber, String manufacture, String storeId){
