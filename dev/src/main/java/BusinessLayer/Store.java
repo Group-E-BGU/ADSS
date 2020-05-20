@@ -465,7 +465,7 @@ public class Store {
             if(sub == null) {
                 sub = new Category(Category.CategoryRole.SubCategory, subcategory);
                 categories.put(subcategory, sub);
-                mapperCategory.InsertCategory(subcategory, 1, email_ID);
+                mapperCategory.InsertCategory(subcategory, 2, email_ID);
             }
             sub.addItem(ir);
         }
@@ -474,9 +474,9 @@ public class Store {
         if(subsub == null){
             subsub = mapperCategory.getCategory(sub_subcategory,email_ID);
             if(subsub == null) {
-                subsub = new Category(Category.CategoryRole.MainCategory, sub_subcategory);
+                subsub = new Category(Category.CategoryRole.SubSubCategory, sub_subcategory);
                 categories.put(sub_subcategory, subsub);
-                mapperCategory.InsertCategory(sub_subcategory, 1, email_ID);
+                mapperCategory.InsertCategory(sub_subcategory, 3, email_ID);
             }
             subsub.addItem(ir);
         }
@@ -859,16 +859,18 @@ public class Store {
 
     private void loadItemRecordsOfCategory(Category c) {
         List<ItemRecord> l = mapperItemRecord.getItemRecordByCategoryName(c.getName(),email_ID);
-        for (ItemRecord ir:l) {
-            boolean inList = false;
-            for (ItemRecord ir2: c.getItemRecords()) {
-                if(ir.getId() == ir2.getId()) {
-                    inList = true;
-                    break;
+        if(l != null) {
+            for (ItemRecord ir : l) {
+                boolean inList = false;
+                for (ItemRecord ir2 : c.getItemRecords()) {
+                    if (ir.getId() == ir2.getId()) {
+                        inList = true;
+                        break;
+                    }
                 }
+                if (!inList)
+                    c.addItem(ir);
             }
-            if(!inList)
-                c.addItem(ir);
         }
     }
 

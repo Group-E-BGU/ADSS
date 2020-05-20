@@ -379,8 +379,12 @@ public class MapperItemRecord {
             ResultSet rs = stmt.executeQuery(sqlstmt);
             List<ItemRecord> l = new LinkedList<>();
             while (rs.next()) {
-                l.add(getItemRecordById(rs.getInt(4)));
+                ItemRecord i = getItemRecordById(rs.getInt(4));
+                if(i != null)
+                    l.add(i);
             }
+            if(l.isEmpty())
+                return null;
             return l;
         } catch (Exception e) {
             System.out.println(e.getMessage());

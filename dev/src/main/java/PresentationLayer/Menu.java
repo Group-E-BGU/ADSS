@@ -13,8 +13,8 @@ public class Menu {
 
     public static void main(String[] args) {
             Sys.initializeDB();
-            Sys.initialize();
         AddArguments();
+
         MainMenu();
     }
 
@@ -529,6 +529,7 @@ public class Menu {
             GetOrderDetails();
             System.out.println("");
             Action();
+
         }
     }
 
