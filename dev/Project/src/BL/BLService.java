@@ -304,6 +304,14 @@ public class BLService {
 
         workers.setWorkers(workers_map);
 
+        List<Shift> shifts = new ShiftDAO().getAll();
+
+        for(Shift shift : shifts)
+
+        {
+
+        }
+
         List<Truck> trucks = new TruckDAO().getAll();
         Map<String,Truck> trucks_map = new HashMap<>();
         for(Truck truck : trucks)
