@@ -238,7 +238,7 @@ public class DeliveryDAO {
         List<String> logs = delivery.getLogs();
         int truckWeight = delivery.getTruckWeight();
         Map<String, Document> documents = delivery.getDocuments();
-        int deliveryID = -1;
+        int deliveryID = delivery.getDeliveryID();
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -249,11 +249,11 @@ public class DeliveryDAO {
             pstmt.setString(5, encodeDocuments(documents));
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(7, truckWeight);
+            pstmt.setInt(8, deliveryID);
             pstmt.executeUpdate();
 
         } catch (SQLException ignored) {
         }
-
     }
 
     public void delete(int id) {

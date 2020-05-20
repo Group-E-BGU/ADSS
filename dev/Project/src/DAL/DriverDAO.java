@@ -134,7 +134,34 @@ public class DriverDAO
         }
     }
 
-    public void update(Driver driver, String[] params) {
+    public void update(Driver driver) {
+        String sql = "UPDATE Drivers SET name = ? , " +
+                "schedule = ? , " +
+                "license = ? , " +
+                "shifts = ? " +
+                "WHERE id = ?";
+
+        int id = driver.getId();
+        String name = driver.getName();
+        String schedule = encodeSchedule(driver.getSchedule());
+        String license = driver.getLicense();
+        String shifts = encodeShifts(driver.getWorker_shifts());
+
+        // add the contract to the contracts table with the id of the driver
+        new WorkerDealDAO().update(driver.getContract());
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, schedule);
+            pstmt.setString(3, license);
+            pstmt.setString(4, shifts);
+            pstmt.setInt(5, id);
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 

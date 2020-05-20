@@ -122,7 +122,7 @@ public class WorkerDealDAO {
 
     }
 
-    public void update(WorkerDeal workerDeal, String[] params)
+    public void update(WorkerDeal workerDeal)
     {
 
 
