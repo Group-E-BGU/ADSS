@@ -38,7 +38,6 @@ public class DeliveryDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-//                date = rs.getDate("date");
                 String stringDate = rs.getString("date");
                 date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
                 source = rs.getString("source");

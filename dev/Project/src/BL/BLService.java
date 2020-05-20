@@ -185,8 +185,17 @@ public class BLService {
 
     public Shift getShift(Address address, Date date, Shift.ShiftTime shiftTime) {
         for (Shift shift : getAllShifts().values()) {
-            if (shift.getAddress().equals(address) && shift.getShiftDate().equals(date) && shift.getShiftTime() == shiftTime)
-                return shift;
+            if (shift.getAddress().getLocation().equals(address.getLocation()))
+            {
+                if(shift.getShiftDate().equals(date))
+                {
+                    if(shift.getShiftTime().equals(shiftTime))
+                    {
+                        return shift;
+                    }
+                }
+            }
+            //     return shift;
         }
 
         return null;
@@ -219,6 +228,16 @@ public class BLService {
             getShift(shift_id).getWorkingTeam().put(workingType, new LinkedList<>());
 
         getShift(shift_id).getWorkingTeam().get(workingType).add(worker_id);
+
+        // new ShiftDAO().update();
+        if(getWorker(worker_id).getType()== WorkPolicy.WorkingType.Driver)
+        {
+            new DriverDAO().update((Driver)getWorker(worker_id));
+        }
+        else if(getWorker(worker_id).getType() == WorkPolicy.WorkingType.StockKeeper)
+        {
+            new StockKeeperDAO().update((StockKeeper)getWorker(worker_id));
+        }
         return true;
     }
 
@@ -333,7 +352,7 @@ public class BLService {
         {
             workers_map.put(sk.getId(),sk);
         }
-        
+
         for(Driver d : drivers)
         {
             workers_map.put(d.getId(),d);
@@ -440,5 +459,10 @@ public class BLService {
         new DeliveryDAO().save(delivery);
         return true;
 
+    }
+
+    public boolean updateShift(Shift shift) {
+        new ShiftDAO().update(shift);
+        return true;
     }
 }

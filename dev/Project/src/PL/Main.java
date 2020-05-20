@@ -197,6 +197,7 @@ public class Main {
                         } else if (!blService.addToWorkingTeam(shift_id, worker_id, w.getType())) {
                             System.out.println("Error : " + w.getName() + " is not available to work in this shift!");
                         } else {
+                            blService.updateShift(shift);
                             System.out.println("worker added successfully to shift");
                         }
                     }

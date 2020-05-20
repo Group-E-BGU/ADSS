@@ -93,7 +93,7 @@ public class WorkerDealDAO {
 
         String sql = "INSERT INTO Work_Deals(workerId, startDate, bankAddress, salary, workConditions) VALUES(?, ?, ?, ?, ?)";
 
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
+        //SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(workerDeal.getStart_date());

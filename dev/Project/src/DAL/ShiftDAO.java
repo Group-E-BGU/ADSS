@@ -1,15 +1,15 @@
 package DAL;
 
-import BL.*;
 import BL.Driver;
+import BL.*;
 import javafx.util.Pair;
 
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -107,7 +107,7 @@ public class ShiftDAO {
 
         int id = shift.getShiftId();
         Date date; // your date
-// Choose time zone in which you want to interpret your Date
+        // Choose time zone in which you want to interpret your Date
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(shift.getShiftDate());
         int year = cal.get(Calendar.YEAR);
@@ -134,8 +134,32 @@ public class ShiftDAO {
     }
 
 
-    public void update(Shift shift, String[] params) {
+    public void update(Shift shift) {
+        String sql = "UPDATE Shifts SET date = ? , boss = ? , time = ? , workTeam = ? , address = ? WHERE id = ?";
 
+        int id = shift.getShiftId();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(shift.getShiftDate());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+
+        int bossId = shift.getBoss().getId();
+        String shift_time = shift.getShiftTime() == Shift.ShiftTime.Morning ? "Morning" : "Evening";
+        String work_team = encodeWorkTeam(shift.getWorkingTeam());
+        String shift_date = day + "/" + month + "/" + year;
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, shift_date);
+            pstmt.setInt(2, bossId);
+            pstmt.setString(3, shift_time);
+            pstmt.setString(4, work_team);
+            pstmt.setString(5,shift.getAddress().getLocation());
+            pstmt.setInt(6,id);
+            pstmt.executeUpdate();
+        } catch (SQLException ignored)
+        {
+        }
     }
 
 
@@ -166,6 +190,7 @@ public class ShiftDAO {
             for (Integer workerId : entry.getValue())
                 encodedWorkingTeam += workerId + ",";
 
+
             encodedWorkingTeam += "\n";
         }
 
@@ -173,7 +198,8 @@ public class ShiftDAO {
         {
             encodedWorkingTeam = encodedWorkingTeam.substring(0,encodedWorkingTeam.length()-1);
         }
-
+        if(encodedWorkingTeam.charAt(encodedWorkingTeam.length()-1) == ',')
+            encodedWorkingTeam = encodedWorkingTeam.substring(0, encodedWorkingTeam.length() - 1);
         return encodedWorkingTeam;
     }
 
@@ -186,7 +212,7 @@ public class ShiftDAO {
         for (String team : separatedWorkTeams) {
             tmpTeam = team.split(",");
             if(tmpTeam.length > 1)
-                tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length - 1);
+                tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length);
 
             workers = new LinkedList<>();
 
@@ -202,17 +228,16 @@ public class ShiftDAO {
 
                     StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
 
-                    for (int i = 0; i < tmpTeam.length - 1; i++) {
+                    for (int i = 0; i < tmpTeam.length ; i++) {
                         sql.append(tmpTeam[i]).append(",");
+                        if(i == tmpTeam.length-1)
+                            sql.append(tmpTeam[tmpTeam.length - 1 ]).append(")");
                     }
-
-                    sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
 
                     try (Connection conn = DAL.connect();
                          Statement stmt = conn.createStatement();
                          ResultSet rs = stmt.executeQuery(sql.toString())) {
 
-                        // loop through the result set
                         while (rs.next()) {
                             id = rs.getInt("id");
                             name = rs.getString("name");
@@ -238,13 +263,13 @@ public class ShiftDAO {
                     List<Shift> shifts;
                     WorkerDeal contract;
 
-                    StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+                    StringBuilder sql = new StringBuilder("SELECT * FROM Drivers WHERE id IN (");
 
-                    for (int i = 0; i < tmpTeam.length - 1; i++) {
+                    for (int i = 0; i < tmpTeam.length; i++) {
                         sql.append(tmpTeam[i]).append(",");
+                        if(i == tmpTeam.length-1)
+                            sql.append(tmpTeam[tmpTeam.length - 1 ]).append(")");
                     }
-
-                    sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
 
                     try (Connection conn = DAL.connect();
                          Statement stmt = conn.createStatement();

@@ -116,8 +116,8 @@ public class StockKeeperDAO {
 
     public void update(StockKeeper stockKeeper) {
         String sql = "UPDATE StockKeepers SET name = ? , " +
-                "schedule = ? , " +
-                "WHERE id = ?";
+                "schedule = ? " +
+                "WHERE id = ? ";
 
         int id = stockKeeper.getId();
         String name = stockKeeper.getName();
@@ -127,7 +127,7 @@ public class StockKeeperDAO {
         new WorkerDealDAO().update(stockKeeper.getContract());
 
         try (Connection conn = DAL.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.setString(2, schedule);
             pstmt.setInt(3, id);
