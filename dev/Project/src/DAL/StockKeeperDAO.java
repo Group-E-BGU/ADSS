@@ -114,7 +114,31 @@ public class StockKeeperDAO {
 
     }
 
-    public void update(StockKeeper stockKeeper, String[] params) {
+    public void update(StockKeeper stockKeeper) {
+        String sql = "UPDATE StockKeepers SET name = ? , " +
+                "schedule = ? , " +
+                "WHERE id = ?";
+
+        int id = stockKeeper.getId();
+        String name = stockKeeper.getName();
+        String schedule = encodeSchedule(stockKeeper.getSchedule());
+
+        // add the contract to the contracts table with the id of the driver
+        new WorkerDealDAO().update(stockKeeper.getContract());
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, schedule);
+            pstmt.setInt(3, id);
+
+            pstmt.executeUpdate();
+
+            System.out.println("The worker has been updated successfully");
+        } catch (SQLException e)
+        {
+            System.out.println(e.getMessage());
+        }
 
     }
 

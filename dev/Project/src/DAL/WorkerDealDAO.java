@@ -124,8 +124,39 @@ public class WorkerDealDAO {
 
     public void update(WorkerDeal workerDeal)
     {
+        String sql = "UPDATE Work_Deals SET startDate = ? , " +
+                "bankAddress = ? , " +
+                "salary = ? , " +
+                "workConditions = ? " +
+                "WHERE id = ?";
 
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(workerDeal.getStart_date());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+        int workerId = workerDeal.getWorker_id();
+        String startDate = day + "/" + month + "/" + year;
+        String bankAddress = workerDeal.getBankAddress();
+        double salary = workerDeal.getSalary();
+        String workConditions = encodeWorkConditions(workerDeal.getWork_conditions());
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, startDate);
+            pstmt.setString(2, bankAddress);
+            pstmt.setDouble(3, salary);
+            pstmt.setString(4, workConditions);
+            pstmt.setInt(5, workerId);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void delete(WorkerDeal workerDeal)
