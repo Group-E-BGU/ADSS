@@ -24,7 +24,6 @@ public class Mapper {
             String sqlStmt = "CREATE TABLE IF NOT EXISTS Store(" +
                     "email varchar NOT NULL," +
                     "itemId int," +
-                    "NumOfProduct int," +
                     "NumOfOrder int," +
                     "totalAmount int," + //todo?
                     "PRIMARY KEY(email));";

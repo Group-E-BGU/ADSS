@@ -284,6 +284,7 @@ public class Menu {
             }
         }
     }
+
     private static void AddArguments() {
         Sys.Register("A","A");
         Sys.Register("Store2@gmail.com","S2_superLi");
@@ -322,7 +323,7 @@ public class Menu {
         ProductAli3.put(Id_Store1,2314567);
         LinkedList<Integer> Days=new LinkedList<>();
         Days.add(2);
-        Days.add(4);
+        Days.add(3);
         Sys.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
 
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
@@ -340,7 +341,9 @@ public class Menu {
         ProductIKEA3.put(Id_Store2,143);
         ProductIKEA3.put(Id_Store3,5432);
         ProductIKEA3.put(Id_Store4,22);
-        Sys.AddContract(51321,false,Days,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
+        LinkedList<Integer> Days1=new LinkedList<>();
+        Days1.add(5);
+        Sys.AddContract(51321,false,Days1,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
 
         Map<Integer,String> ProductXiaomi1 =new ConcurrentHashMap<Integer, String>();
         ProductXiaomi1.put(142356,"Potatoes");
@@ -357,7 +360,9 @@ public class Menu {
         ProductXiaomi3.put(Id_Store5,142356);
         ProductXiaomi3.put(Id_Store6,46288);
         ProductXiaomi3.put(Id_Store7,4328);
-        Sys.AddContract(51328,false,Days,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
+        LinkedList<Integer> Days2=new LinkedList<>();
+        Days2.add(4);
+        Sys.AddContract(51328,false,Days2,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
 
         Map<Integer,Integer> WriteAli1=new ConcurrentHashMap<Integer, Integer>();
         WriteAli1.put(12313,100);
@@ -372,19 +377,18 @@ public class Menu {
         WriteXiaomi2.put(4328,10.0);
         Sys.AddWrite(51328,WriteXiaomi1,WriteXiaomi2);
 
-
         Map<Integer,Integer> o1=new HashMap<Integer, Integer>();
         o1.put(12313,150);
         Sys.MakeOrder(51345,Days,o1);
         Map<Integer,Integer> o2=new HashMap<Integer, Integer>();
         o2.put(5432,150);
         o2.put(22,150);
-        Sys.MakeOrder(51321,Days,o2);
+        Sys.MakeOrder(51321,Days1,o2);
         Map<Integer,Integer> o3=new HashMap<Integer, Integer>();
         o3.put(142356,150);
         o3.put(46288,150);
         o3.put(4328,150);
-        Sys.MakeOrder(51328,Days,o3);
+        Sys.MakeOrder(51328,Days2,o3);
 
         Sys.addNewItemDiscount("milk","20","20/04/2020","20/06/2020");
         Sys.addNewItemDiscount("Carrots","30","20/03/2020","20/06/2021");
@@ -399,8 +403,6 @@ public class Menu {
         Sys.setNewPrice("Carrots","8","3");
         Sys.setNewPrice("Potatoes","22","15");
         Sys.setNewPrice("Potatoes","20","13");
-
-
 
         Sys.Logout();
 
@@ -796,6 +798,9 @@ public class Menu {
                             moreDay = false;
                         }
                     }
+                    else{
+                        System.out.println("the supplier not supply in that day");
+                    }
                 }
                 if (conect) {
                     boolean MoreProduct = true;
@@ -820,20 +825,14 @@ public class Menu {
                             MoreProduct = false;
                         }
                     }
-                    int Done = Sys.MakeOrder(ID_Suplaier, Days,ItemsIDVendor_NumberOfItems);
-                    System.out.println(Done);
-                    if (Done>-1){
+                    int Done = Sys.MakeOrder(ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
+                    if (Done>=0){
                         InterfaceOrder o = Sys.getOrderDetails(Done);
                         if(o!=null){
                             PrintOrder(o);
                         }
-                       if(o==null){
-
-                       }
                     }
                 }
-                else
-                    System.out.println("the supplier does not supply in that days.");
             }
         }
 
@@ -857,7 +856,7 @@ public class Menu {
             String Able = Sys.CheckAbleToChangeOrder(ID_Order);
             if (!Able.equals("Able")) {
                 conect = false;
-                System.out.println(Able);
+                System.out.println("Too late to change order");
             }
             if (conect) {
                 ID_Suplaier = Sys.GetSupplierID_PerOrder(ID_Order);
@@ -895,7 +894,7 @@ public class Menu {
                     }
 
                     boolean MoreProduct = false;
-                    System.out.println("Would you like to add Product to the Order?");
+                    System.out.println("Would you like to add Product to the Order? n/y");
                     ans = myScanner.next();
                     if (ans.equals("y")) {
                         MoreProduct = true;
@@ -917,8 +916,10 @@ public class Menu {
                             MoreProduct = false;
                         }
                     }
-                    String Done = Sys.ChangeOrder(ID_Order, ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
-                    System.out.println(Done);
+                    InterfaceOrder o = Sys.ChangeOrder(ID_Order, ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
+                    if(o!=null){
+                        PrintOrder(o);
+                    }
                 }
                 else
                     System.out.println("the supplier arrived to the store in another days.");
@@ -935,7 +936,7 @@ public class Menu {
         if (conect) {
             LinkedList<InterfaceContract> Contract = Sys.GetContract();
             for (InterfaceContract Con : Contract
-            ) {//todo change
+            ) {
                 for (Map.Entry<Integer, String> e : Con.ProductIDVendor_Name.entrySet()) {
                     int P = e.getKey();
                     String N = e.getValue();
@@ -986,7 +987,7 @@ public class Menu {
     }
 
     private static void UpdateOrderStatus() {
-
+/*
         boolean conect = Sys.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
@@ -1017,7 +1018,7 @@ public class Menu {
             }
             if (order==null)
                 System.out.println("the Order is mot exist in the system");
-        }
+        }*/
     }
 
     private static void DeleteSupplier() {
@@ -1044,6 +1045,7 @@ public class Menu {
     }
 
     private static void PrintOrder(InterfaceOrder o) {
+        System.out.println("\n Receipt For The Order:"+o.ID_Inventation);
         System.out.println("The Order ID is: "+o.ID_Inventation);
         System.out.println("The Supplier ID is: "+o.ID_Vendor);
         System.out.println("The Days that the order is coming is:"  );
@@ -1052,10 +1054,10 @@ public class Menu {
             System.out.println(d);
         }
         System.out.println("The product that include in the Order is: ");
-        System.out.println("Product  | Amount");
+        System.out.println("Product/Amount");
         for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
         ) {
-            System.out.print(I.getValue());
+            System.out.print(I.getValue()+" ");
             System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
         }
         System.out.println("The Total Price of the order is: "+o.TotalPrice);

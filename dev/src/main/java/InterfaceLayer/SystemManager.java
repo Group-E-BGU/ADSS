@@ -307,7 +307,7 @@ public class SystemManager {
         current_Store.RemoveProduct(id_order,product_id);
     }
 
-    public String ChangeOrder(int Id_Order, int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
+    public InterfaceOrder ChangeOrder(int Id_Order, int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
     return current_Store.ChangeOrder(Id_Order,id_suplaier, day ,itemsIDVendor_numberOfItems);
 
     }
