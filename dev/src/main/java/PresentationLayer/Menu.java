@@ -14,7 +14,7 @@ public class Menu {
     public static void main(String[] args) {
             Sys.initializeDB();
             AddArguments();
-           // Sys.initialize();
+            Sys.initialize();
         MainMenu();
     }
 

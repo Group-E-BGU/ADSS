@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
-import sun.util.calendar.LocalGregorianCalendar;
 
 public class Store {
 
@@ -512,6 +511,34 @@ public class Store {
        }
 
     public void initializeCategories() {
+        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
+        itemRecords.put("milk Tnova 3%",itemRecord1);
+        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
+
+        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecords.put("white bread",itemRecord2);
+        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
+
+        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
+        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
+        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
+        itemRecords.put("coffee Elite",itemRecord3);
+        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
+
+
+        itemRecord1.addPrice(new Price(80,120));
+        itemRecord2.addPrice(new Price(90,130));
+        itemRecord3.addPrice(new Price(100,135));
+
         Category category1 = new Category(Category.CategoryRole.MainCategory,"Dairy");
         Category subCat1 = new Category(Category.CategoryRole.SubCategory,"Milk");
         Category subsubcat1 = new Category(Category.CategoryRole.SubSubCategory,"1 liter");
@@ -549,6 +576,8 @@ public class Store {
         mapperCategory.InsertCategory(category3.getName(),1,email_ID);
         mapperCategory.InsertCategory(subcat3.getName(),2,email_ID);
         mapperCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
+
+
 
         categories.put("Drinks",category3);
         categories.put("Coffee powder",subcat3);
@@ -661,6 +690,16 @@ public class Store {
                 Price p = ir.getCurrPrice();
                 Price newPr = new Price(retailPrice , price);
                 ir.addPrice(newPr);
+                mapperPrice.InsertPrice(newPr.getId(), ir.getId(), newPr.getStorePrice() , newPr.getRetailPrice());
+                return "added successfully";
+            }
+        }
+        for (ItemRecord ir: mapperItemRecord.getAllItemRecs()){
+            if (ir.getName().equals(name)) {         //checks if there is an item record with the given name
+                Price p = ir.getCurrPrice();
+                Price newPr = new Price(retailPrice , price);
+                ir.addPrice(newPr);
+                mapperPrice.InsertPrice(newPr.getId(), ir.getId(), newPr.getStorePrice() , newPr.getRetailPrice());
                 return "added successfully";
             }
         }
@@ -887,7 +926,8 @@ public class Store {
                 report = report + pair.getItem().toString() ;
             }
             for (ItemRecord ir: itemRecords.values()) {
-                if(ir.getItems().contains(pair.getItem())) {
+                if(ir.getItems().contains(pair.getIt
+                em())) {
                     report = report + " shelf: " + ir.getShelfNumber() +" Item: "+ir.getName()+ "\n";
                 }
             }
