@@ -1,11 +1,13 @@
 package PL;
 
 import BL.*;
+import javafx.util.Pair;
 
 
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.util.*;
 
 public class CreateActions {
@@ -164,7 +166,7 @@ public class CreateActions {
 
             Printer.printEditWorkerMenu();
 
-            int choice = getChoice(1, 5);
+            int choice = getChoice(1, 6);
             switch (choice) {
                 case 1:
                     System.out.println("Type the new name :");
@@ -195,7 +197,94 @@ public class CreateActions {
                     worker.getContract().setSalary(edited_salary);
                     blService.updateContract(worker_id, worker.getContract());
                     break;
+
                 case 5:
+                    Printer.printSchedule(worker_id);
+                    System.out.println("type the day you want to edit : Sun,Mon,Tue,Wed,Thu,Fri,Sat...");
+                    DayOfWeek chosen_day = null;
+                    boolean chosen = false;
+                    while(chosen_day == null) {
+                        String day = keyboard.nextLine();
+                        if (day.equals("Sun") || day.equals("sun")) {
+                            chosen_day = DayOfWeek.SUNDAY;
+                        } else if (day.equals("Mon") || day.equals("mon")) {
+                            chosen_day = DayOfWeek.MONDAY;
+                        } else if (day.equals("Tue") || day.equals("tue")) {
+                            chosen_day = DayOfWeek.TUESDAY;
+                        } else if (day.equals("Wed") || day.equals("wed")) {
+                            chosen_day = DayOfWeek.WEDNESDAY;
+                        } else if (day.equals("Thu") || day.equals("thu")) {
+                            chosen_day = DayOfWeek.THURSDAY;
+                        } else if (day.equals("Fri") || day.equals("fri")) {
+                            chosen_day = DayOfWeek.FRIDAY;
+                        } else if (day.equals("Sat") || day.equals("sat")) {
+                            chosen_day = DayOfWeek.SATURDAY;
+                        } else {
+                            System.out.println("Error : wrong input please type one of those : Sun,Mon,Tue,Wed,Thu,Fri,Sat , try again ? y/n ");
+                            {
+                                if (!getConfirmation()) {
+                                    return worker_id;
+                                }
+                            }
+                        }
+
+                        System.out.println("Type M for Morning , Type E for Evening");
+                        boolean chosen_shift = false;
+
+                        Shift.ShiftTime shiftTime = null;
+
+                        while (!chosen_shift) {
+                            String shiftTime_choice = keyboard.nextLine();
+
+                            if (shiftTime_choice.equals("M") || shiftTime_choice.equals("m")) {
+                                shiftTime = Shift.ShiftTime.Morning;
+                                chosen_shift = true;
+                            } else if (shiftTime_choice.equals("E") || shiftTime_choice.equals("e")) {
+                                shiftTime = Shift.ShiftTime.Evening;
+                                chosen_shift = true;
+                            } else
+                            {
+                                System.out.println("Error : invalid input! try again? y/n");
+                                if(!getConfirmation())
+                                    return worker_id;
+                            }
+
+                        }
+
+                        System.out.println("Type 0 to set to false , type 1 to set to true");
+                        {
+                            int set = getChoice(0,1);
+                            Pair<DayOfWeek, Shift.ShiftTime> p = new Pair<>(chosen_day , shiftTime);
+                            switch (set)
+                            {
+                                case 0:
+                                    List<Integer> working_shifts = worker.getWorker_shifts();
+                                    for(Integer shift_id : working_shifts)
+                                    {
+                                        Shift shift = blService.getShift(shift_id);
+                                        Calendar calendar = Calendar.getInstance();
+                                        calendar.setTime(shift.getShiftDate());
+                                        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                                        if(DayOfWeek.values()[dayOfWeek] == p.getKey() && shift.getShiftTime() == p.getValue())
+                                        {
+                                            System.out.println("Error : This worker has a shift at this time");
+                                            return worker_id;
+                                        }
+
+                                    }
+                                    worker.getSchedule().put(p,false);
+                                    break;
+                                case 1:
+                                    worker.getSchedule().put(p,true);
+                                    break;
+                            }
+                        }
+
+                    }
+
+                    blService.updateWorker(worker);
+                    break;
+                case 6:
                     go_back = true;
                     break;
 
@@ -361,10 +450,9 @@ public class CreateActions {
             System.out.println("Error : invalid date input");
         }
 
-        List<String> available_trucks = blService.getAvailableTrucks(date,delivery_time);
+        List<String> available_trucks = blService.getAvailableTrucks(date, delivery_time);
 
-        if(available_trucks.isEmpty())
-        {
+        if (available_trucks.isEmpty()) {
             System.out.println("There are no available trucks for this delivery! aborting the arrangement...");
             return;
         }
@@ -374,21 +462,17 @@ public class CreateActions {
         System.out.println("Choose a truck by its serial number : ");
 
         boolean truck_chosen = false;
-        String truck_serial_number=null;
+        String truck_serial_number = null;
 
-        while(!truck_chosen)
-        {
+        while (!truck_chosen) {
             truck_serial_number = keyboard.nextLine();
-            if(!available_trucks.contains(truck_serial_number))
-            {
-                System.out.println("Error : the truck with the serial number "+truck_serial_number+" is not a valid option! try again ? y/n");
-                if(!getConfirmation())
-                {
+            if (!available_trucks.contains(truck_serial_number)) {
+                System.out.println("Error : the truck with the serial number " + truck_serial_number + " is not a valid option! try again ? y/n");
+                if (!getConfirmation()) {
                     System.out.println("Delivery arrangement canceled");
                     return;
                 }
-            }
-            else
+            } else
                 truck_chosen = true;
         }
 
@@ -404,19 +488,16 @@ public class CreateActions {
                     System.out.println("Delivery arrangement canceled");
                     return;
                 }
-            }else if(blService.getShift(blService.getAddress(location),date,delivery_time)== null)
-            {
+            } else if (blService.getShift(blService.getAddress(location), date, delivery_time) == null) {
                 System.out.println("Error : no shift in this address is available at the chosen date!");
-            }
-            else
-                {
+            } else {
                 address_chosen = true;
                 address = blService.getAddress(location);
             }
         }
 
         Truck delivery_truck = blService.getTruck(truck_serial_number);
-        Shift source_shift = blService.getShift(address,date,delivery_time);
+        Shift source_shift = blService.getShift(address, date, delivery_time);
 
         String source = address.getLocation();
 
@@ -440,46 +521,33 @@ public class CreateActions {
                     System.out.println("Delivery arrangement canceled");
                     return;
                 }
-            }
-            else if(blService.getShift(blService.getAddress(des),date,delivery_time)==null)
-            {
+            } else if (blService.getShift(blService.getAddress(des), date, delivery_time) == null) {
                 System.out.println("Error : no available shift at this destination at the chosen time");
-            }
-            else if(!blService.stockKeeperAvailable(blService.getShift(blService.getAddress(des),date,delivery_time)))
-            {
+            } else if (!blService.stockKeeperAvailable(blService.getShift(blService.getAddress(des), date, delivery_time))) {
                 System.out.println("Error : no working stock keeper at the destination at the chosen time");
-            }
-            else {
+            } else {
 
                 Printer.printAllProducts();
                 boolean products_chosen = false;
                 System.out.println("Choose the product you want to deliver by typing the CN");
-                Map<String,Integer> delivery_products = new HashMap<>();
-                while(!products_chosen)
-                {
+                Map<String, Integer> delivery_products = new HashMap<>();
+                while (!products_chosen) {
                     String product_cn = keyboard.nextLine();
-                    if(blService.getProduct(product_cn)== null)
-                    {
+                    if (blService.getProduct(product_cn) == null) {
                         System.out.println("Error : no product with such cn found! try again ? y/n");
-                        if(!getConfirmation())
-                        {
+                        if (!getConfirmation()) {
                             System.out.println("Delivery arrangement canceled");
                             return;
                         }
-                    }
-                    else
-                    {
-                        if(delivery_products.containsKey(product_cn))
-                        {
+                    } else {
+                        if (delivery_products.containsKey(product_cn)) {
                             System.out.println("Warning : you already added this type of product to your delivery. the amount you choose now will be the new one");
-                        }
-                        else
+                        } else
                             System.out.println("Type the amount you want to deliver from this product , it must be bigger than zero : ");
-                        int amount = getChoice(1,Integer.MAX_VALUE);
-                        delivery_products.put(product_cn,amount);
+                        int amount = getChoice(1, Integer.MAX_VALUE);
+                        delivery_products.put(product_cn, amount);
                         System.out.println("add another product delivery to this destination ? y/n");
-                        if(!getConfirmation())
-                        {
+                        if (!getConfirmation()) {
                             products_chosen = true;
                         }
 
@@ -488,11 +556,10 @@ public class CreateActions {
 
                 Document document = new Document();
                 document.setDeliveryGoods(delivery_products);
-                documents.put(des,document);
+                documents.put(des, document);
 
                 System.out.println("Choose another destination ? y/n");
-                if(!getConfirmation())
-                {
+                if (!getConfirmation()) {
                     destinations_chosen = true;
                 }
             }
@@ -501,43 +568,31 @@ public class CreateActions {
 
         int total_weight = delivery_truck.getWeight();
         List<String> logs = new LinkedList<>();
-        for(Document doc : documents.values())
-        {
-            for(Map.Entry<String,Integer> entry : doc.getDeliveryGoods().entrySet())
-            {
+        for (Document doc : documents.values()) {
+            for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
                 total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
             }
         }
 
-        if(total_weight > delivery_truck.getMaxAllowedWeight())
-        {
+        if (total_weight > delivery_truck.getMaxAllowedWeight()) {
             // error
-        }
-        else
-        {
-            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate() , source_shift.getShiftTime() , "a");
-            if(drivers_ids.isEmpty())
-            {
+        } else {
+            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), "a");
+            if (drivers_ids.isEmpty()) {
                 System.out.println("Error : no available drivers for this delivery ... abort");
                 return;
-            }
-            else
-            {
+            } else {
                 Printer.printWorkers(drivers_ids);
                 System.out.println("Select one of these drivers by typing his id to assign to this delivery");
                 int driver_id = -1;
                 boolean driver_chosen = false;
-                while (!driver_chosen)
-                {
-                    driver_id = getChoice(Main.id_lower_bound , Main.id_upper_bound);
-                    if(!drivers_ids.contains(driver_id))
-                    {
+                while (!driver_chosen) {
+                    driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
+                    if (!drivers_ids.contains(driver_id)) {
                         System.out.println("Error : driver id not valid!");
-                    }
-                    else
-                    {
+                    } else {
                         driver_chosen = true;
-                        Delivery delivery = new Delivery(date,source,truck_serial_number,driver_id,total_weight);
+                        Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
                         delivery.setDocuments(documents);
                         delivery.setLogs(logs);
 
@@ -548,10 +603,9 @@ public class CreateActions {
         }
 
 
-
         // finished choosing the destinations
 
-    //    delivery = blService.arrangeDelivery(source, deliveryGoods);
+        //    delivery = blService.arrangeDelivery(source, deliveryGoods);
     }
 
     private static void rearrangeDelivery(Delivery delivery) {

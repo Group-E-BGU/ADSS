@@ -88,8 +88,4 @@ public abstract class Worker {
         this.worker_shifts = worker_shifts;
     }
 
-    public List<Integer> getWorkingShifts()
-    {
-        return worker_shifts;
-    }
 }

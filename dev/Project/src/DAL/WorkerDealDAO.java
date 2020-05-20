@@ -128,7 +128,7 @@ public class WorkerDealDAO {
                 "bankAddress = ? , " +
                 "salary = ? , " +
                 "workConditions = ? " +
-                "WHERE id = ?";
+                "WHERE workerId = ?";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 

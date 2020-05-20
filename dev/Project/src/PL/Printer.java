@@ -140,7 +140,8 @@ public class Printer {
         System.out.println("2) Edit worker id");
         System.out.println("3) Edit worker bank address");
         System.out.println("4) Edit worker salary");
-        System.out.println("5) Return");
+        System.out.println("5) Edit schedule");
+        System.out.println("6) Return");
     }
 //------------------------------------ Shifts ---------------------------------//
 
