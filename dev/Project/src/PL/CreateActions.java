@@ -416,6 +416,7 @@ public class CreateActions {
             }
         }
 
+        Truck delivery_truck = blService.getTruck(truck_serial_number);
         Shift source_shift = blService.getShift(address,date,delivery_time);
 
         String source = address.getLocation();
@@ -497,6 +498,49 @@ public class CreateActions {
                 if(!getConfirmation())
                 {
                     destinations_chosen = true;
+                }
+            }
+        }
+
+
+        int total_weight = delivery_truck.getWeight();
+        for(Document doc : documents.values())
+        {
+            for(Map.Entry<String,Integer> entry : doc.getDeliveryGoods().entrySet())
+            {
+                total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
+            }
+        }
+
+        if(total_weight > delivery_truck.getMaxAllowedWeight())
+        {
+            // error
+        }
+        else
+        {
+            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate() , source_shift.getShiftTime() , "a");
+            if(drivers_ids.isEmpty())
+            {
+                System.out.println("Error : no available drivers for this delivery ... abort");
+                return;
+            }
+            else
+            {
+                Printer.printWorkers(drivers_ids);
+                System.out.println("Select one of these drivers by typing his id to assign to this delivery");
+                int driver_id = -1;
+                boolean driver_chosen = false;
+                while (!driver_chosen)
+                {
+                    driver_id = getChoice(Main.id_lower_bound , Main.id_upper_bound);
+                    if(!drivers_ids.contains(driver_id))
+                    {
+                        System.out.println("Error : driver id not valid!");
+                    }
+                    else
+                    {
+                        driver_chosen = true;
+                    }
                 }
             }
         }

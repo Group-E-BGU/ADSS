@@ -57,6 +57,21 @@ public class BLService {
         return workers.getAllWorkers().get(worker_id);
     }
 
+    public List<Integer> getDeliveryDriver(Date shiftDate, Shift.ShiftTime shiftTime, String license)
+    {
+        List<Integer> delivery_drivers = new LinkedList<>();
+        List<Worker> potential_drivers = getAvailableWorkers(shiftDate,shiftTime, WorkPolicy.WorkingType.Driver);
+        for(Worker worker : potential_drivers)
+        {
+            if(((Driver)worker).getLicense().equals(license))
+            {
+                delivery_drivers.add(worker.getId());
+            }
+        }
+
+        return delivery_drivers;
+    }
+
     public boolean addWorker(Worker worker) {
         if (workers.getAllWorkers().containsKey(worker.getId())) {
             return false;
@@ -422,5 +437,4 @@ public class BLService {
     {
         return data.getDeliveries().get(id);
     }
-
 }

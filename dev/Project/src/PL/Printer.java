@@ -10,12 +10,10 @@ public class Printer {
 
     static BLService blService = new BLService();
 
-    public static void printAllWorkingTypes()
-    {
-        int number =1;
-        for(WorkPolicy.WorkingType workingType : WorkPolicy.WorkingType.values())
-        {
-            System.out.println(number+") "+workingType.toString());
+    public static void printAllWorkingTypes() {
+        int number = 1;
+        for (WorkPolicy.WorkingType workingType : WorkPolicy.WorkingType.values()) {
+            System.out.println(number + ") " + workingType.toString());
             number++;
         }
     }
@@ -39,7 +37,7 @@ public class Printer {
             @Override
             public int compare(Pair<DayOfWeek, Shift.ShiftTime> o1, Pair<DayOfWeek, Shift.ShiftTime> o2) {
 
-                if ((o1.getKey().getValue()+1)%8 < (o2.getKey().getValue()+1)%8)
+                if ((o1.getKey().getValue() + 1) % 8 < (o2.getKey().getValue() + 1) % 8)
                     return -1;
 
                 if (o1.getKey().equals(o2.getKey())) {
@@ -66,22 +64,18 @@ public class Printer {
         System.out.println("7) exit");
     }
 
-    public static void printWorkersView()
-    {
+    public static void printWorkersView() {
 
-        String workers_string="";
+        String workers_string = "";
         for (Worker worker : blService.getAllWorkers().values()) {
-            workers_string = workers_string+worker.toString()+'\n';
+            workers_string = workers_string + worker.toString() + '\n';
         }
-        if(workers_string.equals(""))
-        {
+        if (workers_string.equals("")) {
             System.out.println(workers_string);
 
-        }
-        else
-        {
-            workers_string = workers_string.substring(0,workers_string.length()-1);
-            System.out.println(workers_string+'\n');
+        } else {
+            workers_string = workers_string.substring(0, workers_string.length() - 1);
+            System.out.println(workers_string + '\n');
         }
 
 
@@ -90,8 +84,7 @@ public class Printer {
         System.out.println("3) return\n");
     }
 
-    public static void printShiftsView()
-    {
+    public static void printShiftsView() {
         for (Shift shift : blService.getAllShifts().values()) {
             System.out.println(shift.toString());
             border();
@@ -102,23 +95,40 @@ public class Printer {
         System.out.println("3) return");
     }
 
-    public static void PrintWorkerView(int worker_id)
-    {
+    public static void PrintWorkerView(int worker_id) {
         Worker w = blService.getWorker(worker_id);
-        if(w==null)
-        {
+        if (w == null) {
             System.out.println("Error : no worker with such id");
             return;
         }
         System.out.println("Worker name : " + w.getName());
         System.out.println("Worker id : " + w.getId());
-        System.out.println("jobs : " + w.getType().toString()+ "\n");
+        System.out.println("job : " + w.getType().toString() + "\n");
 
         System.out.println("1) Print Schedule");
         System.out.println("2) Print contract");
         System.out.println("3) Print working shifts");
         System.out.println("4) Edit worker info");
         System.out.println("5) Return");
+    }
+
+    public static void printWorkers(List<Integer> drivers_ids) {
+
+        for (Integer id : drivers_ids) {
+            Worker worker = blService.getWorker(id);
+            if (worker == null) {
+                System.out.println("Error while printing the worker with the id : " + id);
+            } else {
+                System.out.println("Worker name : " + worker.getName());
+                System.out.println("Worker id : " + worker.getId());
+                System.out.println("job : " + worker.getType().toString());
+                if (worker.getType() == WorkPolicy.WorkingType.Driver) {
+                    System.out.println("License : " + ((Driver) worker).getLicense() + '\n');
+                }
+
+            }
+        }
+
     }
 
     public static void printEditWorkerMenu() {
@@ -130,14 +140,12 @@ public class Printer {
     }
 //------------------------------------ Shifts ---------------------------------//
 
-    public static void printAvailableWorkers(Shift shift)
-    {
+    public static void printAvailableWorkers(Shift shift) {
         String available_workers = blService.AvilableWorkerstoString(shift.getShiftDate(), shift.getShiftTime());
         System.out.println(available_workers);
     }
 
-    public static void printShiftView(int shift_id)
-    {
+    public static void printShiftView(int shift_id) {
         Shift shift = blService.getShift(shift_id);
         System.out.println(shift.toString());
         System.out.println("1) print available workers for this shift");
@@ -145,8 +153,7 @@ public class Printer {
     }
 //------------------------------------ Addresses ---------------------------------//
 
-    public static void printAddressesView()
-    {
+    public static void printAddressesView() {
 
         printAllAddresses();
         System.out.println("1) Add an address");
@@ -154,9 +161,8 @@ public class Printer {
 
     }
 
-    public static void printAllAddresses()
-    {
-        Map<String,Address> addresses_map = blService.getAllAddresses();
+    public static void printAllAddresses() {
+        Map<String, Address> addresses_map = blService.getAllAddresses();
 
         String addresses = "";
 
@@ -171,8 +177,7 @@ public class Printer {
 
 //------------------------------------ Trucks ---------------------------------//
 
-    public static void printTrucksView()
-    {
+    public static void printTrucksView() {
 
         printAllTrucks();
         System.out.println("1) Add a truck");
@@ -180,9 +185,8 @@ public class Printer {
 
     }
 
-    public static void printAllTrucks()
-    {
-        Map<String,Truck> trucks_map = blService.getAllTrucks();
+    public static void printAllTrucks() {
+        Map<String, Truck> trucks_map = blService.getAllTrucks();
 
         String trucks = "";
 
@@ -197,8 +201,7 @@ public class Printer {
     }
 //------------------------------------ Products ---------------------------------//
 
-    public static void printProductsView()
-    {
+    public static void printProductsView() {
 
         printAllProducts();
         System.out.println("1) Add a product");
@@ -206,9 +209,8 @@ public class Printer {
 
     }
 
-    public static void printAllProducts()
-    {
-        Map<String,Product> products_map = blService.getAllProducts();
+    public static void printAllProducts() {
+        Map<String, Product> products_map = blService.getAllProducts();
 
         String products = "";
 
@@ -221,22 +223,18 @@ public class Printer {
         System.out.println(products);
     }
 
-    public static void printDeliveriesView()
-    {
+    public static void printDeliveriesView() {
 
-        String deliveries_string="";
+        String deliveries_string = "";
         for (Delivery delivery : blService.getAllDeliveries().values()) {
-            deliveries_string = deliveries_string+delivery.toString()+'\n';
+            deliveries_string = deliveries_string + delivery.toString() + '\n';
         }
-        if(deliveries_string.equals(""))
-        {
+        if (deliveries_string.equals("")) {
             System.out.println(deliveries_string);
 
-        }
-        else
-        {
-            deliveries_string = deliveries_string.substring(0,deliveries_string.length()-1);
-            System.out.println(deliveries_string+'\n');
+        } else {
+            deliveries_string = deliveries_string.substring(0, deliveries_string.length() - 1);
+            System.out.println(deliveries_string + '\n');
         }
 
 
@@ -246,11 +244,9 @@ public class Printer {
 
     }
 
-    public static void PrintDeliveryView(int delivery_id)
-    {
+    public static void PrintDeliveryView(int delivery_id) {
         Delivery delivery = blService.getDelivery(delivery_id);
-        if(delivery==null)
-        {
+        if (delivery == null) {
             System.out.println("Error : no delivery with such id");
             return;
         }
@@ -260,7 +256,7 @@ public class Printer {
         System.out.println("Source location name : " + delivery.getSource());
         System.out.println("Destinations : " + delivery.getDocuments().keySet().toString());
         System.out.println("Truck weight : " + delivery.getTruckWeight());
-        System.out.println("Delivery logs : " + delivery.getLogs().toString()+ "\n");
+        System.out.println("Delivery logs : " + delivery.getLogs().toString() + "\n");
 
 
         System.out.println("1) reArrange");
@@ -271,6 +267,4 @@ public class Printer {
     public static void border() {
         System.out.println("--------------------------------");
     }
-
-
 }
