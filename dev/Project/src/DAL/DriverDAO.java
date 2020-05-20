@@ -94,7 +94,7 @@ public class DriverDAO
                 shifts = getShiftsIds(rs.getString("shifts"));
                 contract = new WorkerDealDAO().get(id);
 
-                tmpDriver = new Driver(id, name, schedule, contract, license);//TODO - ask mohammad about the shifts field
+                tmpDriver = new Driver(id, name, schedule, contract, license);
 
                 drivers.add(tmpDriver);
             }
@@ -186,7 +186,7 @@ public class DriverDAO
         String[] separatedDays = schedule.split("\n");
 
         for (String separatedDay : separatedDays) {
-            decodedSchedule.put(new Pair<DayOfWeek, Shift.ShiftTime>(DayOfWeek.of(separatedDay.charAt(0) - 48), separatedDay.charAt(1) == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 1);
+            decodedSchedule.put(new Pair<>(DayOfWeek.of(separatedDay.charAt(0) - 48), separatedDay.charAt(1) == 48 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening), separatedDay.charAt(2) == 49);
         }
 
         return decodedSchedule;
