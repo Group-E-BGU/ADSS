@@ -159,13 +159,13 @@ public class DeliveryDAO {
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(2, date);
-            pstmt.setString(3, source);
-            pstmt.setString(4, truckSerialnumber);
-            pstmt.setInt(5, driverId);
-            pstmt.setString(6, encodeDocuments(documents));
+            pstmt.setString(1, date);
+            pstmt.setString(2, source);
+            pstmt.setString(3, truckSerialnumber);
+            pstmt.setInt(4, driverId);
+            pstmt.setString(5, encodeDocuments(documents));
             pstmt.setString(6, encodeLogs(logs));
-            pstmt.setInt(6, truckWeight);
+            pstmt.setInt(7, truckWeight);
             pstmt.executeUpdate();
 
         } catch (SQLException ignored) {
@@ -212,7 +212,45 @@ public class DeliveryDAO {
         return encodedDocument;
     }
 
-    public void update(Delivery delivery, String[] params) {
+    public void update(Delivery delivery) {
+        String sql = "UPDATE Deliveries SET date = ?," +
+                "source = ?," +
+                "truckSerialNumber = ? , " +
+                "driverId = ? , " +
+                "documents = ? , " +
+                "logs = ? , " +
+                "truckWeight = ? " +
+                "WHERE id = ?";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(delivery.getDate());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+        //String date = sdf.format(delivery.getDate());
+        String date = day + "/" + month + "/" + year;
+        String source = delivery.getSource();
+        String truckSerialnumber = delivery.getTruckSerialNumber();
+        int driverId = delivery.getDriverID();
+        List<String> logs = delivery.getLogs();
+        int truckWeight = delivery.getTruckWeight();
+        Map<String, Document> documents = delivery.getDocuments();
+        int deliveryID = -1;
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setString(2, source);
+            pstmt.setString(3, truckSerialnumber);
+            pstmt.setInt(4, driverId);
+            pstmt.setString(5, encodeDocuments(documents));
+            pstmt.setString(6, encodeLogs(logs));
+            pstmt.setInt(7, truckWeight);
+            pstmt.executeUpdate();
+
+        } catch (SQLException ignored) {
+        }
 
     }
 
