@@ -13,7 +13,7 @@ public class Menu {
 
     public static void main(String[] args) {
             Sys.initializeDB();
-          //  AddArguments();
+            AddArguments();
            // Sys.initialize();
         MainMenu();
     }
@@ -60,7 +60,7 @@ public class Menu {
                     "4. Make an Fix order\n" +
                     "5. Display the items in the super\n" +
                     "6. Display sll the supplier's details\n"+
-                    "7. Update Order Status\n"+
+                   // "7. Update Order Status\n"+
                     "8. Edit supplier details\n"+
                     "9. Edit supplier's arrangement\n" +
                     "10. Edit \"Write Quantities\" of supplier\n" +
@@ -288,10 +288,10 @@ public class Menu {
     }
 
     private static void AddArguments() {
-        Sys.Register("Store1@gmail.com","S1_superLi");
+        Sys.Register("a","a");
         Sys.Register("Store2@gmail.com","S2_superLi");
 
-        Sys.Login("Store1@gmail.com","S1_superLi");
+        Sys.Login("a","a");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);
@@ -465,7 +465,6 @@ public class Menu {
     }
 
     private static void Login() {
-      //todo changed!
         Scanner myScanner = new Scanner(System.in);
         String email;
         String password;
@@ -482,7 +481,7 @@ public class Menu {
             password = myScanner.next();
             String Done = Sys.Login(email, password);
             if (!Done.equals("Done")) {
-                System.out.println("worng password");
+                System.out.println("wrong password");
                 done=false;
             }
         }
@@ -1064,7 +1063,7 @@ public class Menu {
             }
         }
             System.out.println("\nIf an order arrives at the store,\n" +
-                    " select the \"Update Order Status\" in the menu and fill in the order details\n");
+                    " select the \"Change item amount\" in the menu and fill the Product that arraived to the store\n");
 
     }
 

@@ -273,7 +273,6 @@ public class Store {
         int Id_p_sup=-1;
         Supplier sup=null;
         double FinalPrice= Integer.MAX_VALUE;
-        //todo change it. add contract iworte!
         LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
         for (Supplier s:suppliers
         ) {
@@ -289,11 +288,10 @@ public class Store {
         }
         if(sup!=null) {
             LinkedList<Integer> day = new LinkedList<Integer>();
-            day.add(LocalDate.now().getDayOfWeek().getValue()+1);
+            day.add(LocalDate.now().getDayOfWeek().getValue()+2);
 
             Map<Integer, Integer> ProductStoreID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
             Map<Integer, Integer> ProductIDSupplier_numberOfItems = new ConcurrentHashMap<Integer, Integer>();
-            Id_p_sup=sup.GetIdProduct(IdProduct);
             ProductStoreID_IDSupplier.put(IdProduct, Id_p_sup);
             ProductIDSupplier_numberOfItems.put(Id_p_sup, amount);
 
