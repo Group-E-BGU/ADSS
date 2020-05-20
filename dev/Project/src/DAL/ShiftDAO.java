@@ -168,7 +168,10 @@ public class ShiftDAO {
 
         for (String team : separatedWorkTeams) {
             tmpTeam = team.split(",");
-            tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length - 1);
+            if(tmpTeam.length > 0)
+                tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length - 1);
+            else
+                tmpTeam = new String[0];
             workers = new LinkedList<>();
 
             if (team.charAt(0) == 0) {
