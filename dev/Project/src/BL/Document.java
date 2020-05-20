@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Document{
-
     private int document_id;
     private Map<String, Integer> deliveryGoods;
 

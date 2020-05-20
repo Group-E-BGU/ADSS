@@ -113,7 +113,7 @@ public class DeliveryDAO {
         return deliveries;
     }
 
-    public void save(Delivery delivery) {
+    public int save(Delivery delivery) {
 
         String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight) VALUES(?, ?, ?, ?, ?, ?, ?)";
 
@@ -127,7 +127,6 @@ public class DeliveryDAO {
         int truckWeight = delivery.getTruckWeight();
         Map<String, Document> documents = delivery.getDocuments();
 
-
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(2, date);
@@ -138,6 +137,7 @@ public class DeliveryDAO {
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(6, truckWeight);
             pstmt.executeUpdate();
+            
         } catch (SQLException ignored) {
         }
 
