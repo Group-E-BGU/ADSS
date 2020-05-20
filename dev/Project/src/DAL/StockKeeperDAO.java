@@ -43,7 +43,7 @@ public class StockKeeperDAO {
                 stockKeeper = new StockKeeper(id, name, schedule, contract);
 
             } else
-                System.out.println("No stock keeper with id :" + stockKeeperId + " is found.");
+                return null;
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
