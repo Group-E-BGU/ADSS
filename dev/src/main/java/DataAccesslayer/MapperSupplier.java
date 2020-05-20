@@ -77,12 +77,12 @@ public class MapperSupplier {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "UPDATE Supplier SET " +
-                    " name = "+name+"," +
-                    " address = "+address+"," +
-                    " bank = "+bank+"," +
-                    " branch = "+branch+"," +
-                    " bankNumber = "+bankNumber+"," +
-                    " payment = "+payments+"," +
+                    " name = '"+name+"'," +
+                    " address = '"+address+"'," +
+                    " bank = '"+bank+"'," +
+                    " branch = '"+branch+"'," +
+                    " bankNumber = '"+bankNumber+"'," +
+                    " payment = '"+payments+"'" +
                     "WHERE id = '"+id+ "' AND StoreId = '"+email_id+"';";
 
             Statement stmt = conn.createStatement();
@@ -226,7 +226,7 @@ public class MapperSupplier {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "DELETE * From Contact"+
+            String sqlstmt = "DELETE From Contact"+
                     " WHERE sid = '"+supId+ "' AND StoreId = '"+storeId+ "' AND ID = '"+id+"';";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);

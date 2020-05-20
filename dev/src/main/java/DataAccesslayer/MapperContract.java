@@ -132,8 +132,8 @@ public class MapperContract {
         conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
         String sqlstmt = "UPDATE Contract SET " +
-                " fixDay = "+fixeDays+"," +
-                " leading = "+leading+"," +
+                " fixDay = '"+fixeDays+"'," +
+                " leading = '"+leading+"'" +
                 "WHERE SupplierId = '"+suplaier_ID+ "' AND StoreId = '"+storeId+"';";
 
         Statement stmt = conn.createStatement();

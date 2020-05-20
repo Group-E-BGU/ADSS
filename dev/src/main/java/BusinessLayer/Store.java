@@ -123,6 +123,7 @@ public class Store {
     }
 
     public String EditSuplier(String name, int id,String address, String bank, String branch, int bankNumber, String payments, Map<Integer, String> contacts_id_name, Map<Integer, Integer> contacts_number) {
+
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id){

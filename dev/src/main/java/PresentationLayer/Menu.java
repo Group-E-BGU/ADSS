@@ -555,7 +555,7 @@ public class Menu {
 
             if (status == 2) {
                 String exist = Sys.CheckSuplierExist(ID);
-                while (!exist.equals("Done")) {
+                while (!exist.equals("Exist")) {
                     System.out.println(exist);
                     System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
                     String ans = myScanner.next();
