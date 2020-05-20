@@ -5,6 +5,7 @@ import BL.Driver;
 import javafx.util.Pair;
 
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
@@ -75,7 +76,10 @@ public class ShiftDAO {
             // loop through the result set
             while (rs.next()) {
                 shift_id = rs.getInt("id");
-                shift_date = rs.getDate("date");
+                System.out.println("gotHere");
+                String stringDate = rs.getString("date");
+                shift_date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+
                 boss = (new StockKeeperDAO()).get(rs.getInt("boss"));
                 boss = boss != null ? boss : (new DriverDAO()).get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
@@ -87,7 +91,7 @@ public class ShiftDAO {
 
                 shifts.add(tmpShift);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ParseException e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -102,11 +106,18 @@ public class ShiftDAO {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         int id = shift.getShiftId();
-        String shift_date = sdf.format(shift.getShiftDate());
+        Date date; // your date
+// Choose time zone in which you want to interpret your Date
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(shift.getShiftDate());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+
         int bossId = shift.getBoss().getId();
         String shift_time = shift.getShiftTime() == Shift.ShiftTime.Morning ? "Morning" : "Evening";
         String work_team = encodeWorkTeam(shift.getWorkingTeam());
-
+        String shift_date = day + "/" + month + "/" + year;
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
