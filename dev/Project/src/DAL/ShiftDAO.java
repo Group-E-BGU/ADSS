@@ -97,7 +97,7 @@ public class ShiftDAO {
 
     public void save(Shift shift) {
 
-        String sql = "INSERT INTO StockKeepers(id, date, boss, time, workTeam) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Shifts(id, date, boss, time, workTeam) VALUES(?, ?, ?, ?, ?)";
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         int id = shift.getShiftId();

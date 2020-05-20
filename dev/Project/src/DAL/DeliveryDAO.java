@@ -137,7 +137,7 @@ public class DeliveryDAO {
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(6, truckWeight);
             pstmt.executeUpdate();
-            
+
         } catch (SQLException ignored) {
         }
 
