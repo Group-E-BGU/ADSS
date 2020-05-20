@@ -265,26 +265,26 @@ public class BLService {
         return data.getTrucks();
     }
 
-    public Map<String,Truck> getAvailableTrucks(Date date, Shift.ShiftTime delivery_time)
+    public List<String> getAvailableTrucks(Date date, Shift.ShiftTime delivery_time)
     {
 
-        Map<String,Truck> available_trucks = new HashMap();
+        List<String> available_trucks = new LinkedList<>();
         for(Truck truck : getAllTrucks().values())
         {
-            if(truckIsAvailable(truck,date,delivery_time))
+            if(truckIsAvailable(truck.getSerialNumber(),date,delivery_time))
             {
-                available_trucks.put(truck.getSerialNumber() , truck);
+                available_trucks.add(truck.getSerialNumber());
             }
         }
 
         return available_trucks;
     }
 
-    public boolean truckIsAvailable(Truck truck , Date date , Shift.ShiftTime shift_time)
+    public boolean truckIsAvailable(String truck_serial , Date date , Shift.ShiftTime shift_time)
     {
         for(Delivery delivery : getAllDeliveries().values())
         {
-            if(delivery.getTruckSerialNumber().equals(truck.getSerialNumber()))
+            if(delivery.getTruckSerialNumber().equals(truck_serial))
             {
                 return false;
             }
@@ -436,5 +436,13 @@ public class BLService {
     public Delivery getDelivery(int id)
     {
         return data.getDeliveries().get(id);
+    }
+
+    public boolean addDelivery(Delivery delivery)
+    {
+        data.getDeliveries().put(delivery.getDeliveryID(),delivery);
+        new DeliveryDAO().save(delivery);
+        return true;
+
     }
 }

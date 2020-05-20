@@ -204,6 +204,32 @@ public class Printer {
 
         System.out.println(trucks);
     }
+
+    public static void printTrucks(List<String> available_trucks)
+    {
+
+        String trucks = "";
+
+        for (String truck_serial : available_trucks) {
+            Truck truck = blService.getTruck(truck_serial);
+            if(truck== null)
+            {
+                System.out.println("Error in printing a truck with serial number : "+truck_serial+'\n');
+            }
+            else
+            {
+                trucks += "Truck serial number : " + truck_serial + "\n" +
+                        "Model : " + truck.getModel() + "\n" +
+                        "Weight : " + truck.getWeight() + "\n" +
+                        "Max allowed weight : " + truck.getMaxAllowedWeight() + "\n\n";
+            }
+
+        }
+
+        System.out.println(trucks);
+
+    }
+
 //------------------------------------ Products ---------------------------------//
 
     public static void printProductsView() {
@@ -272,4 +298,5 @@ public class Printer {
     public static void border() {
         System.out.println("--------------------------------");
     }
+
 }

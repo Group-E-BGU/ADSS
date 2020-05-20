@@ -45,10 +45,10 @@ public class DeliveryDAO {
                 truckWeight = rs.getInt("truckWeight");
                 logs = decodeLogs(rs.getString("logs"));
 
-                delivery = new Delivery(id, date, source, truckSerialNumber,driverID);
+                delivery = new Delivery(date, source, truckSerialNumber,driverID,truckWeight);
+                delivery.setDeliveryId(id);
 
                 delivery.setDocuments(documents);
-                delivery.setTruckWeight(truckWeight);
                 delivery.setLogs(logs);
 
                 return delivery;
@@ -99,10 +99,9 @@ public class DeliveryDAO {
                 List<String> logs = decodeLogs(rs.getString("logs"));
                 deliveryId = rs.getInt("id");
 
-                delivery = new Delivery(deliveryId, date, source, truckSerialNumber,driverID);
-
+                delivery = new Delivery(date, source, truckSerialNumber,driverID,truckWeight);
+                delivery.setDeliveryId(deliveryId);
                 delivery.setDocuments(documents);
-                delivery.setTruckWeight(truckWeight);
                 delivery.setLogs(logs);
 
                 deliveries.add(delivery);

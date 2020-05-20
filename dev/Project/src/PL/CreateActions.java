@@ -361,7 +361,7 @@ public class CreateActions {
             System.out.println("Error : invalid date input");
         }
 
-        Map<String,Truck> available_trucks = blService.getAvailableTrucks(date,delivery_time);
+        List<String> available_trucks = blService.getAvailableTrucks(date,delivery_time);
 
         if(available_trucks.isEmpty())
         {
@@ -369,7 +369,7 @@ public class CreateActions {
             return;
         }
 
-        System.out.println(available_trucks.toString());
+        Printer.printTrucks(available_trucks);
 
         System.out.println("Choose a truck by its serial number : ");
 
@@ -379,7 +379,7 @@ public class CreateActions {
         while(!truck_chosen)
         {
             truck_serial_number = keyboard.nextLine();
-            if(!available_trucks.containsKey(truck_serial_number))
+            if(!available_trucks.contains(truck_serial_number))
             {
                 System.out.println("Error : the truck with the serial number "+truck_serial_number+" is not a valid option! try again ? y/n");
                 if(!getConfirmation())
@@ -419,8 +419,6 @@ public class CreateActions {
         Shift source_shift = blService.getShift(address,date,delivery_time);
 
         String source = address.getLocation();
-
-        List<String> destinations = new LinkedList<>();
 
         Printer.printAllAddresses();
 
@@ -489,7 +487,6 @@ public class CreateActions {
                 }
 
                 Document document = new Document();
-                destinations.add(des);
                 document.setDeliveryGoods(delivery_products);
                 documents.put(des,document);
 
@@ -503,6 +500,7 @@ public class CreateActions {
 
 
         int total_weight = delivery_truck.getWeight();
+        List<String> logs = new LinkedList<>();
         for(Document doc : documents.values())
         {
             for(Map.Entry<String,Integer> entry : doc.getDeliveryGoods().entrySet())
@@ -539,12 +537,16 @@ public class CreateActions {
                     else
                     {
                         driver_chosen = true;
+                        Delivery delivery = new Delivery(date,source,truck_serial_number,driver_id,total_weight);
+                        delivery.setDocuments(documents);
+                        delivery.setLogs(logs);
+
+                        blService.addDelivery(delivery);
                     }
                 }
             }
         }
 
-        Delivery delivery = new Delivery();
 
 
         // finished choosing the destinations

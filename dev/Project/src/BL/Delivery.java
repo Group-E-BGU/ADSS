@@ -3,6 +3,7 @@ package BL;
 import java.util.*;
 
 public class Delivery{
+    public static int counter=0;
     private int delivery_id;
     private Date date;
     private String source;
@@ -12,13 +13,15 @@ public class Delivery{
     private List<String> logs;
     private int truckWeight;
 
-    public Delivery(int delivery_id , Date date, String source, String truckSerialNumber, int driverID){
-        this.delivery_id = delivery_id;
+    public Delivery(Date date, String source, String truckSerialNumber, int driverID , int truckWeight){
+        this.delivery_id = counter++;
         this.date = date;
         this.source = source;
         this.truckSerialNumber = truckSerialNumber;
         this.driverID = driverID;
+        this.truckWeight = truckWeight;
         this.documents = new HashMap<>();
+        this.logs = new LinkedList<>();
     }
 
     public Delivery(){}
