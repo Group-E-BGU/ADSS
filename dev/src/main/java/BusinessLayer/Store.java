@@ -202,11 +202,6 @@ public class Store {
         if(sup==null){
             sup=MapSupplier.GetSupplier(id_suplaier,email_ID);
             if(sup!=null){
-                //todo change it
-                Contract c=MapContract.getContract(id_suplaier,email_ID);
-                Wrotequantities w=MapWorte.GetWrotequantities(id_suplaier,email_ID);
-                sup.setWorte(w);
-                sup.setContract(c);
                 list_of_Suplier.add(sup);
             }
         }
@@ -218,9 +213,6 @@ public class Store {
                 ProductID_IDSupplier.put(Id_Product, e.getKey());
                 double Price =sup.getPric(e.getKey(), e.getValue());
                 TotalPrice.set(TotalPrice.get()+Price);
-                //Sale = (100 - Sale) / 100;
-                //double Price = sup.GetPricProduct(id_suplaier, Id);
-                //TotalPrice.set(TotalPrice.get() + num * Price * Sale);
             }
             Order O = new Order(id_suplaier, NumOfOrder,false, day, ProductID_IDSupplier, ProductIDSupplier_numberOfItems, TotalPrice.get());
             Map<Integer, Integer> ProductIDSupplier_IDStore = new ConcurrentHashMap<Integer, Integer>();
@@ -377,9 +369,9 @@ public class Store {
     public String CheckSuplierExit(int id) {
         Supplier s=MapSupplier.GetSupplier(id,email_ID);
              if(s!=null){
-                return "Exit";
+                return "Exist";
             }
-        return "Not Exit";
+        return "Not Exist";
     }
 
     public String CheckSAgreementExit(int suplaier_id) {

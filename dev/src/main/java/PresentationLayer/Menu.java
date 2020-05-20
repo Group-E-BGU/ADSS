@@ -13,7 +13,7 @@ public class Menu {
 
     public static void main(String[] args) {
             Sys.initializeDB();
-            AddArguments();
+          //  AddArguments();
            // Sys.initialize();
         MainMenu();
     }
@@ -286,39 +286,6 @@ public class Menu {
             }
         }
     }
-/*
-    @SuppressWarnings("deprecation")
-
-    public void initializeItems() {
-        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecords.put("milk Tnova 3%",itemRecord1);
-        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
-
-        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecords.put("white bread",itemRecord2);
-        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
-
-        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecords.put("coffee Elite",itemRecord3);
-        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
-
-
-        itemRecord1.addPrice(new Price(80,120));
-        itemRecord2.addPrice(new Price(90,130));
-        itemRecord3.addPrice(new Price(100,135));
-
-    }*/
 
     private static void AddArguments() {
         Sys.Register("Store1@gmail.com","S1_superLi");
@@ -344,7 +311,7 @@ public class Menu {
         Map<Integer,String> contactXiaomi2=new ConcurrentHashMap<Integer, String>();
         contactXiaomi2.put(45337561,"Or");
         Sys.AddSupplier("Eli",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
-        
+
         Map<Integer,String> ProductAli1 =new ConcurrentHashMap<Integer, String>();
         ProductAli1.put(12313,"milk");
         int Id_Store = Sys.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
@@ -798,7 +765,7 @@ public class Menu {
             System.out.println("Please enter the Supplier's ID you want to order from");
             ID_Suplaier = myScanner.nextInt();
             String exist = Sys.CheckSuplierExist(ID_Suplaier);
-            if (exist.equals("Exit")) {
+            if (!exist.equals("Exist")) {
                 conect = false;
                 System.out.println("the supplier is not exist in the system.");
             }
@@ -844,7 +811,12 @@ public class Menu {
                     System.out.println(Done);
                     if (Done>-1){
                         InterfaceOrder o = Sys.getOrderDetails(Done);
-                        PrintOrder(o);
+                        if(o!=null){
+                            PrintOrder(o);
+                        }
+                       if(o==null){
+
+                       }
                     }
                 }
                 else
@@ -978,25 +950,26 @@ public class Menu {
             LinkedList<InterfaceSupplier> suppliers =Sys.GetSupliers();
             for (InterfaceSupplier Sup : suppliers
             ) {
-                System.out.print("name: " + Sup.Name + "\n" +
+                System.out.print("\nname: " + Sup.Name + "\n" +
                         "Id: " + Sup.ID + "\n" +
                         "Payment with: " + Sup.Payments + "\n" +
                         "Bank: " + Sup.Bank + "\n" +
                         "Branch: " + Sup.Branch + "\n" +
                         "Bank number: " + Sup.BankNumber + "\n");
                 System.out.println("Contacts:");
-                Sup.ContactsID_Name.forEach((ID, name) -> {
-                    System.out.println("name: " + name);
-                    System.out.println("ID: " + ID);
-                    Sup.ContactsID_number.forEach((Id, number) -> {
-                        if (ID == Id) {
-                            System.out.println("number: " + number + "\n");
+                    for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
+                         ) {
+                    System.out.println("name: " + i.getValue());
+                    System.out.println("ID: " + i.getKey());
+                    for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
+                         ) {
+                        if (i.getKey().intValue()==e.getKey().intValue()) {
+                            System.out.println("number: " + e.getValue() + "\n");
                         }
-                    });
-                });
-            }
+                    }
+                 }
+              }
         }
-
     }
 
     private static void UpdateOrderStatus() {
