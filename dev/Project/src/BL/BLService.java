@@ -340,13 +340,23 @@ public class BLService {
         int totalWeight = getTotalWeight(documents);
         Truck truck = Data.getInstance().getProperTruck(totalWeight);
         Driver driver = Data.getInstance().getProperDriver(totalWeight);
+        Date date;
 
         delivery.setTruckSerialNumber(truck.getSerialNumber());
         delivery.setDriverID(driver.getId());
         delivery.setDocuments(documents);
         delivery.setSource(source);
 
+        if(totalWeight <= truck.getMaxAllowedWeight())
+            date = getDeliveryDate(driver);
+
         return delivery;
+    }
+
+    private Date getDeliveryDate(Driver driver) {
+        // todo
+        // returns the first date that the driver could deliver the delivery in
+        return null;
     }
 
     private int getTotalWeight(Map<String, Document> deliveryGoods) {
@@ -354,8 +364,11 @@ public class BLService {
         // todo
     }
 
-    public void rearrangeDelivery(Delivery delivery, Map<String, Document> deliveryGoods) {
-        // todo
+    public void rearrangeDelivery(Delivery delivery, Map<String, Document> documents) {
+        int totalWeight = getTotalWeight(documents);
+
+        if(totalWeight <= Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight())
+            delivery.setDate(getDeliveryDate((new DriverDAO()).get(delivery.getDriverID())));
     }
 
 
