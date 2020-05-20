@@ -35,7 +35,8 @@ public class ShiftDAO {
 
             // loop through the result set
             if (rs.next()) {
-                shift_date = rs.getDate("date");
+                String stringDate = rs.getString("date");
+                shift_date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
                 StockKeeper s = (new StockKeeperDAO()).get(rs.getInt("boss"));
                 boss = s != null ? s : (new DriverDAO()).get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
@@ -47,7 +48,7 @@ public class ShiftDAO {
 
                 return shift;
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ParseException e) {
             System.out.println(e.getMessage());
             return null;
         }

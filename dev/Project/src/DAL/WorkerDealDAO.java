@@ -28,7 +28,9 @@ public class WorkerDealDAO {
 
             if (rs.next()) {
                 worker_id = rs.getInt("workerId");
-                start_date = rs.getDate("startDate");
+//                start_date = rs.getDate("startDate");
+                String stringDate = rs.getString("startDate");
+                start_date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
                 bank_address = rs.getString("bankAddress");
                 salary = rs.getDouble("salary");
                 work_conditions = decodeWorkConditions(rs.getString("workConditions"));
@@ -37,7 +39,7 @@ public class WorkerDealDAO {
             } else
                 System.out.println("No deal with worker id of: " + id + " is found");
 
-        } catch (SQLException e) {
+        } catch (SQLException | ParseException e) {
             System.out.println(e.getMessage());
         }
 

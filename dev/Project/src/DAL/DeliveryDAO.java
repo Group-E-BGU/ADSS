@@ -38,7 +38,9 @@ public class DeliveryDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                date = rs.getDate("date");
+//                date = rs.getDate("date");
+                String stringDate = rs.getString("date");
+                date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
                 source = rs.getString("source");
                 documents = decodeDocuments(rs.getString("documents"));
                 truckSerialNumber = rs.getString("truckSerialNumber");
@@ -55,7 +57,7 @@ public class DeliveryDAO {
                 return delivery;
             } else
                 System.out.println("No delivery with ID: " + id + " was found.");
-        } catch (SQLException e) {
+        } catch (SQLException | ParseException e) {
             System.out.println(e.toString());
         }
 
