@@ -12,71 +12,12 @@ public class MapperItemRecord {
     //this class also manages Items
     Connection conn = null;
 
-    public List<ItemRecord> getAllItemRecs(){
-        try {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
-
-            String sqlstmt = "SELECT * FROM ItemRecord;";
-
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sqlstmt);
-            List<ItemRecord> l = new LinkedList<>();
-            while (rs.next()) {
-                l.add(new ItemRecord(rs.getString(2),rs.getInt(1), rs.getInt(3),rs.getInt(4),
-                        rs.getInt(5),rs.getInt(6),rs.getInt(7),rs.getString(8)));
-            }
-            return l;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        finally{
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        return null;
-    }
-
-    public List<Item> getAllItems(){
-        try {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
-
-            String sqlstmt = "SELECT * FROM Item;";
-
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sqlstmt);
-            List<Item> l = new LinkedList<>();
-            while (rs.next()) {
-                l.add(new Item(rs.getInt(1),rs.getDate(2)));
-            }
-            return l;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        finally{
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        return null;
-    }
-
     public void InsertItemRecord(String name,int id, int minAmount, int storageAmount, int shelfAmount, int totalAmount, int shelfNumber, String manufacture, String storeId){
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "INSERT INTO ItemRecord VALUES (?,?,?,?,?,?,?,?,?);";
+            String sqlstmt = "INSERT INTO ItemRecord VALUES (?,?,?,?,?,?,?,?,?)";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
@@ -111,7 +52,7 @@ public class MapperItemRecord {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "INSERT INTO Item VALUES (?,?,?,?,?);";
+            String sqlstmt = "INSERT INTO Item VALUES (?,?,?,?,?)";
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
@@ -169,7 +110,7 @@ public class MapperItemRecord {
 
             String sqlstmt = "UPDATE Item WHERE id IN (SELECT Item.id FROM Item JOIN ItemRecord ON ItemRecord.id = itemRecId " +
                     "SET defective = " + true + ", defectiveDate = " + date +
-                    "WHERE Item.id = "+itemId+" AND " + " ItemRecord.StoreId = '"+storeId+"');";;
+                    "WHERE Item.id = "+itemId+" AND " + " ItemRecord.StoreId = '"+storeId+"')";;
 
 
             Statement stmt = conn.createStatement();
@@ -196,7 +137,7 @@ public class MapperItemRecord {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "DELETE FROM Item WHERE id IN (SELECT Item.id FROM Item JOIN ItemRecord ON ItemRecord.id = IRID WHERE ItemRecord.name = '"+name+"' AND " +
-                    "Item.id = "+id+" AND ItemRecord.StoreId = '"+storeId+"');";
+                    "Item.id = "+id+" AND ItemRecord.StoreId = '"+storeId+"')";
 
             Statement stmt = conn.createStatement();
             stmt.execute(sqlstmt);
@@ -379,7 +320,7 @@ public class MapperItemRecord {
             ResultSet rs = stmt.executeQuery(sqlstmt);
             List<ItemRecord> l = new LinkedList<>();
             while (rs.next()) {
-                ItemRecord i = getItemRecordById(rs.getInt(4));
+                ItemRecord i = getItemRecordById(rs.getInt(5));
                 if(i != null)
                     l.add(i);
             }

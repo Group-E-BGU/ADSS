@@ -1,6 +1,5 @@
 package PresentationLayer;
 
-import BusinessLayer.Order;
 import InterfaceLayer.InterfaceContract;
 import InterfaceLayer.InterfaceOrder;
 import InterfaceLayer.InterfaceSupplier;
@@ -14,7 +13,6 @@ public class Menu {
     public static void main(String[] args) {
             Sys.initializeDB();
         AddArguments();
-
         MainMenu();
     }
 
@@ -60,7 +58,7 @@ public class Menu {
                     "4. Make an Fix order\n" +
                     "5. Display the items in the super\n" +
                     "6. Display sll the supplier's details\n"+
-                  //  "7. Update Order Status\n"+
+                    "7. Update Order Status\n"+
                     "8. Edit supplier details\n"+
                     "9. Edit supplier's arrangement\n" +
                     "10. Edit \"Write Quantities\" of supplier\n" +
@@ -260,6 +258,7 @@ public class Menu {
     }
 
     private static void CheckcheepSupplier() {
+        //todo change!
         Scanner myScanner = new Scanner(System.in);
         System.out.println("Please enter the product ID");
         int ProdudtId = myScanner.nextInt();
@@ -270,108 +269,75 @@ public class Menu {
             System.out.println("there is no supplier that supply this product");
         }
         else{
-            System.out.println("The most profitable supplier to order "+ ProdudtId +" in "+" units, is: "+Supplier.Name+"\n with ID:"+ Supplier.ID );
+            System.out.println("The most profitable supplier to order "+ ProdudtId +" in "+"units, is:\n "+Supplier.Name+"\nwith ID:"+ Supplier.ID);
             System.out.println("The days that the supplier comes to the store are: ");
             if (Supplier.Contract.Days==null|Supplier.Contract.Days.isEmpty()){
                 System.out.println("No day,\n" +
-                        "The supplier does not arrive on regular days ");
+                        "The supplier does not arrive on regular days");
             }
             else {
                 for (int d:Supplier.Contract.Days
                 ) {
-                    System.out.print(d);
+                    System.out.print(d+"\n");
                 }
                 System.out.print("");
             }
         }
     }
-/*
-    @SuppressWarnings("deprecation")
 
-    public void initializeItems() {
-        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecords.put("milk Tnova 3%",itemRecord1);
-        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
-
-        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecords.put("white bread",itemRecord2);
-        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
-
-        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecords.put("coffee Elite",itemRecord3);
-        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
-
-
-        itemRecord1.addPrice(new Price(80,120));
-        itemRecord2.addPrice(new Price(90,130));
-        itemRecord3.addPrice(new Price(100,135));
-
-    }*/
 
     private static void AddArguments() {
-        Sys.Register("Store1@gmail.com","S1_superLi");
+        Sys.Register("A","A");
         Sys.Register("Store2@gmail.com","S2_superLi");
 
-        Sys.Login("Store1@gmail.com","S1_superLi");
+        Sys.Login("A","A");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);
         Map<Integer,String> contactAli2=new ConcurrentHashMap<Integer, String>();
         contactAli2.put(2087564,"yoni");
         contactAli2.put(2453214,"roi");
-        Sys.AddSupplier("Ali",51345,"hprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli2,contactAli1);
+        Sys.AddSupplier("Ron",51345,"haprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli2,contactAli1);
         Map<Integer,Integer> contactIKEA1=new ConcurrentHashMap<Integer, Integer>();
         contactIKEA1.put(208231,0522136272);
         contactIKEA1.put(4283214,0523546253);
         Map<Integer,String> contactIKEA2=new ConcurrentHashMap<Integer, String>();
         contactIKEA2.put(208231,"Dov");
         contactIKEA2.put(4283214,"Leni");
-        Sys.AddSupplier("IKEA",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA2,contactIKEA1);
+        Sys.AddSupplier("Tom",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA2,contactIKEA1);
         Map<Integer,Integer> contacttXiaomi1=new ConcurrentHashMap<Integer, Integer>();
         contacttXiaomi1.put(45337561,05221336272);
         Map<Integer,String> contactXiaomi2=new ConcurrentHashMap<Integer, String>();
         contactXiaomi2.put(45337561,"Or");
-        Sys.AddSupplier("Xiaomi",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
-
-
+        Sys.AddSupplier("Eli",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
+        
         Map<Integer,String> ProductAli1 =new ConcurrentHashMap<Integer, String>();
-        ProductAli1.put(12313,"pijamas");
-        int Id_Store = Sys.FindId_P_Store("pijamas", "clothes", "night", "shirt", "Delta",100, 5 );
-        ProductAli1.put(2314567,"slippers");
-        int Id_Store1 = Sys.FindId_P_Store("slippers", "clothes", "night", "wool", "Delta",100, 6 );
+        ProductAli1.put(12313,"milk");
+        int Id_Store = Sys.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
+        ProductAli1.put(2314567,"cheese");
+        int Id_Store1 = Sys.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5 );
         Map<Integer,Double> ProductAli2 =new ConcurrentHashMap<Integer,Double>();
-        ProductAli2.put(12313,499.9);
-        ProductAli2.put(2314567,69.9);
+        ProductAli2.put(12313,4.9);
+        ProductAli2.put(2314567,2.9);
         Map<Integer,Integer>  ProductAli3=new ConcurrentHashMap<Integer, Integer>();
         ProductAli3.put(Id_Store,12313);
         ProductAli3.put(Id_Store1,2314567);
         LinkedList<Integer> Days=new LinkedList<>();
-        Days.add(1);
+        Days.add(2);
         Days.add(4);
         Sys.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
 
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
-        ProductIKEA1.put(143,"table");
-        int Id_Store2 = Sys.FindId_P_Store("table", "furniture", "Living room", "meeting", "Deblin",100, 17 );
-        ProductIKEA1.put(5432,"bed");
-        int Id_Store3 = Sys.FindId_P_Store("bed", "Bedroom", "Children", "Stars", "Una",100, 18 );
-        ProductIKEA1.put(22,"lamp");
-        int Id_Store4 = Sys.FindId_P_Store("lamp", "Bedroom", "Children", "nion", "Light",100, 19 );
+        ProductIKEA1.put(143,"milk");
+        int Id_Store2 = Sys.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
+        ProductIKEA1.put(5432,"cheese");
+        int Id_Store3 = Sys.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
+        ProductIKEA1.put(22,"cottage");
+        int Id_Store4 = Sys.FindId_P_Store("cottage", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
         Map<Integer,Double> ProductIKEA2 =new ConcurrentHashMap<Integer,Double>();
-        ProductIKEA2.put(143,499.9);
-        ProductIKEA2.put(5432,1399.9);
-        ProductIKEA2.put(22,139.9);
+        ProductIKEA2.put(143,4.9);
+        ProductIKEA2.put(5432,1.9);
+        ProductIKEA2.put(22,2.9);
         Map<Integer,Integer>  ProductIKEA3=new ConcurrentHashMap<Integer, Integer>();
         ProductIKEA3.put(Id_Store2,143);
         ProductIKEA3.put(Id_Store3,5432);
@@ -379,16 +345,16 @@ public class Menu {
         Sys.AddContract(51321,false,Days,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
 
         Map<Integer,String> ProductXiaomi1 =new ConcurrentHashMap<Integer, String>();
-        ProductAli1.put(142356,"smartPhone");
-        int Id_Store5 = Sys.FindId_P_Store("smartPhone", "communication", "phones", "Mobile", "Xiaomi",100, 13 );
-         ProductAli1.put(46288,"headphones");
-        int Id_Store6 = Sys.FindId_P_Store("headphones", "communication", "Audio", "Mobile", "Xiaomi",100, 14 );
-        ProductAli1.put(4328,"Screen Protector");
-        int Id_Store7= Sys.FindId_P_Store("Screen Protector", "communication", "phones", "Stars", "Xiaomi",100, 14 );
+        ProductXiaomi1.put(142356,"Potatoes");
+        int Id_Store5 = Sys.FindId_P_Store("Potatoes", "vegetables", "whites", "bag", "Harez",100, 13 );
+        ProductXiaomi1.put(46288,"Carrots");
+        int Id_Store6 = Sys.FindId_P_Store("Carrots", "vegetables", "orange", "bag", "Harez",100, 14 );
+        ProductXiaomi1.put(4328,"Potatoes");
+        int Id_Store7= Sys.FindId_P_Store("RedPotatoes", "vegetables", "red", "bag", "Harez",100, 14 );
         Map<Integer,Double> ProductXiaomi2 =new ConcurrentHashMap<Integer,Double>();
-        ProductAli2.put(142356,2499.9);
-        ProductAli2.put(46288,29.9);
-        ProductAli2.put(4328,79.9);
+        ProductXiaomi2.put(142356,13.9);
+        ProductXiaomi2.put(46288,8.9);
+        ProductXiaomi2.put(4328,13.9);
         Map<Integer,Integer>  ProductXiaomi3=new ConcurrentHashMap<Integer, Integer>();
         ProductXiaomi3.put(Id_Store5,142356);
         ProductXiaomi3.put(Id_Store6,46288);
@@ -396,27 +362,35 @@ public class Menu {
         Sys.AddContract(51328,false,Days,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
 
         Map<Integer,Integer> WriteAli1=new ConcurrentHashMap<Integer, Integer>();
-        WriteAli1.put(12313,200);
+        WriteAli1.put(12313,100);
         Map<Integer,Double> WriteAli2=new ConcurrentHashMap<Integer, Double>();
         WriteAli2.put(12313,10.0);
         Sys.AddWrite(51345,WriteAli1,WriteAli2);
-        Map<Integer,Integer> WriteIKEA1=new ConcurrentHashMap<Integer, Integer>();
-        WriteIKEA1.put(5432,150);
-        WriteIKEA1.put(22,200);
-        Map<Integer,Double> WriteIKEA2=new ConcurrentHashMap<Integer, Double>();
-        WriteIKEA2.put(5432,10.0);
-        WriteIKEA2.put(22,10.0);
-        Sys.AddWrite(51321, WriteIKEA1,WriteIKEA2);
         Map<Integer,Integer> WriteXiaomi1=new ConcurrentHashMap<Integer, Integer>();
         WriteXiaomi1.put(142356,50);
         WriteXiaomi1.put(4328,70);
         Map<Integer,Double> WriteXiaomi2=new ConcurrentHashMap<Integer, Double>();
         WriteXiaomi2.put(142356,10.0);
         WriteXiaomi2.put(4328,10.0);
-        Sys.AddWrite(51328,WriteAli1,WriteAli2);
+        Sys.AddWrite(51328,WriteXiaomi1,WriteXiaomi2);
+
+
+        Map<Integer,Integer> o1=new HashMap<Integer, Integer>();
+        o1.put(12313,150);
+        Sys.MakeOrder(51345,Days,o1);
+        Map<Integer,Integer> o2=new HashMap<Integer, Integer>();
+        o2.put(5432,150);
+        o2.put(22,150);
+        Sys.MakeOrder(51321,Days,o2);
+        Map<Integer,Integer> o3=new HashMap<Integer, Integer>();
+        o3.put(142356,150);
+        o3.put(46288,150);
+        o3.put(4328,150);
+        Sys.MakeOrder(51328,Days,o3);
 
         Sys.Logout();
-     /*   Sys.Login("Store2@gmail.com","S2_superLi");
+
+        Sys.Login("Store2@gmail.com","S2_superLi");
         Map<Integer,String> contactAli22=new ConcurrentHashMap<Integer, String>();
         contactAli22.put(2087564,"yoni");
         contactAli22.put(2453214,"roi");
@@ -454,7 +428,7 @@ public class Menu {
         Map<Integer,Double> WriteAli22=new ConcurrentHashMap<Integer, Double>();
         WriteAli22.put(1213,13.0);
         Map<Integer,Integer> WriteAli11=new ConcurrentHashMap<Integer, Integer>();
-        WriteAli11.put(1213,200);
+        WriteAli11.put(1213,100);
         Sys.AddWrite(51328,WriteAli11,WriteAli22);
         Map<Integer,Integer> WriteIKEA11=new ConcurrentHashMap<Integer, Integer>();
         WriteIKEA11.put(223,60);
@@ -464,9 +438,8 @@ public class Menu {
         WriteIKEA22.put(345,12.0);
         Sys.AddWrite(51321, WriteIKEA11,WriteIKEA22);
 
-
         //todo add details!
-        Sys.Logout();*/
+        Sys.Logout();
     }
 
     private static void Register() {
@@ -491,6 +464,7 @@ public class Menu {
     }
 
     private static void Login() {
+      //todo changed!
         Scanner myScanner = new Scanner(System.in);
         String email;
         String password;
@@ -501,26 +475,14 @@ public class Menu {
         if(!Ex.equals("Exist")) {
             System.out.println(Ex);
             done=false;
-           /* System.out.println("Do you want to return to the menu? y/n");
-            String ans=myScanner.next();
-            if(ans.equals("y")){
-                continu=false;
-                break;
-            }*/
-           /* System.out.println("enter your email:");
-            email = myScanner.next();
-            Ex = Sys.CheckEmailExist(email);*/
         }
         if (done) {
             System.out.println("Please enter password");
             password = myScanner.next();
             String Done = Sys.Login(email, password);
             if (!Done.equals("Done")) {
-                System.out.println(Ex);
+                System.out.println("worng password");
                 done=false;
-                //System.out.println("enter the password again");
-                //password = myScanner.next();
-                //Done = Sys.Login(email, password);
             }
         }
         if(done) {
@@ -955,7 +917,7 @@ public class Menu {
         if (conect) {
             LinkedList<InterfaceContract> Contract = Sys.GetContract();
             for (InterfaceContract Con : Contract
-            ) {
+            ) {//todo change
                 for (Map.Entry<Integer, String> e : Con.ProductIDVendor_Name.entrySet()) {
                     int P = e.getKey();
                     String N = e.getValue();
@@ -963,8 +925,9 @@ public class Menu {
                         int p = entry.getKey();
                         Double price = entry.getValue();
                         if (P == p) {
-                            System.out.println("supplier: " + Con.Suplaier_ID);
+                            System.out.println("supplierId: " + Con.Suplaier_ID);
                             System.out.println("product name: " + N);
+                            System.out.println("product Id_Supplier: " + p);
                             System.out.println("Price: " + price + "\n");
                         }
                     }
@@ -1080,21 +1043,23 @@ public class Menu {
     }
 
     private static void GetOrderDetails() {
+        //todo changed!
         System.out.println("Orders that are scheduled to arrive today:");
         LinkedList<InterfaceOrder> Orders=Sys.GetOrderDetails();
         for (InterfaceOrder o:Orders
         ) {
-            System.out.println("Order ID is: "+o.ID_Inventation);
-            System.out.println("Supplier ID is: "+o.ID_Vendor);
+            System.out.println("Order ID is: " + o.ID_Inventation);
+            System.out.println("Supplier ID is: " + o.ID_Vendor);
             System.out.println("The product that include in the Order is: ");
-            for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
+            for (Map.Entry<Integer, Integer> I : o.ItemsID_ItemsIDVendor.entrySet()
             ) {
                 System.out.print(I.getValue());
                 System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
             }
-            System.out.println("If an order arrives at the store,\n" +
-                    " select the \"Update Order Status\" in the menu and fill in the order details");
         }
+            System.out.println("\nIf an order arrives at the store,\n" +
+                    " select the \"Update Order Status\" in the menu and fill in the order details\n");
+
     }
 
 }

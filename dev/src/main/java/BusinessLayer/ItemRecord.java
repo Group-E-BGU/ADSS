@@ -46,19 +46,19 @@ public class ItemRecord {
     }
 
     public void setStorageAmount(int newAmount) {
-        storageAmount = newAmount;
+        storageAmount += newAmount;
     }
 
     public void setShelfAmount(int newAmount) {
-        shelfAmount = newAmount;
+        shelfAmount += newAmount;
     }
 
     public void setTotalAmount(int newAmount,java.sql.Date expDate) {
+        newAmount += totalAmount;
         while(totalAmount < newAmount){
             int Iid = mapperItemRecord.getMaxItemId()+1;
             items.addFirst(new Item(Iid,expDate));
             mapperItemRecord.InsertItem(id,Iid,expDate);
-            storageAmount++;
             totalAmount++;
         }
         if(totalAmount < minAmount){

@@ -28,6 +28,7 @@ public class Contract {
     }
 
     public double GetPrice(int Id){
+     //todo change it!
        AtomicReference<Double> p= new AtomicReference<>((double) 1);
         productIDVendor_Price.forEach((id,Price)->{
             if(id==Id){
@@ -38,14 +39,15 @@ public class Contract {
     }
 
 
-    public int GetIdSup(Integer id) {
-        AtomicInteger Id= new AtomicInteger(-1);
-        ItemsID_ItemsIDSupplier.forEach((I,P)->{
-            if(P== id){
-            Id.set(I);
+    public int GetIdSup(int id) {
+        AtomicInteger Id = new AtomicInteger(-1);
+        for (Map.Entry<Integer, Integer> p : ItemsID_ItemsIDSupplier.entrySet()
+        ) {
+            if (id==p.getValue()) {
+                Id.set(p.getKey());
             }
-        });
-        return Id.get();
+        }
+            return Id.get();
     }
 
     public void setSuplaier_ID(int suplaier_ID) {
@@ -122,5 +124,17 @@ public class Contract {
             }
         }
         return false;
+    }
+
+    //todo change
+    public int GetIdPerStore(int id) {
+        AtomicInteger Id = new AtomicInteger(-1);
+        for (Map.Entry<Integer, Integer> p : ItemsID_ItemsIDSupplier.entrySet()
+        ) {
+            if (id==p.getKey()) {
+                Id.set(p.getValue());
+            }
+        }
+        return Id.get();
     }
 }

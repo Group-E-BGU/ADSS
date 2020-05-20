@@ -105,15 +105,9 @@ public class SystemManager {
             logged_user=new User(email,password);
             current_Store=Store.createInstance(email);
         }
+        //initialize();
         return Done;
     }
-
-    public void initialize(){
-        current_Store.initializeCategories();
-        current_Store.initializeDiscounts();
-
-    }
-
 
     public LinkedList<InterfaceContract> GetContract() {
         LinkedList<InterfaceContract> list=new LinkedList<InterfaceContract>();
@@ -158,13 +152,14 @@ public class SystemManager {
     }
 
     public String Logout() {
+        //todo changed
         if(logged_user==null| current_Store==null){
             return "you need to Login before you logout";
         }
         current_Store.Logout();
         current_Store=null;
         logged_user=null;
-        return "login successfully";
+        return "logout successfully";
     }
 
     public boolean CheckConected() {

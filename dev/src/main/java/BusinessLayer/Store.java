@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
 import InterfaceLayer.*;
+import sun.util.calendar.LocalGregorianCalendar;
 
 public class Store {
 
@@ -36,9 +37,8 @@ public class Store {
     private MapperStore MapStore;
 
     public static Store createInstance(String email) {
-        if (storeInstance == null) {
-            storeInstance = new Store(email);
-        }
+
+        storeInstance = new Store(email);
         return storeInstance;
     }
 
@@ -105,12 +105,12 @@ public class Store {
     }
 
     public String Delete(int id) {
+       //todo change
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id){
                 list_of_Suplier.remove(s);
-                MapWorte.DeleteWrote(id,email_ID);
-                MapContract.DeleteContract(id,email_ID);
+                MapOrder.DeleteOrder_Supplier(email_ID,id);
                 MapSupplier.DeleteSupplier(id,email_ID);
                 return "Done";
             }
@@ -118,8 +118,7 @@ public class Store {
 
         Supplier s=MapSupplier.GetSupplier(id,email_ID);
         if(s!=null){
-            MapWorte.DeleteWrote(id,email_ID);
-            MapContract.DeleteContract(id,email_ID);
+            MapOrder.DeleteOrder_Supplier(email_ID,id);
             MapSupplier.DeleteSupplier(id,email_ID);
             return "Done";
         }
@@ -191,7 +190,7 @@ public class Store {
     }
 
     public int MakeOrder(int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> ProductIDSupplier_numberOfItems) {
-        Supplier sup=null;//todo check mayby it not necessary
+        Supplier sup=null;
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id_suplaier){
@@ -201,6 +200,11 @@ public class Store {
         if(sup==null){
             sup=MapSupplier.GetSupplier(id_suplaier,email_ID);
             if(sup!=null){
+                //todo change it
+                Contract c=MapContract.getContract(id_suplaier,email_ID);
+                Wrotequantities w=MapWorte.GetWrotequantities(id_suplaier,email_ID);
+                sup.setWorte(w);
+                sup.setContract(c);
                 list_of_Suplier.add(sup);
             }
         }
@@ -210,7 +214,7 @@ public class Store {
             for (Map.Entry<Integer,Integer> e : ProductIDSupplier_numberOfItems.entrySet()) {
                 int Id_Product = sup.GetIdProduct(e.getKey());
                 ProductID_IDSupplier.put(Id_Product, e.getKey());
-                double Price =sup.getPric(e.getKey(), e.getValue()); //todo check if works
+                double Price =sup.getPric(e.getKey(), e.getValue());
                 TotalPrice.set(TotalPrice.get()+Price);
                 //Sale = (100 - Sale) / 100;
                 //double Price = sup.GetPricProduct(id_suplaier, Id);
@@ -275,10 +279,11 @@ public class Store {
         int Id_p_sup=-1;
         Supplier sup=null;
         double FinalPrice= Integer.MAX_VALUE;
-        //todo how to do that?
-        for (Supplier s:list_of_Suplier
+        //todo change it. add contract iworte!
+        LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
+        for (Supplier s:suppliers
         ) {
-            Id_p_sup=s.GetIdProduct(IdProduct);
+            Id_p_sup=s.GetIdProductPerStore(IdProduct);
             if(Id_p_sup!=-1) {
                 double price = s.getPric(IdProduct, amount);
                 if (price < FinalPrice) {
@@ -306,7 +311,7 @@ public class Store {
             ) {
                 ProductIDSupplier_IDStore.put(e.getValue(),e.getKey());
             }
-            MapOrder.WriteOrder(email_ID, NumOfOrder, NumOfOrder,true, day, java.sql.Date.valueOf(LocalDate.now()),java.sql.Date.valueOf(LocalDate.now()) ,O.getTotalPrice(),"Waiting",ProductIDSupplier_IDStore,ProductIDSupplier_numberOfItems);
+            MapOrder.WriteOrder(email_ID, sup.getID(),NumOfOrder,true, day, java.sql.Date.valueOf(LocalDate.now()),java.sql.Date.valueOf(LocalDate.now()) ,O.getTotalPrice(),"Waiting",ProductIDSupplier_IDStore,ProductIDSupplier_numberOfItems);
             NumOfOrder++;
             return "Done";
         }
@@ -438,48 +443,51 @@ public class Store {
     }
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
-        int id=MapIRS.getProductId(email_ID,category,subcategory,sub_subcategory,product_name,manufacturer);
+        int id=MapIRS.getProductId(email_ID,product_name,category,subcategory,sub_subcategory,manufacturer);
         ItemRecord ir = itemRecords.get(product_name);
         if(ir == null)
             ir = mapperItemRecord.getItemRecord(product_name,email_ID);
         if(id==-1) {
             id = itemId++;
-            MapIRS.WriteItemRecord_Supplier(email_ID, id, category, subcategory, sub_subcategory, product_name);
+            MapIRS.WriteItemRecord_Supplier(email_ID, id, category, subcategory, sub_subcategory, product_name,manufacturer);
             ir = new ItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer);
             mapperItemRecord.InsertItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer, email_ID);
         }
         Category main = categories.get(category);
-        if(main == null){
-            main = mapperCategory.getCategory(category,email_ID);
-            if(main == null) {
+        if(main == null) {
+            main = mapperCategory.getCategory(category, email_ID);
+            if (main == null) {
                 main = new Category(Category.CategoryRole.MainCategory, category);
                 categories.put(category, main);
                 mapperCategory.InsertCategory(category, 1, email_ID);
             }
-            main.addItem(ir); //addItem is safe
         }
+            main.addItem(ir); //addItem is safe
+
 
         Category sub = categories.get(subcategory);
-        if(sub == null){
-             sub = mapperCategory.getCategory(subcategory,email_ID);
-            if(sub == null) {
+        if(sub == null) {
+            sub = mapperCategory.getCategory(subcategory, email_ID);
+            if (sub == null) {
                 sub = new Category(Category.CategoryRole.SubCategory, subcategory);
                 categories.put(subcategory, sub);
                 mapperCategory.InsertCategory(subcategory, 2, email_ID);
             }
-            sub.addItem(ir);
         }
+            sub.addItem(ir);
+
 
         Category subsub = categories.get(sub_subcategory);
-        if(subsub == null){
-            subsub = mapperCategory.getCategory(sub_subcategory,email_ID);
-            if(subsub == null) {
+        if(subsub == null) {
+            subsub = mapperCategory.getCategory(sub_subcategory, email_ID);
+            if (subsub == null) {
                 subsub = new Category(Category.CategoryRole.SubSubCategory, sub_subcategory);
                 categories.put(sub_subcategory, subsub);
                 mapperCategory.InsertCategory(sub_subcategory, 3, email_ID);
             }
-            subsub.addItem(ir);
         }
+            subsub.addItem(ir);
+
 
 
         return id;
@@ -511,34 +519,6 @@ public class Store {
        }
 
     public void initializeCategories() {
-        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecords.put("milk Tnova 3%",itemRecord1);
-        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
-
-        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecords.put("white bread",itemRecord2);
-        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
-
-        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecords.put("coffee Elite",itemRecord3);
-        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
-
-
-        itemRecord1.addPrice(new Price(80,120));
-        itemRecord2.addPrice(new Price(90,130));
-        itemRecord3.addPrice(new Price(100,135));
-
         Category category1 = new Category(Category.CategoryRole.MainCategory,"Dairy");
         Category subCat1 = new Category(Category.CategoryRole.SubCategory,"Milk");
         Category subsubcat1 = new Category(Category.CategoryRole.SubSubCategory,"1 liter");
@@ -576,8 +556,6 @@ public class Store {
         mapperCategory.InsertCategory(category3.getName(),1,email_ID);
         mapperCategory.InsertCategory(subcat3.getName(),2,email_ID);
         mapperCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
-
-
 
         categories.put("Drinks",category3);
         categories.put("Coffee powder",subcat3);
@@ -625,21 +603,7 @@ public class Store {
                 return "The discount was added succesfully";
             }
         }
-        for( ItemRecord ir: mapperItemRecord.getAllItemRecs()) {
-            if (ir.getName().equals(name)) {         //checks if there is an item record with the given name
-                ItemDiscount d = new ItemDiscount(mapperDiscount.getMaxId() + 1, ir, beginDate, endDate, percentage);
-                mapperDiscount.InsertItemDiscount(d.getId(), d.getPercentage(), d.getStartDate(), d.getEndDate(), ir.getId(), this.getEmail_ID());
-                Price p = ir.getCurrPrice();
-                int beforeDiscount = p.getStorePrice();
-                int afterDiscount = (beforeDiscount / 100) * percentage;
-                Price discountedPrice = new Price(p.getRetailPrice(), afterDiscount);
-                mapperPrice.InsertPrice(discountedPrice.getId(), ir.getId(), discountedPrice.getStorePrice(), discountedPrice.getRetailPrice());
-                //ir.addPrice(discountedPrice);
-                discounts.add(d);
-                return "The discount was added succesfully";
-            }
-        }
-            return "No such item";
+        return "No such item";
     }
 
     /*
@@ -658,25 +622,29 @@ public class Store {
         if(!(percentage>=1 && percentage<=100)){
             return "Discount percentage must be a number between 1-100";
         }
-        Category cat = mapperCategory.getCategory(categoryName , this.email_ID);
-        if (cat == null){
-            return "No such category\n";
+        for( Category cat: categories.values()){
+            if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
+                CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
+                mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
+                for (ItemRecord itemRec: cat.getItemRecords() ){
+                    Price p = itemRec.getCurrPrice();
+                    int beforeDiscount = p.getStorePrice();
+                    int afterDiscount = (beforeDiscount/100) * percentage;
+                    Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
+                    mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
+                    //itemRec.addPrice(discountedPrice);
+
+
+                }
+                discounts.add(d);
+                return "The discount was added successfully";
+            }
         }
-        CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
-        mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
-        for (ItemRecord itemRec: cat.getItemRecords() ){
-            Price p = itemRec.getCurrPrice();
-            int beforeDiscount = p.getStorePrice();
-            int afterDiscount = (beforeDiscount/100) * percentage;
-            Price discountedPrice = new Price(p.getRetailPrice() , afterDiscount);
-            mapperPrice.InsertPrice(discountedPrice.getId(), itemRec.getId(), discountedPrice.getStorePrice() , discountedPrice.getRetailPrice());
-        }
-        discounts.add(d);
-        return "The discount was added successfully";
+        return "No such item";
     }
 
     public String setDefectedItem(String name, int id){
-        for( ItemRecord ir: mapperItemRecord.getAllItemRecs()){
+        for( ItemRecord ir: itemRecords.values()){
             if (ir.getName().equals(name)){         //checks if there is an item record with the given name
                 LinkedList<Item> itemsList = ir.getItems();
                 for (Item item: itemsList){
@@ -700,16 +668,6 @@ public class Store {
                 Price p = ir.getCurrPrice();
                 Price newPr = new Price(retailPrice , price);
                 ir.addPrice(newPr);
-                mapperPrice.InsertPrice(newPr.getId(), ir.getId(), newPr.getStorePrice() , newPr.getRetailPrice());
-                return "added successfully";
-            }
-        }
-        for (ItemRecord ir: mapperItemRecord.getAllItemRecs()){
-            if (ir.getName().equals(name)) {         //checks if there is an item record with the given name
-                Price p = ir.getCurrPrice();
-                Price newPr = new Price(retailPrice , price);
-                ir.addPrice(newPr);
-                mapperPrice.InsertPrice(newPr.getId(), ir.getId(), newPr.getStorePrice() , newPr.getRetailPrice());
                 return "added successfully";
             }
         }
@@ -884,8 +842,9 @@ public class Store {
                     break;
                 }
             }
-            if(!inList)
-                categories.put(c.getName(),c);
+            if(!inList || categories.containsKey(c.getName())) {
+                categories.put(c.getName(), c);
+            }
                 c.addItem(record);//addItem is safe
         }
     }
@@ -898,7 +857,7 @@ public class Store {
         loadCategoryOfItem(record);
         for (Category category:categories.values()) {
 
-            if(category.getItemRecords().contains(record)){
+            if(category.containsRecId(record)){
                 if(category.isMain())
                     main = main + category.getName()+" ";
                 else if(category.isSub())
@@ -938,8 +897,7 @@ public class Store {
                 report = report + pair.getItem().toString() ;
             }
             for (ItemRecord ir: itemRecords.values()) {
-                if(ir.getItems().contains(pair.getIt
-                em())) {
+                if(ir.getItems().contains(pair.getItem())) {
                     report = report + " shelf: " + ir.getShelfNumber() +" Item: "+ir.getName()+ "\n";
                 }
             }
@@ -960,7 +918,7 @@ public class Store {
     public void sendWarning(ItemRecord itemRecord) {
         SystemManager.sendWarning("Making new order of "+itemRecord.getName()+" after reaching total amount of : "+itemRecord.getTotalAmount()+" " +
                 " while min amount is : " +itemRecord.getMinAmount()+ "\n");
-        createAutomaticOrder(itemRecord.getId(),itemRecord.getMinAmount()*2);
+        AutomaticProductOrdering(itemRecord.getId(),itemRecord.getMinAmount()*2);
     }
 
     public int getPrice(String itemRecord) {
@@ -968,7 +926,7 @@ public class Store {
     }
 
     public boolean isDefective(String itemRecord, int itemId) {
-        for (Item item: mapperItemRecord.getAllItems()) {
+        for (Item item: itemRecords.get(itemRecord).getItems()) {
             if(item.getId() == itemId)
                 return item.isDefective();
 
@@ -1101,7 +1059,7 @@ public class Store {
         LinkedList<Supplier> suppliers=MapSupplier.GetSuppliers(email_ID);
         for (Supplier s:suppliers
         ) {
-            Id_p_sup=s.GetIdProduct(produdtId);
+            Id_p_sup=s.GetIdProductPerStore(produdtId);
             if(Id_p_sup!=-1) {
                 double price = s.getPric(produdtId, amount);
                 if (price < FinalPrice) {
@@ -1127,8 +1085,9 @@ public class Store {
         }
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
-     LinkedList<InterfaceOrder> orders=new LinkedList<>();
-     int today = LocalDate.now().getDayOfWeek().getValue();
+     //todo changed
+     LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
+     int today = LocalDate.now().getDayOfWeek().getValue()+1;
      LinkedList<Integer> ooo=MapOrder.GetOrdersId(today,email_ID);
         for (int order: ooo
              ) {
@@ -1140,6 +1099,7 @@ public class Store {
     }
 
     public void Logout(){
+
         MapStore.UpdateStore(email_ID,itemId,NumOfProduct,NumOfOrder);
  }
 }
