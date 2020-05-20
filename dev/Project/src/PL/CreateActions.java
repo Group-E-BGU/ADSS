@@ -283,6 +283,7 @@ public class CreateActions {
                     }
 
                     blService.updateWorker(worker);
+
                     break;
                 case 6:
                     go_back = true;
@@ -501,6 +502,7 @@ public class CreateActions {
 
         String source = address.getLocation();
 
+        Printer.border();
         Printer.printAllAddresses();
 
         System.out.println("Choose destinations : ");
@@ -527,11 +529,11 @@ public class CreateActions {
                 System.out.println("Error : no working stock keeper at the destination at the chosen time");
             } else {
 
-                Printer.printAllProducts();
                 boolean products_chosen = false;
-                System.out.println("Choose the product you want to deliver by typing the CN");
                 Map<String, Integer> delivery_products = new HashMap<>();
                 while (!products_chosen) {
+                    System.out.println("Choose the product you want to deliver by typing the CN");
+                    Printer.printAllProducts();
                     String product_cn = keyboard.nextLine();
                     if (blService.getProduct(product_cn) == null) {
                         System.out.println("Error : no product with such cn found! try again ? y/n");
@@ -577,10 +579,18 @@ public class CreateActions {
         if (total_weight > delivery_truck.getMaxAllowedWeight()) {
             // error
         } else {
-            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), "a");
+            String license = null;
+            if(total_weight > 20)
+            {
+                license = "B";
+            }
+            else
+            {
+                license = "A";
+            }
+            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
             if (drivers_ids.isEmpty()) {
                 System.out.println("Error : no available drivers for this delivery ... abort");
-                return;
             } else {
                 Printer.printWorkers(drivers_ids);
                 System.out.println("Select one of these drivers by typing his id to assign to this delivery");

@@ -1,5 +1,6 @@
 package BL;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Delivery{
@@ -106,5 +107,23 @@ public class Delivery{
 
     public int getDelivery_id() {
         return delivery_id;
+    }
+
+    @Override
+    public String toString()
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String delivery_string = "Delivery id : " + delivery_id + '\n';
+        delivery_string = delivery_string + "Delivery date : " + dateFormat.format(date) + '\n';
+        dateFormat = new SimpleDateFormat("EEEE");
+        delivery_string = delivery_string + "Truck id : " + truckSerialNumber+ '\n';
+        delivery_string = delivery_string +"Source Address : "+source +'\n';
+        delivery_string = delivery_string + "Driver id : " + driverID + '\n';
+
+
+        delivery_string = delivery_string + "\n";
+
+        return delivery_string;
+
     }
 }

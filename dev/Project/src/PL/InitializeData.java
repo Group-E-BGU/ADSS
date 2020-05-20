@@ -98,11 +98,13 @@ public class InitializeData {
         for (Pair<DayOfWeek, Shift.ShiftTime> pair : shifts) {
             schedule.put(pair, true);
         }
-        for(int i = 0; i < 4; i++) {
+  /*      for(int i = 0; i < 4; i++) {
             int randome = (int) (Math.random()*shifts.size());
             Pair rand = shifts.get(randome);
             schedule.replace(rand, false);
         }
+
+   */
         return schedule;
     }
 

@@ -195,7 +195,7 @@ public class BLService {
                     }
                 }
             }
-            //     return shift;
+           //     return shift;
         }
 
         return null;
@@ -352,7 +352,7 @@ public class BLService {
         {
             workers_map.put(sk.getId(),sk);
         }
-
+        
         for(Driver d : drivers)
         {
             workers_map.put(d.getId(),d);
@@ -399,6 +399,17 @@ public class BLService {
         }
 
         data.setAddresses(addresses_map);
+
+        List<Delivery> deliveries = new DeliveryDAO().getAll();
+        Map<Integer,Delivery> deliveryMap = new HashMap<>();
+
+        for(Delivery delivery : deliveries)
+        {
+            deliveryMap.put(delivery.getDeliveryID(),delivery);
+        }
+
+        data.setDeliveries(deliveryMap);
+
 
         return true;
     }
@@ -460,7 +471,6 @@ public class BLService {
         return true;
 
     }
-
     public boolean updateShift(Shift shift) {
         new ShiftDAO().update(shift);
         return true;
