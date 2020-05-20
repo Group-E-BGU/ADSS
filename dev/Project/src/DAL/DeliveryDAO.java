@@ -5,6 +5,7 @@ import BL.Delivery;
 import BL.Document;
 import BL.Truck;
 
+import javax.print.Doc;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -62,8 +63,29 @@ public class DeliveryDAO {
     }
 
     private Map<String, Document> decodeDocuments(String documents) {
-        // todo
-        return null;
+        Map<String, Document> decodedDocuments = new HashMap<>();
+        String[] separatedDocuments = documents.split("\n");
+        String[] separatedProducts;
+        String destination;
+        Document document;
+        Map<String, Integer> products;
+
+        for(String doc : separatedDocuments){
+            separatedProducts = doc.split(",");
+            // separatedProducts[0] is the destination and the rest are the products and their amounts
+            destination = separatedProducts[0];
+            products = new HashMap<>();
+            // loop through the products and their amounts and decode them
+            for(int i = 1; i < separatedProducts.length; i+=2)
+                products.put(separatedDocuments[i], Integer.parseInt(separatedProducts[i+1]));
+
+            document = new Document();
+            document.setDeliveryGoods(products);
+
+            decodedDocuments.put(destination, document);
+        }
+
+        return decodedDocuments;
     }
 
     public List<Delivery> getAll() {
@@ -167,8 +189,27 @@ public class DeliveryDAO {
     }
 
     private String encodeDocuments(Map<String, Document> documents) {
-        // todo
-        return null;
+        String encodedDocuments = "";
+
+        for(Map.Entry<String, Document> entry : documents.entrySet()){
+            encodedDocuments += entry.getKey() + ",";
+            encodedDocuments += encodeDocument(entry.getValue());
+            encodedDocuments = encodedDocuments.substring(0, encodedDocuments.length() - 1);
+            encodedDocuments += "\n";
+        }
+
+        return encodedDocuments;
+    }
+
+    private String encodeDocument(Document document) {
+        String encodedDocument = "";
+
+        for(Map.Entry<String,Integer> entry : document.getDeliveryGoods().entrySet()){
+            encodedDocument += entry.getKey() + ",";
+            encodedDocument += entry.getValue() + ",";
+        }
+
+        return encodedDocument;
     }
 
     public void update(Delivery delivery, String[] params) {
