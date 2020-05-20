@@ -157,6 +157,11 @@ public class ShiftDAO {
             encodedWorkingTeam += "\n";
         }
 
+        if(encodedWorkingTeam.compareTo("")!=0)
+        {
+            encodedWorkingTeam = encodedWorkingTeam.substring(0,encodedWorkingTeam.length()-1);
+        }
+
         return encodedWorkingTeam;
     }
 
@@ -168,88 +173,91 @@ public class ShiftDAO {
 
         for (String team : separatedWorkTeams) {
             tmpTeam = team.split(",");
-            if(tmpTeam.length > 0)
+            if(tmpTeam.length > 1)
                 tmpTeam = Arrays.copyOfRange(tmpTeam, 1, tmpTeam.length - 1);
-            else
-                tmpTeam = new String[0];
+
             workers = new LinkedList<>();
 
-            if (team.charAt(0) == 0) {
-                // the team are stock keepers
-                int id;
-                String name;
-                Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
-                WorkerDeal contract;
-                StockKeeper stockKeeper;
+            if(!team.isEmpty())
+            {
+                if (team.charAt(0) == '0') {
+                    // the team are stock keepers
+                    int id;
+                    String name;
+                    Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
+                    WorkerDeal contract;
+                    StockKeeper stockKeeper;
 
-                StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+                    StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
 
-                for (int i = 0; i < tmpTeam.length - 1; i++) {
-                    sql.append(tmpTeam[i]).append(",");
-                }
-
-                sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
-
-                try (Connection conn = DAL.connect();
-                     Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery(sql.toString())) {
-
-                    // loop through the result set
-                    while (rs.next()) {
-                        id = rs.getInt("id");
-                        name = rs.getString("name");
-                        schedule = decodeSchedule(rs.getString("schedule"));
-                        contract = (new WorkerDealDAO()).get(id);
-
-                        stockKeeper = new StockKeeper(id, name, schedule, contract);
-
-                        workers.add(stockKeeper);
+                    for (int i = 0; i < tmpTeam.length - 1; i++) {
+                        sql.append(tmpTeam[i]).append(",");
                     }
-                } catch (SQLException ignored) {
-                }
 
-                decodedWorkTeam.put(WorkPolicy.WorkingType.StockKeeper, workers);
-            } else {
-                // the team are drivers
-                Driver driver;
+                    sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
 
-                int id;
-                String name;
-                Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
-                String license;
-                List<Shift> shifts;
-                WorkerDeal contract;
+                    try (Connection conn = DAL.connect();
+                         Statement stmt = conn.createStatement();
+                         ResultSet rs = stmt.executeQuery(sql.toString())) {
 
-                StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+                        // loop through the result set
+                        while (rs.next()) {
+                            id = rs.getInt("id");
+                            name = rs.getString("name");
+                            schedule = decodeSchedule(rs.getString("schedule"));
+                            contract = (new WorkerDealDAO()).get(id);
 
-                for (int i = 0; i < tmpTeam.length - 1; i++) {
-                    sql.append(tmpTeam[i]).append(",");
-                }
+                            stockKeeper = new StockKeeper(id, name, schedule, contract);
 
-                sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
-
-                try (Connection conn = DAL.connect();
-                     Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery(sql.toString())) {
-
-                    // loop through the result set
-                    while (rs.next()) {
-                        id = rs.getInt("id");
-                        name = rs.getString("name");
-                        schedule = decodeSchedule(rs.getString("schedule"));
-                        license = rs.getString("license");
-                        shifts = decodeShifts(rs.getString("shifts"));
-                        contract = (new WorkerDealDAO()).get(id);
-
-                        driver = new Driver(id, name, schedule, contract, license);
-
-                        workers.add(driver);
+                            workers.add(stockKeeper);
+                        }
+                    } catch (SQLException ignored) {
                     }
-                } catch (SQLException ignored) {
-                }
 
-                decodedWorkTeam.put(WorkPolicy.WorkingType.Driver, workers);
+                    decodedWorkTeam.put(WorkPolicy.WorkingType.StockKeeper, workers);
+                } else {
+                    // the team are drivers
+                    Driver driver;
+
+                    int id;
+                    String name;
+                    Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> schedule;
+                    String license;
+                    List<Shift> shifts;
+                    WorkerDeal contract;
+
+                    StringBuilder sql = new StringBuilder("SELECT * FROM StockKeepers WHERE id IN (");
+
+                    for (int i = 0; i < tmpTeam.length - 1; i++) {
+                        sql.append(tmpTeam[i]).append(",");
+                    }
+
+                    sql.append(tmpTeam[tmpTeam.length - 1]).append(")");
+
+                    try (Connection conn = DAL.connect();
+                         Statement stmt = conn.createStatement();
+                         ResultSet rs = stmt.executeQuery(sql.toString())) {
+
+                        // loop through the result set
+                        while (rs.next()) {
+                            id = rs.getInt("id");
+                            name = rs.getString("name");
+                            schedule = decodeSchedule(rs.getString("schedule"));
+                            license = rs.getString("license");
+                            shifts = decodeShifts(rs.getString("shifts"));
+                            contract = (new WorkerDealDAO()).get(id);
+
+                            driver = new Driver(id, name, schedule, contract, license);
+
+                            workers.add(driver);
+                        }
+                    } catch (SQLException ignored) {
+                    }
+
+                    decodedWorkTeam.put(WorkPolicy.WorkingType.Driver, workers);
+                }
             }
+
         }
         return decodedWorkTeam;
     }

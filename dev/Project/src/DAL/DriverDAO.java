@@ -15,7 +15,7 @@ public class DriverDAO
     public Driver get(int driverId) {
         Driver driver = null;
 
-        String sql = "SELECT FROM Drivers WHERE id = ?";
+        String sql = "SELECT * FROM Drivers WHERE id = ?";
 
         int id;
         String name;
