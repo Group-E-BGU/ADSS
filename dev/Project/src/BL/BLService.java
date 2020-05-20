@@ -250,6 +250,34 @@ public class BLService {
         return data.getTrucks();
     }
 
+    public Map<String,Truck> getAvailableTrucks(Date date, Shift.ShiftTime delivery_time)
+    {
+
+        Map<String,Truck> available_trucks = new HashMap();
+        for(Truck truck : getAllTrucks().values())
+        {
+            if(truckIsAvailable(truck,date,delivery_time))
+            {
+                available_trucks.put(truck.getSerialNumber() , truck);
+            }
+        }
+
+        return available_trucks;
+    }
+
+    public boolean truckIsAvailable(Truck truck , Date date , Shift.ShiftTime shift_time)
+    {
+        for(Delivery delivery : getAllDeliveries().values())
+        {
+            if(delivery.getTruckSerialNumber().equals(truck.getSerialNumber()))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public Truck getTruck(String serial_number)
     {
         return data.getTrucks().get(serial_number);
@@ -384,5 +412,15 @@ public class BLService {
             delivery.setDate(getDeliveryDate((new DriverDAO()).get(delivery.getDriverID())));
     }
 
+
+    public Map<Integer,Delivery> getAllDeliveries()
+    {
+        return data.getDeliveries();
+    }
+
+    public Delivery getDelivery(int id)
+    {
+        return data.getDeliveries().get(id);
+    }
 
 }

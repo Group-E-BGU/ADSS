@@ -9,12 +9,14 @@ public class Data
     private Map<String,Address> addresses;    // the key is the Location string
     private Map<String,Truck> trucks;         // the key is the truck's serial number
     private Map<String,Product> products;
+    private Map<Integer,Delivery> deliveries;
 
     private Data()
     {
         addresses = new HashMap<>();
         trucks = new HashMap<>();
         products = new HashMap<>();
+        deliveries = new HashMap<>();
     }
 
     public static Data getInstance() {
@@ -54,6 +56,16 @@ public class Data
         this.products = products;
     }
 
+    public void setDeliveries(Map<Integer,Delivery> deliveries)
+    {
+        this.deliveries = deliveries;
+    }
+
+
+    public Map<Integer,Delivery> getDeliveries()
+    {
+        return deliveries;
+    }
     public Truck getProperTruck(int totalWeight) {
 
         return null;

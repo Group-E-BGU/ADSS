@@ -221,6 +221,52 @@ public class Printer {
         System.out.println(products);
     }
 
+    public static void printDeliveriesView()
+    {
+
+        String deliveries_string="";
+        for (Delivery delivery : blService.getAllDeliveries().values()) {
+            deliveries_string = deliveries_string+delivery.toString()+'\n';
+        }
+        if(deliveries_string.equals(""))
+        {
+            System.out.println(deliveries_string);
+
+        }
+        else
+        {
+            deliveries_string = deliveries_string.substring(0,deliveries_string.length()-1);
+            System.out.println(deliveries_string+'\n');
+        }
+
+
+        System.out.println("1) Arrange a delivery");
+        System.out.println("2) select a delivery");
+        System.out.println("3) Return\n");
+
+    }
+
+    public static void PrintDeliveryView(int delivery_id)
+    {
+        Delivery delivery = blService.getDelivery(delivery_id);
+        if(delivery==null)
+        {
+            System.out.println("Error : no delivery with such id");
+            return;
+        }
+
+        System.out.println("Delivery id : " + delivery.getDeliveryID());
+        System.out.println("Date : " + delivery.getDate().toString());
+        System.out.println("Source location name : " + delivery.getSource());
+        System.out.println("Destinations : " + delivery.getDocuments().keySet().toString());
+        System.out.println("Truck weight : " + delivery.getTruckWeight());
+        System.out.println("Delivery logs : " + delivery.getLogs().toString()+ "\n");
+
+
+        System.out.println("1) reArrange");
+        System.out.println("2) Return");
+
+    }
 
     public static void border() {
         System.out.println("--------------------------------");

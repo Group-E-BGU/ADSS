@@ -98,7 +98,7 @@ public class ShiftDAO {
 
     public void save(Shift shift) {
 
-        String sql = "INSERT INTO Shifts(id, date, boss, time, workTeam) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Shifts(id, date, boss, time, workTeam,address) VALUES(?, ?, ?, ?, ?,?)";
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
         int id = shift.getShiftId();
@@ -114,6 +114,7 @@ public class ShiftDAO {
             pstmt.setInt(3, bossId);
             pstmt.setString(4, shift_time);
             pstmt.setString(5, work_team);
+            pstmt.setString(6,shift.getAddress().getLocation());
 
             pstmt.executeUpdate();
         } catch (SQLException ignored)

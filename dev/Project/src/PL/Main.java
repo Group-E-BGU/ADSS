@@ -41,6 +41,7 @@ public class Main {
                     shiftsView();
                     break;
                 case 3:
+                    deliveriesView();
                     break;
                 case 4:
                     addressesView();
@@ -80,9 +81,9 @@ public class Main {
                         break;
                     }
                     System.out.println("enter the worker id :");
-                    int id = getChoice(id_lower_bound , id_upper_bound);
+                    int id = getChoice(id_lower_bound, id_upper_bound);
                     Printer.border();
-                    if (blService.getWorker(id)==null) {
+                    if (blService.getWorker(id) == null) {
                         System.out.println("Error : no worker with such id");
                     } else workerView(id);
                     break;
@@ -129,7 +130,7 @@ public class Main {
                     break;
 
                 case 5:
-                    go_back= true;
+                    go_back = true;
                     break;
             }
             Printer.border();
@@ -151,7 +152,7 @@ public class Main {
                         break;
                     }
                     System.out.println("enter the shift id :");
-                    int id = getChoice(0,Integer.MAX_VALUE);
+                    int id = getChoice(0, Integer.MAX_VALUE);
                     shiftView(id);
                     Printer.border();
                     break;
@@ -189,16 +190,13 @@ public class Main {
                         break;
                     else {
                         System.out.println("enter the id of the worker you want to add");
-                        int worker_id = getChoice(id_lower_bound,id_upper_bound);
+                        int worker_id = getChoice(id_lower_bound, id_upper_bound);
                         Worker w = blService.getWorker(worker_id);
                         if (w == null) {
                             System.out.println("Error : no worker with such id");
-                        }
-                        else if (!blService.addToWorkingTeam(shift, w, w.getType())) {
+                        } else if (!blService.addToWorkingTeam(shift, w, w.getType())) {
                             System.out.println("Error : " + w.getName() + " is not available to work in this shift!");
-                        }
-                        else
-                        {
+                        } else {
                             System.out.println("worker added successfully to shift");
                         }
                     }
@@ -212,14 +210,83 @@ public class Main {
         }
 
     }
+
+// -------------------------------------- Deliveries ----------------------------------------  //
+
+    private static void deliveriesView() {
+
+        boolean go_back = false;
+
+        while (!go_back) {
+
+            Printer.printDeliveriesView();
+            int choice = getChoice(1, 3);
+
+            switch (choice) {
+                case 1:
+                    CreateActions.arrangeDelivery();
+                    break;
+                case 2:
+                    if (Data.getInstance().getDeliveries().isEmpty()) {
+                        System.out.println("Error : there are no deliveries!");
+                        break;
+                    }
+                    System.out.println("enter the delivery id :");
+                    int id = getChoice(0, Integer.MAX_VALUE);
+                    Printer.border();
+                    if (blService.getDelivery(id) == null) {
+                        System.out.println("Error : no delivery with such id");
+                    } else DeliveryView(id);
+                    break;
+
+                case 3:
+                    go_back = true;
+                    break;
+
+
+            }
+
+        }
+
+
+    }
+
+    private static void DeliveryView(int delivery_id) {
+        Delivery delivery = blService.getDelivery(delivery_id);
+
+        if (delivery == null) {
+            System.out.println("Error : no delivery with such id");
+            return;
+        }
+
+        boolean go_back = false;
+        while (!go_back) {
+
+            Printer.PrintDeliveryView(delivery_id);
+
+            int choice = getChoice(1, 2);
+
+            switch (choice) {
+                case 1:
+                    // reArrange ?
+                    break;
+                case 2:
+                    go_back = true;
+                    break;
+            }
+            Printer.border();
+        }
+
+
+    }
+
 // -------------------------------------- Addresses ----------------------------------------  //
 
-    private static void addressesView()
-    {
+    private static void addressesView() {
 
         boolean terminate = false;
 
-        while(!terminate) {
+        while (!terminate) {
 
             Printer.printAddressesView();
 
@@ -239,12 +306,11 @@ public class Main {
 
 // -------------------------------------- Trucks ----------------------------------------  //
 
-    private static void trucksView()
-    {
+    private static void trucksView() {
 
         boolean terminate = false;
 
-        while(!terminate) {
+        while (!terminate) {
 
             Printer.printTrucksView();
 
@@ -264,12 +330,11 @@ public class Main {
 
 // -------------------------------------- Products ----------------------------------------  //
 
-    private static void productsView()
-    {
+    private static void productsView() {
 
         boolean terminate = false;
 
-        while(!terminate) {
+        while (!terminate) {
 
             Printer.printProductsView();
 
@@ -286,6 +351,7 @@ public class Main {
         }
 
     }
+
     private static int getChoice(int lower_bound, int upper_bound) {
         for (; ; ) {
             String keyboard_input = keyboard.nextLine();
@@ -309,14 +375,12 @@ public class Main {
         }
     }
 
-    private static boolean getConfirmation()
-    {
-        for(;;)
-        {
+    private static boolean getConfirmation() {
+        for (; ; ) {
             String keyboard_input = keyboard.nextLine();
-            if(keyboard_input.equals("y")|| keyboard_input.equals("Y"))
+            if (keyboard_input.equals("y") || keyboard_input.equals("Y"))
                 return true;
-            else if(keyboard_input.equals("n")|| keyboard_input.equals("N"))
+            else if (keyboard_input.equals("n") || keyboard_input.equals("N"))
                 return false;
             else
                 System.out.println("Error : Invalid input ! type n to cancel or y to confirm");
