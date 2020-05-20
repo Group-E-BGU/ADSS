@@ -388,6 +388,22 @@ public class Menu {
         o3.put(4328,150);
         Sys.MakeOrder(51328,Days,o3);
 
+        Sys.addNewItemDiscount("milk","20","20/04/2020","20/06/2020");
+        Sys.addNewItemDiscount("Carrots","30","20/03/2020","20/06/2021");
+        Sys.addNewItemDiscount("Potatoes","20","20/04/2020","21/04/2020");
+
+        Sys.addNewCategoryDiscount("vegetables" ,"30","20/04/2020","20/06/2020");
+        Sys.addNewCategoryDiscount("3 percent" ,"25","20/04/2020","20/06/2020");
+
+        Sys.setNewPrice("milk","15","5");
+        Sys.setNewPrice("milk","10","5");
+        Sys.setNewPrice("cheese","15","10");
+        Sys.setNewPrice("Carrots","8","3");
+        Sys.setNewPrice("Potatoes","22","15");
+        Sys.setNewPrice("Potatoes","20","13");
+
+
+
         Sys.Logout();
 
         Sys.Login("Store2@gmail.com","S2_superLi");

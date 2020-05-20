@@ -3,6 +3,7 @@ package DataAccesslayer;
 import BusinessLayer.Category;
 import BusinessLayer.CategoryDiscount;
 import BusinessLayer.ItemDiscount;
+import BusinessLayer.ItemRecord;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -58,9 +59,36 @@ public class MapperDiscount {
 
     }
 
-    public ItemDiscount getItemDiscount() {
+    public List<ItemDiscount> getItemDiscount(ItemRecord i, String storeId) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM ItemDiscount "+
+                    "WHERE IRID = "+i.getId()+" StoreId = '"+storeId+"' ;";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            List<ItemDiscount> l = new LinkedList<>();
+            while (rs.next())
+                l.add(new ItemDiscount(rs.getInt(1),i,rs.getDate(2),rs.getDate(3),rs.getInt(4)));
+            return l;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
         return null;
     }
+
 
 
     public void InsertCategoryDiscount(int id, String categoryName, int percentage, java.sql.Date beginDate, java.sql.Date endDate, String storeIdEmail) {
@@ -99,9 +127,6 @@ public class MapperDiscount {
 
 
 
-    public void DeleteCategoryDiscount() {
-
-    }
 
     public List<CategoryDiscount> getCategoryDiscounts(Category c,String storeId) {
         try {
