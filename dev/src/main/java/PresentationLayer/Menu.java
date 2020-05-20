@@ -291,10 +291,10 @@ public class Menu {
     }
 
     private static void AddArguments() {
-        Sys.Register("A","A");
+        Sys.Register("A@gmail.com","123");
         Sys.Register("Store2@gmail.com","S2_superLi");
 
-        Sys.Login("A","A");
+        Sys.Login("A@gmail.com","123");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);

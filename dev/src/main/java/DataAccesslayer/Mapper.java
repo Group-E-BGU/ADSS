@@ -234,7 +234,7 @@ public class Mapper {
             stmt.execute(sqlStmt);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -242,7 +242,7 @@ public class Mapper {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+                //System.out.println(ex.getMessage());
             }
         }
 

@@ -50,14 +50,14 @@ public class MapperSupplier {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -89,7 +89,7 @@ public class MapperSupplier {
             stmt.execute(sqlstmt);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -97,7 +97,7 @@ public class MapperSupplier {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
 
@@ -118,14 +118,14 @@ public class MapperSupplier {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -142,14 +142,14 @@ public class MapperSupplier {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -177,14 +177,14 @@ public class MapperSupplier {
             }else
                 return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
         return null;
@@ -209,14 +209,14 @@ public class MapperSupplier {
             stmt.executeUpdate();
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -233,7 +233,7 @@ public class MapperSupplier {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -241,7 +241,7 @@ public class MapperSupplier {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -262,7 +262,7 @@ public class MapperSupplier {
                 list.put(rs.getInt(4),rs.getString(2));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -270,7 +270,7 @@ public class MapperSupplier {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -292,7 +292,7 @@ public class MapperSupplier {
                 list.put(rs.getInt(4),rs.getInt(3));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -300,7 +300,7 @@ public class MapperSupplier {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -322,14 +322,14 @@ public class MapperSupplier {
                suppliers.add(s);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return suppliers;

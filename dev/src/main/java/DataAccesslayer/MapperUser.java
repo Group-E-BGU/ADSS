@@ -21,7 +21,7 @@ public class MapperUser {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -29,7 +29,7 @@ public class MapperUser {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -50,7 +50,7 @@ public class MapperUser {
             else
                 return "Not Exist";
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -58,7 +58,7 @@ public class MapperUser {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return "Not Exist";
@@ -83,7 +83,7 @@ public class MapperUser {
                     return "un correct password";
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -91,7 +91,7 @@ public class MapperUser {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return "Not Exist";

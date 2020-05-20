@@ -36,14 +36,14 @@ public class MapperPrice {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -63,7 +63,7 @@ public class MapperPrice {
             else
                 return 0;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -71,7 +71,7 @@ public class MapperPrice {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return 0;
@@ -93,7 +93,7 @@ public class MapperPrice {
             else
                 return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -101,7 +101,7 @@ public class MapperPrice {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return null;

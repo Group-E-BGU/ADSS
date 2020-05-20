@@ -43,14 +43,14 @@ public class MapperDiscount {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -72,7 +72,7 @@ public class MapperDiscount {
                 l.add(new ItemDiscount(rs.getInt(1),i,rs.getDate(2),rs.getDate(3),rs.getInt(4)));
             return l;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -80,7 +80,7 @@ public class MapperDiscount {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return null;
@@ -110,14 +110,14 @@ public class MapperDiscount {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -141,7 +141,7 @@ public class MapperDiscount {
                 l.add(new CategoryDiscount(rs.getInt(1),c,rs.getDate(2),rs.getDate(3),rs.getInt(4)));
             return l;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -149,7 +149,7 @@ public class MapperDiscount {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return null;
@@ -178,14 +178,14 @@ public class MapperDiscount {
                 id = Math.max(rs.getInt(1),id);
             return id;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return 0;

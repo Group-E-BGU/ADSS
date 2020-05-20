@@ -46,7 +46,7 @@ public class MapperContract {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -54,7 +54,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+                //System.out.println(ex.getMessage());
             }
         }
     }
@@ -73,7 +73,7 @@ public class MapperContract {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -81,7 +81,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+               // System.out.println(ex.getMessage());
             }
         }
     }
@@ -107,7 +107,7 @@ public class MapperContract {
             else
                 return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -115,7 +115,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return null;
@@ -140,7 +140,7 @@ public class MapperContract {
         stmt.execute(sqlstmt);
 
     } catch (Exception e) {
-        System.out.println(e.getMessage());
+       // System.out.println(e.getMessage());
     }
         finally{
         try {
@@ -148,7 +148,7 @@ public class MapperContract {
                 conn.close();
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+         //   System.out.println(ex.getMessage());
         }
     }
 }
@@ -169,14 +169,14 @@ public class MapperContract {
             stmt.executeUpdate();
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
     }
@@ -193,7 +193,7 @@ public class MapperContract {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -201,7 +201,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
     }
@@ -222,7 +222,7 @@ public class MapperContract {
                 list.add(rs.getInt(2));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -230,7 +230,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -255,14 +255,14 @@ public class MapperContract {
             stmt.executeUpdate();
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+        //    System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+           //     System.out.println(ex.getMessage());
             }
         }
     }
@@ -279,7 +279,7 @@ public class MapperContract {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -287,7 +287,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -304,7 +304,7 @@ public class MapperContract {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -312,7 +312,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -333,7 +333,7 @@ public class MapperContract {
                 list.put(rs.getInt(1),rs.getInt(4));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -341,7 +341,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -363,7 +363,7 @@ public class MapperContract {
                 list.put(rs.getInt(4),rs.getString(2));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -371,7 +371,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -393,7 +393,7 @@ public class MapperContract {
                 list.put(rs.getInt(4),rs.getDouble(3));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -401,7 +401,7 @@ public class MapperContract {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
         return list;

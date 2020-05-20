@@ -30,14 +30,14 @@ public class MapperWrotequantities {
                 stmt.executeUpdate();
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+               // System.out.println(e.getMessage());
             } finally {
                 try {
                     if (conn != null) {
                         conn.close();
                     }
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                  //  System.out.println(ex.getMessage());
                 }
             }
         }
@@ -55,7 +55,7 @@ public class MapperWrotequantities {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -63,7 +63,7 @@ public class MapperWrotequantities {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -84,7 +84,7 @@ public class MapperWrotequantities {
                 list.put(rs.getInt(1),rs.getInt(2));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -92,7 +92,7 @@ public class MapperWrotequantities {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+               // System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -114,7 +114,7 @@ public class MapperWrotequantities {
                 list.put(rs.getInt(1),rs.getDouble(3));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -122,7 +122,7 @@ public class MapperWrotequantities {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -146,7 +146,7 @@ public class MapperWrotequantities {
                return new Wrotequantities(rs.getInt(4),I_Am,I_As) ;
             return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -154,7 +154,7 @@ public class MapperWrotequantities {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return null;

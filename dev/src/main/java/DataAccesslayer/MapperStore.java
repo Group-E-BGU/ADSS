@@ -22,7 +22,7 @@ public class MapperStore {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -30,7 +30,7 @@ public class MapperStore {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -46,7 +46,7 @@ public class MapperStore {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -54,7 +54,7 @@ public class MapperStore {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
     }
@@ -73,7 +73,7 @@ public class MapperStore {
             stmt.execute(sqlstmt);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
@@ -101,7 +101,7 @@ public class MapperStore {
             else
                 return -1;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -109,7 +109,7 @@ public class MapperStore {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
         return -1;

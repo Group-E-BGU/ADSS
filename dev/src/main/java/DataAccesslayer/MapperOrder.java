@@ -38,14 +38,14 @@ public class MapperOrder {
                 stmt.executeUpdate();
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+              //  System.out.println(e.getMessage());
             } finally {
                 try {
                     if (conn != null) {
                         conn.close();
                     }
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                  //  System.out.println(ex.getMessage());
                 }
             }
         }
@@ -67,14 +67,14 @@ public class MapperOrder {
                 stmt.executeUpdate();
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+               // System.out.println(e.getMessage());
             } finally {
                 try {
                     if (conn != null) {
                         conn.close();
                     }
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                 //   System.out.println(ex.getMessage());
                 }
             }
         }
@@ -95,7 +95,7 @@ public class MapperOrder {
             while(rs.next())
                 Days.add(rs.getInt(2));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -103,7 +103,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
         return Days;
@@ -121,14 +121,14 @@ public class MapperOrder {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -151,7 +151,7 @@ public class MapperOrder {
             }
         }
         catch(Exception e){
-                System.out.println(e.getMessage());
+                //System.out.println(e.getMessage());
             }
         finally{
                 try {
@@ -159,7 +159,7 @@ public class MapperOrder {
                         conn.close();
                     }
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                  //  System.out.println(ex.getMessage());
                 }
             }
         }
@@ -183,7 +183,7 @@ public class MapperOrder {
             else
                 return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -191,7 +191,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+                //System.out.println(ex.getMessage());
             }
         }
         return null;
@@ -218,7 +218,7 @@ public class MapperOrder {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+        //    System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -226,7 +226,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -243,7 +243,7 @@ public class MapperOrder {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -251,7 +251,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
     }
@@ -276,14 +276,14 @@ public class MapperOrder {
                 stmt.executeUpdate();
             }
             catch (Exception e) {
-                System.out.println(e.getMessage());
+               // System.out.println(e.getMessage());
             } finally {
                 try {
                     if (conn != null) {
                         conn.close();
                     }
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                 //   System.out.println(ex.getMessage());
                 }
             }
         }
@@ -301,7 +301,7 @@ public class MapperOrder {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -309,7 +309,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -326,7 +326,7 @@ public class MapperOrder {
             stmt.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -334,7 +334,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+             //   System.out.println(ex.getMessage());
             }
         }
     }
@@ -355,7 +355,7 @@ public class MapperOrder {
                 list.put(rs.getInt(2),rs.getInt(3));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+         //   System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -363,7 +363,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -385,7 +385,7 @@ public class MapperOrder {
                 list.put(rs.getInt(2),rs.getInt(4));
             return list;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -393,7 +393,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+              //  System.out.println(ex.getMessage());
             }
         }
         return list;
@@ -416,7 +416,7 @@ public class MapperOrder {
             }
                 return oId;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
         finally{
             try {
@@ -424,7 +424,7 @@ public class MapperOrder {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            //    System.out.println(ex.getMessage());
             }
         }
         return oId;
