@@ -128,6 +128,15 @@ public class BLService {
             dayOfWeek = 7;
         }//to make sure that the day index is correct
 
+
+
+        Map<Integer,Shift> shMap =  history.getShifts();
+        for (Map.Entry<Integer,Shift>entry : shMap.entrySet())
+        {
+            if(entry.getValue().getShiftTime().equals(shiftTime) && entry.getValue().getShiftDate().equals(date) && entry.getValue().getBoss().getId() == worker_id)
+                return false;
+        }
+
         Pair<DayOfWeek, Shift.ShiftTime> pair = new Pair<>(DayOfWeek.of(dayOfWeek), shiftTime);
         if (getWorker(worker_id).getSchedule().get(pair)) {
             for (Integer shift_id : getWorker(worker_id).getWorker_shifts()) {
@@ -210,8 +219,16 @@ public class BLService {
 
     public boolean addToWorkingTeam(Integer shift_id, Integer worker_id, WorkPolicy.WorkingType workingType) {
 
+        Shift sh = getShift(shift_id);
+
         if (!isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime()) || getWorker(worker_id).getType() != workingType)
             return false;
+
+        for (Map.Entry<WorkPolicy.WorkingType, List<Integer>> entry : sh.getWorkingTeam().entrySet())
+        {
+            if(entry.getValue().contains(worker_id) )
+                return false;
+        }
 
         work(worker_id, shift_id);
         if (!getShift(shift_id).getWorkingTeam().containsKey(workingType))
@@ -219,7 +236,6 @@ public class BLService {
 
         getShift(shift_id).getWorkingTeam().get(workingType).add(worker_id);
 
-        // new ShiftDAO().update();
         if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.Driver) {
             new DriverDAO().update((Driver) getWorker(worker_id));
         } else if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.StockKeeper) {
@@ -232,7 +248,7 @@ public class BLService {
     }
 
     public boolean stockKeeperAvailable(Shift shift) {
-        return (shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper) != null && !shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper).isEmpty());
+        return (shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper) != null && (!shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper).isEmpty()) || shift.getBoss().getType() == WorkPolicy.WorkingType.StockKeeper);
     }
 
     //------------------------------ WorkerDeal --------------------------//
@@ -456,5 +472,40 @@ public class BLService {
 
         return aa;
 
+    }
+
+    public List<String> getBigTrucks(int weight , Shift shift)
+    {
+
+        List<String> big = new LinkedList<>();
+
+        for(Truck truck : getAllTrucks().values())
+        {
+
+            if(truck.getMaxAllowedWeight()-truck.getWeight() >= weight)
+            {
+                boolean av = true;
+
+                for(Delivery delivery : getAllDeliveries().values())
+                {
+
+                    if(delivery.getTruckSerialNumber().equals(truck.getSerialNumber()) && delivery.getDate().equals(shift.getShiftDate()))
+                    {
+                       av = false;
+                       break;
+                    }
+                }
+
+                if(av)
+                {
+                    big.add(truck.getSerialNumber());
+                }
+
+            }
+
+        }
+
+
+        return big;
     }
 }

@@ -475,7 +475,7 @@ public class CreateActions {
 
         System.out.println("Choose a source for this delivery by typing the location :");
         Address address = null;
-        List<String> available_addresses = blService.getAvailableAddresses(date,delivery_time);
+        List<String> available_addresses = blService.getAvailableAddresses(date, delivery_time);
         boolean address_chosen = false;
         Printer.Addresses(available_addresses);
         while (!address_chosen) {
@@ -600,9 +600,15 @@ public class CreateActions {
                     blService.work(driver_id, source_shift.getShiftId());
                     if (total_weight > delivery_truck.getMaxAllowedWeight()) {
                         System.out.println("Error : the truck's weight exceeds its allowed weight");
-                        if(!rearrangeDelivery(delivery.getDeliveryID()));
+                        if (!rearrangeDelivery(delivery, source_shift)) ;
                         {
                             return;
+                        }
+                    }
+                    total_weight = delivery_truck.getWeight();
+                    for (Document doc : documents.values()) {
+                        for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
+                            total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
                         }
                     }
                     blService.work(driver_id, source_shift.getShiftId());
@@ -615,28 +621,68 @@ public class CreateActions {
 
     }
 
-    private static boolean rearrangeDelivery(int delivery_id)
-    {
-        System.out.println("1) Remove goods from destination");
-        System.out.println("2) Change truck and driver");
-        System.out.println("3) Cancel");
+    private static boolean rearrangeDelivery(Delivery delivery, Shift shift) {
+        System.out.println("1) Change truck and driver");
+        System.out.println("2) Cancel");
 
-        int choice = getChoice(1,3);
-        if(choice == 3)
-        {
-
+        int choice = getChoice(1, 2);
+        if (choice == 2) {
+            Delivery.counter--;
+            return false;
         }
 
-        return false;
+        if (choice == 1) {
+            List<String> big_trucks = blService.getBigTrucks(delivery.getTruckWeight() - blService.getTruck(delivery.getTruckSerialNumber()).getWeight(), shift);
 
-    }
+            if (big_trucks.isEmpty()) {
+                System.out.println("Error : no trucks are available ! Aborting delivery....");
+                return false;
+            }
+
+            List<Integer> drivers = blService.getDeliveryDriver(shift.getShiftDate(), shift.getShiftTime(), "B");
+            if (drivers.isEmpty()) {
+                System.out.println("Error : no drivers are available ! Aborting delivery....");
+                return false;
+            }
+
+            Printer.printTrucks(big_trucks);
 
 
+            boolean truck_chosen = false;
+            String truck_serial_number = null;
 
-    private static List<String> getDestinations() {
-        Scanner scanner = new Scanner(System.in);
-        String[] destinations = scanner.nextLine().split(",");
+            while (!truck_chosen) {
+                truck_serial_number = keyboard.nextLine();
+                if (!big_trucks.contains(truck_serial_number)) {
+                    System.out.println("Error : the truck with the serial number " + truck_serial_number + " is not a valid option! try again ? y/n");
+                    if (!getConfirmation()) {
+                        System.out.println("Delivery arrangement canceled");
+                        return false;
+                    }
+                } else
+                    truck_chosen = true;
+                delivery.setTruckSerialNumber(truck_serial_number);
+            }
 
-        return new LinkedList<>(Arrays.asList(destinations));
+
+            Printer.printWorkers(drivers);
+
+            System.out.println("Select one of these drivers by typing his id to assign to this delivery");
+            int driver_id = -1;
+            boolean driver_chosen = false;
+            while (!driver_chosen) {
+                driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
+                if (!drivers.contains(driver_id)) {
+                    System.out.println("Error : driver id not valid!");
+                } else {
+                    driver_chosen = true;
+                }
+            }
+
+            delivery.setDriverID(driver_id);
+
+            return true;
+        }
+        return true;
     }
 }
