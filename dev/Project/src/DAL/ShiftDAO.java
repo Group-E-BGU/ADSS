@@ -48,7 +48,6 @@ public class ShiftDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("line 51");
             return null;
         }
 
@@ -78,6 +77,7 @@ public class ShiftDAO {
                 shift_id = rs.getInt("id");
                 shift_date = rs.getDate("date");
                 boss = (new StockKeeperDAO()).get(rs.getInt("boss"));
+                boss = boss != null ? boss : (new DriverDAO()).get(rs.getInt("boss"));
                 shift_time = rs.getString("time").compareTo("Morning") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
                 work_team = decodeWorkingTeam(rs.getString("workTeam"));
                 Address address = (new AddressDAO()).get(rs.getString("address"));
@@ -89,7 +89,6 @@ public class ShiftDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("line 92");
             return null;
         }
 
@@ -139,8 +138,6 @@ public class ShiftDAO {
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("line 143");
         }
 
 
