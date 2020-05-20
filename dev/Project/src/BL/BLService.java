@@ -4,8 +4,6 @@ import DAL.*;
 import DAL.ShiftDAO;
 import javafx.util.Pair;
 
-import javax.print.Doc;
-import javax.swing.*;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -348,7 +346,7 @@ public class BLService {
         int totalWeight = getTotalWeight(documents);
         Truck truck = Data.getInstance().getProperTruck(totalWeight);
         Driver driver = Data.getInstance().getProperDriver(totalWeight);
-        Date date;
+        Date date= null;
 
         delivery.setTruckSerialNumber(truck.getSerialNumber());
         delivery.setDriverID(driver.getId());
@@ -357,6 +355,9 @@ public class BLService {
 
         if(totalWeight <= truck.getMaxAllowedWeight())
             date = getDeliveryDate(driver);
+
+        delivery.setDate(date);
+        delivery.setDeliveryId(new DeliveryDAO().save(delivery));
 
         return delivery;
     }

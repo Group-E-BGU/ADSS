@@ -96,4 +96,12 @@ public class Delivery{
     public List<String> getLogs() {
         return logs;
     }
+
+    public void setDeliveryId(int id) {
+        this.delivery_id = id;
+    }
+
+    public int getDelivery_id() {
+        return delivery_id;
+    }
 }

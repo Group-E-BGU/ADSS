@@ -126,6 +126,7 @@ public class DeliveryDAO {
         List<String> logs = delivery.getLogs();
         int truckWeight = delivery.getTruckWeight();
         Map<String, Document> documents = delivery.getDocuments();
+        int deliveryID = -1;
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -141,6 +142,21 @@ public class DeliveryDAO {
         } catch (SQLException ignored) {
         }
 
+        sql = "SELECT MAX(id) AS LAST FROM Deliveries";
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                deliveryID =  rs.getInt("LAST");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.toString());
+        }
+
+        return deliveryID;
     }
 
     private String encodeDocuments(Map<String, Document> documents) {
