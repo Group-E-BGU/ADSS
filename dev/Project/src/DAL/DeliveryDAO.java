@@ -6,11 +6,10 @@ import BL.Document;
 import BL.Truck;
 
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Date;
 
 public class DeliveryDAO {
 
@@ -89,7 +88,9 @@ public class DeliveryDAO {
 
             // loop through the result set
             while (rs.next()) {
-                date = rs.getDate("date");
+                String stringDate = rs.getString("date");
+                date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+                //date = rs.getDate("date");
                 source = rs.getString("source");
                 documents = decodeDocuments(rs.getString("documents"));
                 truckSerialNumber = rs.getString("truckSerialNumber");
@@ -108,6 +109,8 @@ public class DeliveryDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         return deliveries;
@@ -118,8 +121,13 @@ public class DeliveryDAO {
         String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight) VALUES(?, ?, ?, ?, ?, ?, ?)";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
-
-        String date = sdf.format(delivery.getDate());
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(delivery.getDate());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+        //String date = sdf.format(delivery.getDate());
+        String date = day + "/" + month + "/" + year;
         String source = delivery.getSource();
         String truckSerialnumber = delivery.getTruckSerialNumber();
         int driverId = delivery.getDriverID();

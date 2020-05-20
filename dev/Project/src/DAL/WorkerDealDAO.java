@@ -3,11 +3,10 @@ package DAL;
 import BL.WorkerDeal;
 
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.*;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 public class WorkerDealDAO {
 
@@ -66,7 +65,9 @@ public class WorkerDealDAO {
             // loop through the result set
             while (rs.next()) {
                 worker_id = rs.getInt("workerId");
-                start_date = rs.getDate("startDate");
+                String stringDate = rs.getString("startDate");
+                start_date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+                //start_date = rs.getDate("startDate");
                 bank_address = rs.getString("bankAddress");
                 salary = rs.getDouble("salary");
                 work_conditions = decodeWorkConditions(rs.getString("workConditions"));
@@ -78,6 +79,8 @@ public class WorkerDealDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         return deals;
@@ -90,8 +93,13 @@ public class WorkerDealDAO {
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
 
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(workerDeal.getStart_date());
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
         int workerId = workerDeal.getWorker_id();
-        String startDate = sdf.format(workerDeal.getStart_date());
+        String startDate = day + "/" + month + "/" + year;
         String bankAddress = workerDeal.getBankAddress();
         double salary = workerDeal.getSalary();
         String workConditions = encodeWorkConditions(workerDeal.getWork_conditions());

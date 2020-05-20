@@ -76,7 +76,6 @@ public class ShiftDAO {
             // loop through the result set
             while (rs.next()) {
                 shift_id = rs.getInt("id");
-                System.out.println("gotHere");
                 String stringDate = rs.getString("date");
                 shift_date = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
 
