@@ -304,11 +304,15 @@ public class BLService {
 
         List<Shift> shifts = new ShiftDAO().getAll();
 
+        Map<Integer,Shift> shifts_map = new HashMap<>();
+
         for(Shift shift : shifts)
 
         {
-
+            shifts_map.put(shift.getShiftId(),shift);
         }
+
+        history.setShifts(shifts_map);
 
         List<Truck> trucks = new TruckDAO().getAll();
         Map<String,Truck> trucks_map = new HashMap<>();
