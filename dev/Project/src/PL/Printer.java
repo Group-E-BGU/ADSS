@@ -291,7 +291,7 @@ public class Printer {
         System.out.println("Delivery logs : " + delivery.getLogs().toString() + "\n");
 
 
-        System.out.println("1) reArrange");
+        System.out.println("1) Print Documents");
         System.out.println("2) Return");
 
     }
@@ -300,4 +300,39 @@ public class Printer {
         System.out.println("--------------------------------");
     }
 
+    public static void printDocuments(int delivery_id)
+    {
+
+        for(Document document : blService.getDelivery(delivery_id).getDocuments().values())
+        {
+
+            System.out.println("document id : "+document.getDocumentID());
+            System.out.println("Trade goods : \n");
+            for(Map.Entry<String,Integer> entry : document.getDeliveryGoods().entrySet())
+            {
+                System.out.println("Product name : "+blService.getProduct(entry.getKey()).getName() + "     , amount : "+entry.getValue()+'\n');
+            }
+
+            System.out.println("\n");
+
+        }
+
+
+    }
+
+    public static void Addresses(List<String> available_addresses) {
+
+        String addresses="";
+        for(String location : available_addresses)
+        {
+            Address a = blService.getAddress(location);
+
+            addresses += "Location : " + a.getLocation() + "\n" +
+                    "Contact Name : " + a.getContactName() + "\n" +
+                    "Phone Number : " + a.getPhoneNumber() + "\n\n";
+
+        }
+
+        System.out.println(addresses);
+    }
 }

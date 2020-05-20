@@ -24,8 +24,7 @@ public class BLService {
 //------------------------------------ Workers --------------------------------//
 
 
-    public Map<Integer,Worker> getAllWorkers()
-    {
+    public Map<Integer, Worker> getAllWorkers() {
         return workers.getAllWorkers();
     }
 
@@ -57,14 +56,11 @@ public class BLService {
         return workers.getAllWorkers().get(worker_id);
     }
 
-    public List<Integer> getDeliveryDriver(Date shiftDate, Shift.ShiftTime shiftTime, String license)
-    {
+    public List<Integer> getDeliveryDriver(Date shiftDate, Shift.ShiftTime shiftTime, String license) {
         List<Integer> delivery_drivers = new LinkedList<>();
-        List<Integer> potential_drivers = getAvailableWorkers(shiftDate,shiftTime, WorkPolicy.WorkingType.Driver);
-        for(Integer driver_id : potential_drivers)
-        {
-            if(((Driver)getWorker(driver_id)).getLicense().equals(license))
-            {
+        List<Integer> potential_drivers = getAvailableWorkers(shiftDate, shiftTime, WorkPolicy.WorkingType.Driver);
+        for (Integer driver_id : potential_drivers) {
+            if (((Driver) getWorker(driver_id)).getLicense().equals(license)) {
                 delivery_drivers.add(driver_id);
             }
         }
@@ -81,13 +77,12 @@ public class BLService {
 
         WorkPolicy.WorkingType working_type = worker.getType();
 
-        switch (working_type)
-        {
+        switch (working_type) {
             case StockKeeper:
-                new StockKeeperDAO().save((StockKeeper)worker);
+                new StockKeeperDAO().save((StockKeeper) worker);
                 break;
             case Driver:
-                new DriverDAO().save((Driver)worker);
+                new DriverDAO().save((Driver) worker);
                 break;
         }
 
@@ -96,7 +91,7 @@ public class BLService {
     }
 
     public boolean updateWorker(Worker worker) {
-        if(worker.getType() == WorkPolicy.WorkingType.StockKeeper)
+        if (worker.getType() == WorkPolicy.WorkingType.StockKeeper)
             new StockKeeperDAO().update((StockKeeper) worker);
         else
             new DriverDAO().update((Driver) worker);
@@ -106,16 +101,13 @@ public class BLService {
 
     public boolean updateWorkerID(int old_id, int new_id) {
 
-        getAllWorkers().put(new_id,getWorker(old_id));
+        getAllWorkers().put(new_id, getWorker(old_id));
         getAllWorkers().remove(old_id);
-        Worker worker =getWorker(new_id);
+        Worker worker = getWorker(new_id);
         worker.setID(new_id);
-        for(Integer shift_id : worker.getWorker_shifts())
-        {
+        for (Integer shift_id : worker.getWorker_shifts()) {
             Shift shift = getShift(shift_id);
-            if(shift.getBoss().getId() != new_id)
-
-            {
+            if (shift.getBoss().getId() != new_id) {
                 shift.getWorkingTeam().get(worker.getType()).remove(old_id);
                 shift.getWorkingTeam().get(worker.getType()).add(new_id);
             }
@@ -167,6 +159,7 @@ public class BLService {
     public boolean work(Integer worker_id, Integer shift_id) {
         if (isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime())) {
             getWorker(worker_id).getWorker_shifts().add(shift_id);
+            updateWorker(getWorker(worker_id));
             return true;
         }
 
@@ -185,17 +178,14 @@ public class BLService {
 
     public Shift getShift(Address address, Date date, Shift.ShiftTime shiftTime) {
         for (Shift shift : getAllShifts().values()) {
-            if (shift.getAddress().getLocation().equals(address.getLocation()))
-            {
-                if(shift.getShiftDate().equals(date))
-                {
-                    if(shift.getShiftTime().equals(shiftTime))
-                    {
+            if (shift.getAddress().getLocation().equals(address.getLocation())) {
+                if (shift.getShiftDate().equals(date)) {
+                    if (shift.getShiftTime().equals(shiftTime)) {
                         return shift;
                     }
                 }
             }
-           //     return shift;
+            //     return shift;
         }
 
         return null;
@@ -230,14 +220,14 @@ public class BLService {
         getShift(shift_id).getWorkingTeam().get(workingType).add(worker_id);
 
         // new ShiftDAO().update();
-        if(getWorker(worker_id).getType()== WorkPolicy.WorkingType.Driver)
-        {
-            new DriverDAO().update((Driver)getWorker(worker_id));
+        if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.Driver) {
+            new DriverDAO().update((Driver) getWorker(worker_id));
+        } else if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.StockKeeper) {
+            new StockKeeperDAO().update((StockKeeper) getWorker(worker_id));
         }
-        else if(getWorker(worker_id).getType() == WorkPolicy.WorkingType.StockKeeper)
-        {
-            new StockKeeperDAO().update((StockKeeper)getWorker(worker_id));
-        }
+
+        updateShift(getShift(shift_id));
+
         return true;
     }
 
@@ -275,19 +265,15 @@ public class BLService {
 //------------------------------ Truck --------------------------//
 
 
-    public Map<String,Truck> getAllTrucks()
-    {
+    public Map<String, Truck> getAllTrucks() {
         return data.getTrucks();
     }
 
-    public List<String> getAvailableTrucks(Date date, Shift.ShiftTime delivery_time)
-    {
+    public List<String> getAvailableTrucks(Date date, Shift.ShiftTime delivery_time) {
 
         List<String> available_trucks = new LinkedList<>();
-        for(Truck truck : getAllTrucks().values())
-        {
-            if(truckIsAvailable(truck.getSerialNumber(),date,delivery_time))
-            {
+        for (Truck truck : getAllTrucks().values()) {
+            if (truckIsAvailable(truck.getSerialNumber(), date, delivery_time)) {
                 available_trucks.add(truck.getSerialNumber());
             }
         }
@@ -295,12 +281,9 @@ public class BLService {
         return available_trucks;
     }
 
-    public boolean truckIsAvailable(String truck_serial , Date date , Shift.ShiftTime shift_time)
-    {
-        for(Delivery delivery : getAllDeliveries().values())
-        {
-            if(delivery.getTruckSerialNumber().equals(truck_serial))
-            {
+    public boolean truckIsAvailable(String truck_serial, Date date, Shift.ShiftTime shift_time) {
+        for (Delivery delivery : getAllDeliveries().values()) {
+            if (delivery.getTruckSerialNumber().equals(truck_serial)) {
                 return false;
             }
         }
@@ -308,14 +291,12 @@ public class BLService {
         return true;
     }
 
-    public Truck getTruck(String serial_number)
-    {
+    public Truck getTruck(String serial_number) {
         return data.getTrucks().get(serial_number);
     }
 
-    public boolean addTruck(Truck truck)
-    {
-        data.getTrucks().put(truck.getSerialNumber(),truck);
+    public boolean addTruck(Truck truck) {
+        data.getTrucks().put(truck.getSerialNumber(), truck);
         new TruckDAO().save(truck);
         return true;
     }
@@ -323,89 +304,77 @@ public class BLService {
 //------------------------------ Product --------------------------//
 
 
-    public Map<String,Product> getAllProducts()
-    {
+    public Map<String, Product> getAllProducts() {
         return data.getProducts();
     }
 
-    public Product getProduct(String cn)
-    {
+    public Product getProduct(String cn) {
         return data.getProducts().get(cn);
     }
 
-    public boolean addProduct(Product product)
-    {
-        data.getProducts().put(product.getCN(),product);
+    public boolean addProduct(Product product) {
+        data.getProducts().put(product.getCN(), product);
         new ProductDAO().save(product);
         return true;
     }
 
 
-    public boolean loadFromDataBase()
-    {
+    public boolean loadFromDataBase() {
 
         List<StockKeeper> stockKeepers = new StockKeeperDAO().getAll();
         List<Driver> drivers = new DriverDAO().getAll();
-        Map<Integer,Worker> workers_map = new HashMap<>();
+        Map<Integer, Worker> workers_map = new HashMap<>();
 
-        for(StockKeeper sk : stockKeepers)
-        {
-            workers_map.put(sk.getId(),sk);
+        for (StockKeeper sk : stockKeepers) {
+            workers_map.put(sk.getId(), sk);
         }
-        
-        for(Driver d : drivers)
-        {
-            workers_map.put(d.getId(),d);
+
+        for (Driver d : drivers) {
+            workers_map.put(d.getId(), d);
         }
 
         workers.setWorkers(workers_map);
 
         List<Shift> shifts = new ShiftDAO().getAll();
 
-        Map<Integer,Shift> shifts_map = new HashMap<>();
+        Map<Integer, Shift> shifts_map = new HashMap<>();
 
-        for(Shift shift : shifts)
-
-        {
-            shifts_map.put(shift.getShiftId(),shift);
+        for (Shift shift : shifts) {
+            shifts_map.put(shift.getShiftId(), shift);
         }
 
         history.setShifts(shifts_map);
 
         List<Truck> trucks = new TruckDAO().getAll();
-        Map<String,Truck> trucks_map = new HashMap<>();
-        for(Truck truck : trucks)
-        {
-            trucks_map.put(truck.getSerialNumber(),truck);
+        Map<String, Truck> trucks_map = new HashMap<>();
+        for (Truck truck : trucks) {
+            trucks_map.put(truck.getSerialNumber(), truck);
         }
 
         data.setTrucks(trucks_map);
 
         List<Product> products = new ProductDAO().getAll();
-        Map<String,Product> products_map = new HashMap<>();
-        for(Product product : products)
-        {
-            products_map.put(product.getCN(),product);
+        Map<String, Product> products_map = new HashMap<>();
+        for (Product product : products) {
+            products_map.put(product.getCN(), product);
         }
 
         data.setProducts(products_map);
 
 
         List<Address> addresses = new AddressDAO().getAll();
-        Map<String,Address> addresses_map = new HashMap<>();
-        for(Address address : addresses)
-        {
-            addresses_map.put(address.getLocation(),address);
+        Map<String, Address> addresses_map = new HashMap<>();
+        for (Address address : addresses) {
+            addresses_map.put(address.getLocation(), address);
         }
 
         data.setAddresses(addresses_map);
 
         List<Delivery> deliveries = new DeliveryDAO().getAll();
-        Map<Integer,Delivery> deliveryMap = new HashMap<>();
+        Map<Integer, Delivery> deliveryMap = new HashMap<>();
 
-        for(Delivery delivery : deliveries)
-        {
-            deliveryMap.put(delivery.getDeliveryID(),delivery);
+        for (Delivery delivery : deliveries) {
+            deliveryMap.put(delivery.getDeliveryID(), delivery);
         }
 
         data.setDeliveries(deliveryMap);
@@ -419,14 +388,14 @@ public class BLService {
         int totalWeight = getTotalWeight(documents);
         Truck truck = Data.getInstance().getProperTruck(totalWeight);
         Driver driver = Data.getInstance().getProperDriver(totalWeight);
-        Date date= null;
+        Date date = null;
 
         delivery.setTruckSerialNumber(truck.getSerialNumber());
         delivery.setDriverID(driver.getId());
         delivery.setDocuments(documents);
         delivery.setSource(source);
 
-        if(totalWeight <= truck.getMaxAllowedWeight())
+        if (totalWeight <= truck.getMaxAllowedWeight())
             date = getDeliveryDate(driver);
 
         delivery.setDate(date);
@@ -449,30 +418,43 @@ public class BLService {
     public void rearrangeDelivery(Delivery delivery, Map<String, Document> documents) {
         int totalWeight = getTotalWeight(documents);
 
-        if(totalWeight <= Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight())
+        if (totalWeight <= Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight())
             delivery.setDate(getDeliveryDate((new DriverDAO()).get(delivery.getDriverID())));
     }
 
 
-    public Map<Integer,Delivery> getAllDeliveries()
-    {
+    public Map<Integer, Delivery> getAllDeliveries() {
         return data.getDeliveries();
     }
 
-    public Delivery getDelivery(int id)
-    {
+    public Delivery getDelivery(int id) {
         return data.getDeliveries().get(id);
     }
 
-    public boolean addDelivery(Delivery delivery)
-    {
-        data.getDeliveries().put(delivery.getDeliveryID(),delivery);
+    public boolean addDelivery(Delivery delivery) {
+        data.getDeliveries().put(delivery.getDeliveryID(), delivery);
         new DeliveryDAO().save(delivery);
         return true;
 
     }
+
     public boolean updateShift(Shift shift) {
         new ShiftDAO().update(shift);
         return true;
+    }
+
+    public List<String> getAvailableAddresses(Date date, Shift.ShiftTime delivery_time) {
+
+        List<String> aa = new LinkedList<>();
+
+
+        for (Shift shift : getAllShifts().values()) {
+            if (shift.getShiftDate().equals(date) && shift.getShiftTime().equals(delivery_time)) {
+                aa.add(shift.getAddress().getLocation());
+            }
+        }
+
+        return aa;
+
     }
 }

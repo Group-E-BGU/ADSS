@@ -203,7 +203,7 @@ public class CreateActions {
                     System.out.println("type the day you want to edit : Sun,Mon,Tue,Wed,Thu,Fri,Sat...");
                     DayOfWeek chosen_day = null;
                     boolean chosen = false;
-                    while(chosen_day == null) {
+                    while (chosen_day == null) {
                         String day = keyboard.nextLine();
                         if (day.equals("Sun") || day.equals("sun")) {
                             chosen_day = DayOfWeek.SUNDAY;
@@ -242,10 +242,9 @@ public class CreateActions {
                             } else if (shiftTime_choice.equals("E") || shiftTime_choice.equals("e")) {
                                 shiftTime = Shift.ShiftTime.Evening;
                                 chosen_shift = true;
-                            } else
-                            {
+                            } else {
                                 System.out.println("Error : invalid input! try again? y/n");
-                                if(!getConfirmation())
+                                if (!getConfirmation())
                                     return worker_id;
                             }
 
@@ -253,29 +252,26 @@ public class CreateActions {
 
                         System.out.println("Type 0 to set to false , type 1 to set to true");
                         {
-                            int set = getChoice(0,1);
-                            Pair<DayOfWeek, Shift.ShiftTime> p = new Pair<>(chosen_day , shiftTime);
-                            switch (set)
-                            {
+                            int set = getChoice(0, 1);
+                            Pair<DayOfWeek, Shift.ShiftTime> p = new Pair<>(chosen_day, shiftTime);
+                            switch (set) {
                                 case 0:
                                     List<Integer> working_shifts = worker.getWorker_shifts();
-                                    for(Integer shift_id : working_shifts)
-                                    {
+                                    for (Integer shift_id : working_shifts) {
                                         Shift shift = blService.getShift(shift_id);
                                         Calendar calendar = Calendar.getInstance();
                                         calendar.setTime(shift.getShiftDate());
                                         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                                        if(DayOfWeek.values()[dayOfWeek] == p.getKey() && shift.getShiftTime() == p.getValue())
-                                        {
+                                        if (DayOfWeek.values()[dayOfWeek] == p.getKey() && shift.getShiftTime() == p.getValue()) {
                                             System.out.println("Error : This worker has a shift at this time");
                                             return worker_id;
                                         }
 
                                     }
-                                    worker.getSchedule().put(p,false);
+                                    worker.getSchedule().put(p, false);
                                     break;
                                 case 1:
-                                    worker.getSchedule().put(p,true);
+                                    worker.getSchedule().put(p, true);
                                     break;
                             }
                         }
@@ -479,8 +475,9 @@ public class CreateActions {
 
         System.out.println("Choose a source for this delivery by typing the location :");
         Address address = null;
-        Printer.printAllAddresses();
+        List<String> available_addresses = blService.getAvailableAddresses(date,delivery_time);
         boolean address_chosen = false;
+        Printer.Addresses(available_addresses);
         while (!address_chosen) {
             String location = keyboard.nextLine();
             if (blService.getAddress(location) == null) {
@@ -576,71 +573,65 @@ public class CreateActions {
             }
         }
 
-        if (total_weight > delivery_truck.getMaxAllowedWeight()) {
-            // error
-        } else {
-            String license = null;
-            if(total_weight > 20)
-            {
-                license = "B";
-            }
-            else
-            {
-                license = "A";
-            }
-            List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
-            if (drivers_ids.isEmpty()) {
-                System.out.println("Error : no available drivers for this delivery ... abort");
-            } else {
-                Printer.printWorkers(drivers_ids);
-                System.out.println("Select one of these drivers by typing his id to assign to this delivery");
-                int driver_id = -1;
-                boolean driver_chosen = false;
-                while (!driver_chosen) {
-                    driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
-                    if (!drivers_ids.contains(driver_id)) {
-                        System.out.println("Error : driver id not valid!");
-                    } else {
-                        driver_chosen = true;
-                        Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
-                        delivery.setDocuments(documents);
-                        delivery.setLogs(logs);
 
-                        blService.addDelivery(delivery);
+        String license = null;
+        if (total_weight > 1000) {
+            license = "B";
+        } else {
+            license = "A";
+        }
+        List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
+        if (drivers_ids.isEmpty()) {
+            System.out.println("Error : no available drivers for this delivery ... abort");
+        } else {
+            Printer.printWorkers(drivers_ids);
+            System.out.println("Select one of these drivers by typing his id to assign to this delivery");
+            int driver_id = -1;
+            boolean driver_chosen = false;
+            while (!driver_chosen) {
+                driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
+                if (!drivers_ids.contains(driver_id)) {
+                    System.out.println("Error : driver id not valid!");
+                } else {
+                    driver_chosen = true;
+                    Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
+                    delivery.setDocuments(documents);
+                    delivery.setLogs(logs);
+                    blService.work(driver_id, source_shift.getShiftId());
+                    if (total_weight > delivery_truck.getMaxAllowedWeight()) {
+                        System.out.println("Error : the truck's weight exceeds its allowed weight");
+                        if(!rearrangeDelivery(delivery.getDeliveryID()));
+                        {
+                            return;
+                        }
                     }
+                    blService.work(driver_id, source_shift.getShiftId());
+                    blService.addDelivery(delivery);
                 }
             }
+
         }
 
 
-        // finished choosing the destinations
-
-        //    delivery = blService.arrangeDelivery(source, deliveryGoods);
     }
 
-    private static void rearrangeDelivery(Delivery delivery) {
-        System.out.println("The total weight of the products that you wish to deliver are above the maximum weight.\n" +
-                "maximum weight allowed : " + Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight() + "\n" +
-                "you have to rearrange your delivery.\n" +
-                "The source will still the same, just please enter the destinations and the products to each destination again.");
-        // log the changes
-        delivery.log("Some changes occurred to the delivery goods due to weight over-weight problems");
-        // get the destinations and the products again
-        List<String> destinations = getDestinations();
-        Map<String, Document> deliveryGoods = getDeliveryGoods(destinations);
+    private static boolean rearrangeDelivery(int delivery_id)
+    {
+        System.out.println("1) Remove goods from destination");
+        System.out.println("2) Change truck and driver");
+        System.out.println("3) Cancel");
 
-        blService.rearrangeDelivery(delivery, deliveryGoods);
+        int choice = getChoice(1,3);
+        if(choice == 3)
+        {
 
-        if (delivery.getDate() != null)
-            System.out.println("Delivery with id : " + delivery.getDeliveryID() + " will be launched at : " + delivery.getDate().toString());
-        else
-            rearrangeDelivery(delivery);
+        }
+
+        return false;
+
     }
 
-    private static Map<String, Document> getDeliveryGoods(List<String> destinations) {
-        // TODO
-        return null;
-    }
+
 
     private static List<String> getDestinations() {
         Scanner scanner = new Scanner(System.in);

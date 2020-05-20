@@ -78,7 +78,7 @@ public class DeliveryDAO {
             products = new HashMap<>();
             // loop through the products and their amounts and decode them
             for(int i = 1; i < separatedProducts.length; i+=2)
-                products.put(separatedDocuments[i], Integer.parseInt(separatedProducts[i+1]));
+                products.put(separatedProducts[i], Integer.parseInt(separatedProducts[i+1]));
 
             document = new Document();
             document.setDeliveryGoods(products);
