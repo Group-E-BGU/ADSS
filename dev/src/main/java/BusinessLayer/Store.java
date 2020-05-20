@@ -507,71 +507,12 @@ public class Store {
           }
        }
 
-    public void initializeCategories() {
-        Category category1 = new Category(Category.CategoryRole.MainCategory,"Dairy");
-        Category subCat1 = new Category(Category.CategoryRole.SubCategory,"Milk");
-        Category subsubcat1 = new Category(Category.CategoryRole.SubSubCategory,"1 liter");
-        addItemToCategory(itemRecords.get("milk Tnova 3%") ,category1);
-        addItemToCategory(itemRecords.get("milk Tnova 3%") ,subCat1);
-        addItemToCategory(itemRecords.get("milk Tnova 3%") ,subsubcat1);
-        mapperCategory.InsertCategory(category1.getName(),1,email_ID);
-        mapperCategory.InsertCategory(subCat1.getName(),2,email_ID);
-        mapperCategory.InsertCategory(subsubcat1.getName(),3,email_ID);
-
-
-        categories.put("Dairy",category1);
-        categories.put("Milk",subCat1);
-        categories.put("1 liter",subsubcat1);
-
-        Category category2 = new Category(Category.CategoryRole.MainCategory,"Bread and pastry");
-        Category subcat2 = new Category(Category.CategoryRole.SubCategory,"Bread");
-        Category subsubcat2 = new Category(Category.CategoryRole.SubSubCategory,"750 gr");
-        addItemToCategory(itemRecords.get("white bread") ,category2);
-        addItemToCategory(itemRecords.get("white bread") ,subcat2);
-        addItemToCategory(itemRecords.get("white bread") ,subsubcat2);
-        mapperCategory.InsertCategory(category2.getName(),1,email_ID);
-        mapperCategory.InsertCategory(subcat2.getName(),2,email_ID);
-        mapperCategory.InsertCategory(subsubcat2.getName(),3,email_ID);
-
-        categories.put("Bread and pastry",category2);
-        categories.put("Bread",subcat2);
-        categories.put("750 gr",subsubcat2);
-        Category category3 = new Category(Category.CategoryRole.MainCategory,"Drinks");
-        Category subcat3 = new Category(Category.CategoryRole.SubCategory,"Coffee powder");
-        Category subsubcat3 = new Category(Category.CategoryRole.SubSubCategory,"500 gr");
-        addItemToCategory(itemRecords.get("coffee Elite") ,category3);
-        addItemToCategory(itemRecords.get("coffee Elite") ,subcat3);
-        addItemToCategory(itemRecords.get("coffee Elite") ,subsubcat3);
-        mapperCategory.InsertCategory(category3.getName(),1,email_ID);
-        mapperCategory.InsertCategory(subcat3.getName(),2,email_ID);
-        mapperCategory.InsertCategory(subsubcat3.getName(),3,email_ID);
-
-        categories.put("Drinks",category3);
-        categories.put("Coffee powder",subcat3);
-        categories.put("500 gr",subsubcat3);
-    }
-
     private void addItemToCategory(ItemRecord itemRecord, Category cat) {
         for (Category category: categories.values()) {
             if(category.getRole().equals(cat.getRole()) && category.getItemRecords().contains(itemRecord))
                 return;
         }
         cat.addItem(itemRecord);
-    }
-    @SuppressWarnings("deprecation")
-    public void initializeDiscounts() {
-        CategoryDiscount cd1 = new CategoryDiscount(1,categories.get("Drinks"),
-                new java.sql.Date(2020-1900,4-1,20),
-                new java.sql.Date(2020-1900,5-1,20),20);
-        CategoryDiscount cd2 = new CategoryDiscount(2,categories.get("Dairy"),
-                new java.sql.Date(2020-1900,5-1,20),
-                new java.sql.Date(2020-1900,5-1,20),30);
-        discounts.add(cd1);
-        discounts.add(cd2);
-        ItemDiscount id =new ItemDiscount(3,itemRecords.get("white bread"),
-                new java.sql.Date(2020-1900,4-1,20),
-                new java.sql.Date(2020-1900,5-1,20),15);
-        discounts.add(id);
     }
 
     public String addItemDiscount(String name, int percentage, java.sql.Date beginDate, java.sql.Date endDate){
@@ -615,7 +556,7 @@ public class Store {
             if (cat.getName().equals(categoryName)){         //checks if there is a category with the given name
                 CategoryDiscount d = new CategoryDiscount(mapperDiscount.getMaxId()+1,cat, beginDate, endDate, percentage);
                 mapperDiscount.InsertCategoryDiscount(d.getId(), categoryName, d.getPercentage(), d.getStartDate(), d.getEndDate(), this.getEmail_ID());
-                for (ItemRecord itemRec: cat.getItemRecords() ){
+                /*for (ItemRecord itemRec: cat.getItemRecords() ){
                     Price p = itemRec.getCurrPrice();
                     int beforeDiscount = p.getStorePrice();
                     int afterDiscount = (beforeDiscount/100) * percentage;
@@ -624,7 +565,7 @@ public class Store {
                     //itemRec.addPrice(discountedPrice);
 
 
-                }
+                }*/
                 discounts.add(d);
                 return "The discount was added successfully";
             }
@@ -788,6 +729,20 @@ public class Store {
         }
         return category+" : \n"+ category1.items(this);
     }
+    private void loadItemDiscount(ItemRecord i) {
+        List<ItemDiscount> l = mapperDiscount.getItemDiscount(i,email_ID);
+        for (ItemDiscount cd:l) {
+            boolean inList = false;
+            for (Discount d:discounts) {
+                if(d.getId() == cd.getId()) {
+                    inList = true;
+                    break;
+                }
+            }
+            if(!inList)
+                discounts.add(cd);
+        }
+    }
 
     private void loadCategoryDiscount(Category c) {
         List<CategoryDiscount> l = mapperDiscount.getCategoryDiscounts(c,email_ID);
@@ -856,6 +811,7 @@ public class Store {
             }
         }
         itemStr += main+" "+sub+" "+subsub+" "+record.getPrices()+" ";
+        loadItemDiscount(record);
         for (Discount discount: discounts) {
             if(discount.validItemDiscount(record.getName()))
                 itemStr += discount.withDiscount()+" ";
