@@ -19,7 +19,7 @@ public class StockKeeperDAO {
 
         StockKeeper stockKeeper = null;
 
-        String sql = "SELECT FROM StockKeepers WHERE id = ?";
+        String sql = "SELECT * FROM StockKeepers WHERE id = ?";
 
         int id;
         String name;
