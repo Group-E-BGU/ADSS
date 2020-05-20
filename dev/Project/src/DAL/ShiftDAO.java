@@ -295,6 +295,8 @@ public class ShiftDAO {
             sql.append(shiftsIds[i]).append(",");
         }
 
+        sql.substring(0, sql.length() - 1);
+
         sql.append(shiftsIds[shiftsIds.length - 1]).append(")");
 
         try (Connection conn = DAL.connect();
