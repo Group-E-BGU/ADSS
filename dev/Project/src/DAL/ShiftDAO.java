@@ -48,6 +48,7 @@ public class ShiftDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            System.out.println("line 51");
             return null;
         }
 
@@ -88,6 +89,7 @@ public class ShiftDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            System.out.println("line 92");
             return null;
         }
 
@@ -138,6 +140,7 @@ public class ShiftDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            System.out.println("line 143");
         }
 
 
