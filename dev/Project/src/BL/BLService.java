@@ -96,8 +96,10 @@ public class BLService {
     }
 
     public boolean updateWorker(Worker worker) {
-
-        // DAL
+        if(worker.getType() == WorkPolicy.WorkingType.StockKeeper)
+            new StockKeeperDAO().update((StockKeeper) worker);
+        else
+            new DriverDAO().update((Driver) worker);
 
         return true;
     }
@@ -122,12 +124,6 @@ public class BLService {
         // check if he is a driver who has a delivery
 
         return true;
-    }
-
-    public boolean removeWorker(int worker_id) {
-
-
-        return false;
     }
 
 
@@ -232,11 +228,11 @@ public class BLService {
 
     //------------------------------ WorkerDeal --------------------------//
     public boolean updateContract(int worker_id, WorkerDeal contract) {
+        contract.setWorker_id(worker_id);
 
-        // DAL
+        new WorkerDealDAO().update(contract);
 
         return true;
-
     }
 
 //------------------------------ Address --------------------------//

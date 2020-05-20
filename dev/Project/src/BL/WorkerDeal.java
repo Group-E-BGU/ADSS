@@ -66,4 +66,8 @@ public class WorkerDeal {
     {
         this.salary = salary;
     }
+
+    public void setWorker_id(int worker_id) {
+        this.worker_id = worker_id;
+    }
 }
