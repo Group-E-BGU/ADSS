@@ -12,7 +12,7 @@ import java.util.Map;
 public class SystemManager {
     private system systemcontroler;
     private User logged_user;
-    public Store current_Store; //this field is public only for the unitests
+    private Store current_Store;
 
     public SystemManager() {
         logged_user=null;
@@ -23,6 +23,7 @@ public class SystemManager {
     public void initializeDB() {
         Mapper.InitializeDB();
     }
+
     public String AddSupplier(String name, int ID,String Address, String bank, String branch, int bankNumber,
                               String payments, Map<Integer, String> Contacts_ID,
                               Map<Integer, Integer> Contacts_number) {//  List<DALItem> Items)
@@ -31,18 +32,6 @@ public class SystemManager {
          Done = current_Store.AddSuplier(name, ID,Address,bank, branch,bankNumber, payments, Contacts_ID,Contacts_number);
 
         return Done;
-    }
-
-    public String addItemRecord(String name, String minAmount, String shelfNumber, String manufacture) {
-        try {
-            int minA = Integer.parseInt(minAmount);
-            if (minA < 0)
-                return "minimum amount cannot be below 0";
-            int shelfNum = Integer.parseInt(shelfNumber);
-            return current_Store.addItemRecord(name, minA, shelfNum, manufacture);
-        } catch (Exception e) {
-            return "please enter valid numbers";
-        }
     }
 
     public String AddContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days,
@@ -178,12 +167,6 @@ public class SystemManager {
 
     public static void sendWarning(String warning) {
         Menu.printWarning(warning);
-    }
-
-    public void initialize() {
-        current_Store.initializeItems();
-        current_Store.initializeCategories();
-        current_Store.initializeDiscounts();
     }
 
     public String getItemAmountsByName(String name) {

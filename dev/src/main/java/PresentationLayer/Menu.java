@@ -73,10 +73,9 @@ public class Menu {
                     "17. Print defective report\n" +
                     "18. Enter new discount\n" +
                     "19. Enter new price\n"+
-                    "20. Enter new product\n"+//this should be deleted before submission
-                    "21. Update DetailsOrder\n"+
-                    "22. Check the Cheaper Supplier for specific product\n"+
-                    "23. Logout\n");
+                    "20. Update DetailsOrder\n"+
+                    "21. Check the Cheaper Supplier for specific product\n"+
+                    "22. Logout\n");
             Scanner myScanner = new Scanner(System.in);
             int Ask = myScanner.nextInt();
             myScanner.nextLine();
@@ -242,25 +241,13 @@ public class Menu {
                     System.out.println(Sys.setNewPrice(name, price, rPrice));
                 }
                     break;
-                case 20: {
-                    System.out.println("Please enter new item name:");
-                    String name = myScanner.nextLine();
-                    System.out.println("Enter the minimum amount required:");
-                    String minAmount = myScanner.nextLine();
-                    System.out.println("Enter the shelf number of the item:");
-                    String shelfNumber = myScanner.nextLine();
-                    System.out.println("Enter the manufacturer of the item:");
-                    String manufacture = myScanner.nextLine();
-                    System.out.println(Sys.addItemRecord(name, minAmount, shelfNumber, manufacture));
-                }
-                    break;
-                case 21:
+                case 20:
                     UpdateDetailsOrder();
                     break;
-                case 22:
+                case 21:
                     CheckcheepSupplier();
                     break;
-                case 23:
+                case 22:
                     Logout();
                     con=false;
                     break;
@@ -298,6 +285,39 @@ public class Menu {
             }
         }
     }
+/*
+    @SuppressWarnings("deprecation")
+
+    public void initializeItems() {
+        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
+        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
+        itemRecords.put("milk Tnova 3%",itemRecord1);
+        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
+
+        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
+        itemRecords.put("white bread",itemRecord2);
+        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
+
+        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
+        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
+        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
+        itemRecords.put("coffee Elite",itemRecord3);
+        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
+
+
+        itemRecord1.addPrice(new Price(80,120));
+        itemRecord2.addPrice(new Price(90,130));
+        itemRecord3.addPrice(new Price(100,135));
+
+    }*/
 
     private static void AddArguments() {
         Sys.Register("Store1@gmail.com","S1_superLi");
@@ -335,6 +355,7 @@ public class Menu {
         Days.add(1);
         Days.add(4);
         Sys.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
+
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA1.put(143,"table");
         ProductIKEA1.put(5432,"bed");

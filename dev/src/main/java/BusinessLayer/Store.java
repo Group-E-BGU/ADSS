@@ -440,24 +440,49 @@ public class Store {
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
         int id=MapIRS.getProductId(email_ID,category,subcategory,sub_subcategory,product_name,manufacturer);
-        if(id==-1){
-            id=itemId++;
-            MapIRS.WriteItemRecord_Supplier(email_ID,id,category,subcategory,sub_subcategory,product_name);
-            ItemRecord ir = new ItemRecord(product_name,id,minAmount,0,0,0,shelfNumber,manufacturer);
-            mapperItemRecord.InsertItemRecord(product_name,id,minAmount,0,0,0,shelfNumber,manufacturer,email_ID);
-            if(mapperCategory.getCategory(category,email_ID) == null){
-                Category main = new Category(Category.CategoryRole.MainCategory,category);
-                categories.put(category,main);
-                mapperCategory.InsertCategory(category,1,email_ID);
-                main.addItem(ir);
-            }
-            else{
-                Category main = categories.get(category);
-                if(main == null)
-                    main = mapperCategory.getCategory(category,email_ID);
-                main.addItem(ir);
-            }//sub subsub
+        ItemRecord ir = itemRecords.get(product_name);
+        if(ir == null)
+            ir = mapperItemRecord.getItemRecord(product_name,email_ID);
+        if(id==-1) {
+            id = itemId++;
+            MapIRS.WriteItemRecord_Supplier(email_ID, id, category, subcategory, sub_subcategory, product_name);
+            ir = new ItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer);
+            mapperItemRecord.InsertItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer, email_ID);
         }
+        Category main = categories.get(category);
+        if(main == null){
+            main = mapperCategory.getCategory(category,email_ID);
+            if(main == null) {
+                main = new Category(Category.CategoryRole.MainCategory, category);
+                categories.put(category, main);
+                mapperCategory.InsertCategory(category, 1, email_ID);
+            }
+            main.addItem(ir); //addItem is safe
+        }
+
+        Category sub = categories.get(subcategory);
+        if(sub == null){
+             sub = mapperCategory.getCategory(subcategory,email_ID);
+            if(sub == null) {
+                sub = new Category(Category.CategoryRole.SubCategory, subcategory);
+                categories.put(subcategory, sub);
+                mapperCategory.InsertCategory(subcategory, 1, email_ID);
+            }
+            sub.addItem(ir);
+        }
+
+        Category subsub = categories.get(sub_subcategory);
+        if(subsub == null){
+            subsub = mapperCategory.getCategory(sub_subcategory,email_ID);
+            if(subsub == null) {
+                subsub = new Category(Category.CategoryRole.MainCategory, sub_subcategory);
+                categories.put(sub_subcategory, subsub);
+                mapperCategory.InsertCategory(sub_subcategory, 1, email_ID);
+            }
+            subsub.addItem(ir);
+        }
+
+
         return id;
     }
 
@@ -485,38 +510,6 @@ public class Store {
             }
           }
        }
-    @SuppressWarnings("deprecation")
-
-    public void initializeItems() {
-        ItemRecord itemRecord1 = new ItemRecord("milk Tnova 3%",1,3,1,3,4,1,"tnova");
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,19)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecord1.addItem(new Item(itemId++, new java.sql.Date(2020-1900,4-1,20)));
-        itemRecords.put("milk Tnova 3%",itemRecord1);
-        mapperItemRecord.InsertItemRecord(itemRecord1.getName(),itemRecord1.getId(),3,1,3,2,1,"tnova",email_ID);
-
-        ItemRecord itemRecord2 = new ItemRecord("white bread",2,3,2,3,5,2,"dganit");
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,19)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecord2.addItem(new Item(itemId++, new java.sql.Date(2020-1900,5-1,20)));
-        itemRecords.put("white bread",itemRecord2);
-        mapperItemRecord.InsertItemRecord(itemRecord2.getName(),itemRecord2.getId(),3,2,3,2,1,"dganit",email_ID);
-
-        ItemRecord itemRecord3 = new ItemRecord("coffee Elite",3,2,0,2,2,3,"elite");
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecord3.addItem(new Item(itemId++, new java.sql.Date(2020-1900,8-1,20)));
-        itemRecords.put("coffee Elite",itemRecord3);
-        mapperItemRecord.InsertItemRecord(itemRecord3.getName(),itemRecord3.getId(),2,0,2,2,3,"elite",email_ID);
-
-
-        itemRecord1.addPrice(new Price(80,120));
-        itemRecord2.addPrice(new Price(90,130));
-        itemRecord3.addPrice(new Price(100,135));
-
-    }
 
     public void initializeCategories() {
         Category category1 = new Category(Category.CategoryRole.MainCategory,"Dairy");
