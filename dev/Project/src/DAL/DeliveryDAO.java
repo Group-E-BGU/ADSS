@@ -169,6 +169,8 @@ public class DeliveryDAO {
             pstmt.setInt(7, truckWeight);
             pstmt.executeUpdate();
 
+            System.out.println("Delivery has been added successfully");
+
         } catch (SQLException ignored) {
         }
 

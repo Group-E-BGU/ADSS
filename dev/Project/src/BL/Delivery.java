@@ -119,6 +119,12 @@ public class Delivery{
         delivery_string = delivery_string + "Truck id : " + truckSerialNumber+ '\n';
         delivery_string = delivery_string +"Source Address : "+source +'\n';
         delivery_string = delivery_string + "Driver id : " + driverID + '\n';
+        delivery_string = delivery_string + "Destinations : ";
+        for(String location : documents.keySet())
+        {
+            delivery_string = delivery_string + location + "     ";
+        }
+
 
 
         delivery_string = delivery_string + "\n";

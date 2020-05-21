@@ -60,8 +60,20 @@ public class BLService {
         List<Integer> delivery_drivers = new LinkedList<>();
         List<Integer> potential_drivers = getAvailableWorkers(shiftDate, shiftTime, WorkPolicy.WorkingType.Driver);
         for (Integer driver_id : potential_drivers) {
-            if (((Driver) getWorker(driver_id)).getLicense().equals(license)) {
-                delivery_drivers.add(driver_id);
+            Driver driver = ((Driver) getWorker(driver_id));
+            if (driver.getLicense().equals(license)) {
+                boolean av = true;
+                for(Integer shift_id : driver.getWorker_shifts())
+                {
+                    Shift shift = getShift(shift_id);
+                    if(shift.getShiftDate().equals(shiftDate) && shift.getShiftTime().equals(shiftTime))
+                    {
+                        av = false;
+                        break;
+                    }
+                }
+                if(av)
+                    delivery_drivers.add(driver_id);
             }
         }
 
@@ -133,7 +145,7 @@ public class BLService {
         Map<Integer,Shift> shMap =  history.getShifts();
         for (Map.Entry<Integer,Shift>entry : shMap.entrySet())
         {
-            if(entry.getValue().getShiftTime().equals(shiftTime) && entry.getValue().getShiftDate().equals(date) && entry.getValue().getBoss().getId() == worker_id)
+            if(entry.getValue().getShiftTime().equals(shiftTime) && entry.getValue().getShiftDate().equals(date) && (entry.getValue().getBoss().getId() == worker_id || entry.getValue().getWorkingTeam().values().contains(worker_id)))
                 return false;
         }
 
@@ -395,6 +407,16 @@ public class BLService {
 
         data.setDeliveries(deliveryMap);
 
+        for(Shift shift : getAllShifts().values())
+        {
+            for(List<Integer> working_type : shift.getWorkingTeam().values())
+            {
+                for(Integer worker_id : working_type)
+                {
+                    getWorker(worker_id).getWorker_shifts().add(shift.getShiftId());
+                }
+            }
+        }
 
         return true;
     }

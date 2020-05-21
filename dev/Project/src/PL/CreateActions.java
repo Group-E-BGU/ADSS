@@ -18,27 +18,25 @@ public class CreateActions {
 
     public void createShift() {
 
-        for (; ; ) {
-
-            System.out.println("Choose an address for this shift by typing its location :");
-            Address address = null;
-            Printer.printAllAddresses();
-            boolean address_chosen = false;
-            while (!address_chosen) {
-                String location = keyboard.nextLine();
-                if (blService.getAddress(location) == null) {
-                    System.out.println("Error : no address found with " + location + " as its location! , Do you want to try again? y/n");
-                    if (!getConfirmation()) {
-                        System.out.println("Create shift canceled");
-                        return;
-                    }
-                } else {
-                    address_chosen = true;
-                    address = blService.getAddress(location);
+        System.out.println("Choose an address for this shift by typing its location :");
+        Address address = null;
+        Printer.printAllAddresses();
+        boolean address_chosen = false;
+        while (!address_chosen) {
+            String location = keyboard.nextLine();
+            if (blService.getAddress(location) == null) {
+                System.out.println("Error : no address found with " + location + " as its location! , Do you want to try again? y/n");
+                if (!getConfirmation()) {
+                    System.out.println("Create shift canceled");
+                    return;
                 }
+            } else {
+                address_chosen = true;
+                address = blService.getAddress(location);
             }
+        }
 
-
+        for (; ; ) {
             System.out.println("enter the date using this format dd/mm/yyyy or type EXIT to cancel ...");
             String date_string = keyboard.nextLine();
             if (date_string.equals("EXIT") || date_string.equals("exit"))
@@ -412,40 +410,45 @@ public class CreateActions {
 
     public static void arrangeDelivery() {
 
-
-        System.out.println("enter the date for this delivery using this format dd/mm/yyyy or type EXIT to cancel ...");
-        String date_string = keyboard.nextLine();
-        if (date_string.equals("EXIT") || date_string.equals("exit"))
-            return;
-
+        boolean date_chosen = false;
         Date date = null;
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+
+        while (!date_chosen) {
+            System.out.println("enter the date for this delivery using this format dd/mm/yyyy or type EXIT to cancel ...");
+            String date_string = keyboard.nextLine();
+            if (date_string.equals("EXIT") || date_string.equals("exit"))
+                return;
+
+            try {
+                date = date_format.parse(date_string);
+                System.out.println("Your delivery date will be : " + new SimpleDateFormat("EEEE").format(date) + " " + date_string);
+                date_chosen = true;
+            } catch (ParseException pe) {
+                System.out.println("Error : invalid date input");
+            }
+        }
+
+
         Shift.ShiftTime delivery_time = null;
 
-        try {
-            date = date_format.parse(date_string);
-            System.out.println("Your delivery date will be : " + new SimpleDateFormat("EEEE").format(date) + " " + date_string);
+        boolean chosen_time = false;
+
+        while (!chosen_time) {
             System.out.println("Type M for Morning , Type E for Evening");
+            String choice = keyboard.nextLine();
 
-            boolean chosen_time = false;
+            if (choice.equals("M") || choice.equals("m")) {
+                delivery_time = Shift.ShiftTime.Morning;
+                chosen_time = true;
+            } else if (choice.equals("E") || choice.equals("e")) {
+                delivery_time = Shift.ShiftTime.Evening;
+                chosen_time = true;
+            } else
+                System.out.println("Error : invalid input!");
 
-            while (!chosen_time) {
-                String choice = keyboard.nextLine();
-
-                if (choice.equals("M") || choice.equals("m")) {
-                    delivery_time = Shift.ShiftTime.Morning;
-                    chosen_time = true;
-                } else if (choice.equals("E") || choice.equals("e")) {
-                    delivery_time = Shift.ShiftTime.Evening;
-                    chosen_time = true;
-                } else
-                    System.out.println("Error : invalid input!");
-
-            }
-
-        } catch (ParseException pe) {
-            System.out.println("Error : invalid date input");
         }
+
 
         List<String> available_trucks = blService.getAvailableTrucks(date, delivery_time);
 
@@ -473,7 +476,7 @@ public class CreateActions {
                 truck_chosen = true;
         }
 
-        System.out.println("Choose a source for this delivery by typing the location :");
+        System.out.println("Choose a source for this delivery by typing the location :\n");
         Address address = null;
         List<String> available_addresses = blService.getAvailableAddresses(date, delivery_time);
         boolean address_chosen = false;
@@ -581,6 +584,10 @@ public class CreateActions {
             license = "A";
         }
         List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
+
+        if (drivers_ids.isEmpty() && license.equals("A")) {
+            drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), "B");
+        }
         if (drivers_ids.isEmpty()) {
             System.out.println("Error : no available drivers for this delivery ... abort");
         } else {
@@ -597,11 +604,9 @@ public class CreateActions {
                     Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
                     delivery.setDocuments(documents);
                     delivery.setLogs(logs);
-                    blService.work(driver_id, source_shift.getShiftId());
                     if (total_weight > delivery_truck.getMaxAllowedWeight()) {
                         System.out.println("Error : the truck's weight exceeds its allowed weight");
-                        if (!rearrangeDelivery(delivery, source_shift)) ;
-                        {
+                        if (!rearrangeDelivery(delivery, source_shift)) {
                             return;
                         }
                     }
@@ -611,6 +616,7 @@ public class CreateActions {
                             total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
                         }
                     }
+                    driver_id = delivery.getDriverID();
                     blService.work(driver_id, source_shift.getShiftId());
                     blService.addDelivery(delivery);
                 }
@@ -624,6 +630,7 @@ public class CreateActions {
     private static boolean rearrangeDelivery(Delivery delivery, Shift shift) {
         System.out.println("1) Change truck and driver");
         System.out.println("2) Cancel");
+
 
         int choice = getChoice(1, 2);
         if (choice == 2) {
@@ -683,6 +690,6 @@ public class CreateActions {
 
             return true;
         }
-        return true;
+        return false;
     }
 }

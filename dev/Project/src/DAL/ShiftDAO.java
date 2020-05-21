@@ -198,7 +198,7 @@ public class ShiftDAO {
         {
             encodedWorkingTeam = encodedWorkingTeam.substring(0,encodedWorkingTeam.length()-1);
         }
-        if(encodedWorkingTeam.charAt(encodedWorkingTeam.length()-1) == ',')
+        if(encodedWorkingTeam.length() > 0 && encodedWorkingTeam.charAt(encodedWorkingTeam.length()-1) == ',')
             encodedWorkingTeam = encodedWorkingTeam.substring(0, encodedWorkingTeam.length() - 1);
         return encodedWorkingTeam;
     }
