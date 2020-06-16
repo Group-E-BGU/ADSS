@@ -7,8 +7,6 @@ import BusinessLayer.*;
 import BusinessLayer.InterfaceContract;
 import BusinessLayer.InterfaceOrder;
 import BusinessLayer.InterfaceSupplier;
-import InterfaceLayer.SystemManager;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,11 +17,10 @@ public class Main {
     static Scanner keyboard = new Scanner(System.in);
     static BLService blService = BLService.getInstance();
     static InitializeData init_data = new InitializeData();
-    static SystemManager sys = new SystemManager();
 
     public static void main(String[] argv) {
 
-        sys.initializeDB();
+        blService.initializeDB();
         init_data.createWorkers();
         init_data.createShifts();
         blService.loadFromDataBase();
@@ -41,10 +38,10 @@ public class Main {
             int choice = getChoice(1, 4);
             switch (choice) {
                 case 1:
-                    SystemAccess.register(sys);
+                    SystemAccess.register();
                     break;
                 case 2:
-                    if (SystemAccess.login(sys))
+                    if (SystemAccess.login())
                         actionList();
                     break;
                 case 3:
@@ -125,7 +122,7 @@ public class Main {
                 case 18: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
-                    String amount = sys.getItemAmountsByName(name);
+                    String amount = blService.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
                         System.out.println("Choose to add or to remove:\n1.Add\n2.Remove");
@@ -134,13 +131,13 @@ public class Main {
                         if (add_choice == 1) {
                             System.out.println("Please enter new storage and shelf amounts and expiration date in the following format(dd/MM/yyyy)");
                             String amounts = keyboard.nextLine();
-                            System.out.println(sys.addAmounts(name, amounts));
+                            System.out.println(blService.addAmounts(name, amounts));
                         } else if (add_choice == 2) {
-                            System.out.println(sys.getItemIdsByName(name));
+                            System.out.println(blService.getItemIdsByName(name));
                             System.out.println("Please enter item id or -1 if done");
                             int id = keyboard.nextInt();
                             while (id != -1) {
-                                System.out.println(sys.removeItem(name, id));
+                                System.out.println(blService.removeItem(name, id));
                                 System.out.println("Please enter item id or -1 if done");
                                 id = keyboard.nextInt();
                             }
@@ -155,26 +152,26 @@ public class Main {
                 case 19: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
-                    String amount = sys.getItemAmountsByName(name);
+                    String amount = blService.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
                         System.out.println("Please enter amount to move");
                         String amounts = keyboard.nextLine();
-                        System.out.println(sys.moveToShelf(name, amounts));
+                        System.out.println(blService.moveToShelf(name, amounts));
                     }
                     break;
                 }
                 case 20: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
-                    String amount = sys.getItemAmountsByName(name);
+                    String amount = blService.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
-                        System.out.println(sys.getItemIdsByName(name));
+                        System.out.println(blService.getItemIdsByName(name));
                         System.out.println("Please enter item id or -1 if done");
                         int id = keyboard.nextInt();
                         while (id != -1) {
-                            System.out.println(sys.removeItemFromShelf(name, id));
+                            System.out.println(blService.removeItemFromShelf(name, id));
                             System.out.println("Please enter item id or -1 if done");
                             id = keyboard.nextInt();
                         }
@@ -185,19 +182,19 @@ public class Main {
                 case 21: {
                     System.out.println("Please enter categories or 'all'");
                     String names = keyboard.nextLine();
-                    System.out.println(sys.getInventoryReport(names));
+                    System.out.println(blService.getInventoryReport(names));
                     break;
                 }
                 case 22: {
                     System.out.println("Please enter defected item's name");
                     String name = keyboard.nextLine();
-                    String amount = sys.getItemAmountsByName(name);
+                    String amount = blService.getItemAmountsByName(name);
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
-                        System.out.println(sys.getItemIdsByName(name));
+                        System.out.println(blService.getItemIdsByName(name));
                         System.out.println("Please enter defected item's ID");
                         String id = keyboard.nextLine();
-                        System.out.println(sys.setDefectedItem(name, id));
+                        System.out.println(blService.setDefectedItem(name, id));
                     }
                     break;
                 }
@@ -206,7 +203,7 @@ public class Main {
                     String begDate = keyboard.nextLine();
                     System.out.println("Enter report's end date in the following format(dd/MM/yyyy)");
                     String endDate = keyboard.nextLine();
-                    System.out.println(sys.printDefectedReport(begDate, endDate));
+                    System.out.println(blService.printDefectedReport(begDate, endDate));
 
                     break;
                 }
@@ -223,7 +220,7 @@ public class Main {
                         System.out.println("Enter end date in the following format(dd/MM/yyyy)");
                         String endDate = keyboard.nextLine();
 
-                        System.out.println(sys.addNewItemDiscount(itemName, percentage, begDate, endDate));
+                        System.out.println(blService.addNewItemDiscount(itemName, percentage, begDate, endDate));
                     } else if (discountType.equals("2")) {                      //case category discount
                         System.out.println("Enter category name:");
                         String categoryName = keyboard.nextLine();
@@ -234,7 +231,7 @@ public class Main {
                         System.out.println("Enter end date in the following format(dd/MM/yyyy)");
                         String endDate = keyboard.nextLine();
 
-                        System.out.println(sys.addNewCategoryDiscount(categoryName, percentage, begDate, endDate));
+                        System.out.println(blService.addNewCategoryDiscount(categoryName, percentage, begDate, endDate));
                     } else {
                         System.out.println("Please enter valid discount type");
                     }
@@ -247,7 +244,7 @@ public class Main {
                     String price = keyboard.nextLine();
                     System.out.println("Enter new retail price:");
                     String rPrice = keyboard.nextLine();
-                    System.out.println(sys.setNewPrice(name, price, rPrice));
+                    System.out.println(blService.setNewPrice(name, price, rPrice));
                 }
                 break;
                 case 26:
@@ -570,7 +567,7 @@ public class Main {
         int ProdudtId = myScanner.nextInt();
         System.out.println("Please enter the amount of the product you would like to invite");
         int Amount = myScanner.nextInt();
-        InterfaceSupplier Supplier=sys.GetTheCyeeperSuplier(ProdudtId,Amount);
+        InterfaceSupplier Supplier=blService.GetTheCyeeperSuplier(ProdudtId,Amount);
         if(Supplier==null){
             System.out.println("there is no supplier that supply this product");
         }
@@ -592,35 +589,35 @@ public class Main {
     }
 
     private static void AddArguments() {
-        sys.Register("A@gmail.com","123");
-        sys.Register("Store2@gmail.com","S2_superLi");
+        blService.Register("A@gmail.com","123");
+        blService.Register("Store2@gmail.com","S2_superLi");
 
-        sys.Login("A@gmail.com","123");
+        blService.Login("A@gmail.com","123");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
         contactAli1.put(2087564,0524536272);
         contactAli1.put(2453214,0523756223);
         Map<Integer,String> contactAli2=new ConcurrentHashMap<Integer, String>();
         contactAli2.put(2087564,"yoni");
         contactAli2.put(2453214,"roi");
-        sys.AddSupplier("Ron",51345,"haprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli2,contactAli1);
+        blService.AddSupplier("Ron",51345,"haprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli2,contactAli1);
         Map<Integer,Integer> contactIKEA1=new ConcurrentHashMap<Integer, Integer>();
         contactIKEA1.put(208231,0522136272);
         contactIKEA1.put(4283214,0523546253);
         Map<Integer,String> contactIKEA2=new ConcurrentHashMap<Integer, String>();
         contactIKEA2.put(208231,"Dov");
         contactIKEA2.put(4283214,"Leni");
-        sys.AddSupplier("Tom",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA2,contactIKEA1);
+        blService.AddSupplier("Tom",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA2,contactIKEA1);
         Map<Integer,Integer> contacttXiaomi1=new ConcurrentHashMap<Integer, Integer>();
         contacttXiaomi1.put(45337561,05221336272);
         Map<Integer,String> contactXiaomi2=new ConcurrentHashMap<Integer, String>();
         contactXiaomi2.put(45337561,"Or");
-        sys.AddSupplier("Eli",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
+        blService.AddSupplier("Eli",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
 
         Map<Integer,String> ProductAli1 =new ConcurrentHashMap<Integer, String>();
         ProductAli1.put(12313,"milk");
-        int Id_Store = sys.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
+        int Id_Store = blService.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
         ProductAli1.put(2314567,"cheese");
-        int Id_Store1 = sys.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5 );
+        int Id_Store1 = blService.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5 );
         Map<Integer,Double> ProductAli2 =new ConcurrentHashMap<Integer,Double>();
         ProductAli2.put(12313,4.9);
         ProductAli2.put(2314567,2.9);
@@ -630,15 +627,15 @@ public class Main {
         LinkedList<Integer> Days=new LinkedList<>();
         Days.add(2);
         Days.add(3);
-        sys.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
+        blService.AddContract(51345,false,Days,true,ProductAli3,ProductAli1,ProductAli2);
 
         Map<Integer,String> ProductIKEA1 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA1.put(143,"milk");
-        int Id_Store2 = sys.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
+        int Id_Store2 = blService.FindId_P_Store("milk", "Dairy products", "3 percent", "liter", "yotvata",100, 5 );
         ProductIKEA1.put(5432,"cheese");
-        int Id_Store3 = sys.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
+        int Id_Store3 = blService.FindId_P_Store("cheese", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
         ProductIKEA1.put(22,"cottage");
-        int Id_Store4 = sys.FindId_P_Store("cottage", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
+        int Id_Store4 = blService.FindId_P_Store("cottage", "Dairy products", "5 percent", "250 ml", "yotvata",100, 5  );
         Map<Integer,Double> ProductIKEA2 =new ConcurrentHashMap<Integer,Double>();
         ProductIKEA2.put(143,4.9);
         ProductIKEA2.put(5432,1.9);
@@ -649,15 +646,15 @@ public class Main {
         ProductIKEA3.put(Id_Store4,22);
         LinkedList<Integer> Days1=new LinkedList<>();
         Days1.add(5);
-        sys.AddContract(51321,false,Days1,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
+        blService.AddContract(51321,false,Days1,true,ProductIKEA3,ProductIKEA1,ProductIKEA2);
 
         Map<Integer,String> ProductXiaomi1 =new ConcurrentHashMap<Integer, String>();
         ProductXiaomi1.put(142356,"Potatoes");
-        int Id_Store5 = sys.FindId_P_Store("Potatoes", "vegetables", "whites", "bag", "Harez",100, 13 );
+        int Id_Store5 = blService.FindId_P_Store("Potatoes", "vegetables", "whites", "bag", "Harez",100, 13 );
         ProductXiaomi1.put(46288,"Carrots");
-        int Id_Store6 = sys.FindId_P_Store("Carrots", "vegetables", "orange", "bag", "Harez",100, 14 );
+        int Id_Store6 = blService.FindId_P_Store("Carrots", "vegetables", "orange", "bag", "Harez",100, 14 );
         ProductXiaomi1.put(4328,"Potatoes");
-        int Id_Store7= sys.FindId_P_Store("RedPotatoes", "vegetables", "red", "bag", "Harez",100, 14 );
+        int Id_Store7= blService.FindId_P_Store("RedPotatoes", "vegetables", "red", "bag", "Harez",100, 14 );
         Map<Integer,Double> ProductXiaomi2 =new ConcurrentHashMap<Integer,Double>();
         ProductXiaomi2.put(142356,13.9);
         ProductXiaomi2.put(46288,8.9);
@@ -668,73 +665,73 @@ public class Main {
         ProductXiaomi3.put(Id_Store7,4328);
         LinkedList<Integer> Days2=new LinkedList<>();
         Days2.add(4);
-        sys.AddContract(51328,false,Days2,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
+        blService.AddContract(51328,false,Days2,true,ProductXiaomi3,ProductXiaomi1,ProductXiaomi2);
 
         Map<Integer,Integer> WriteAli1=new ConcurrentHashMap<Integer, Integer>();
         WriteAli1.put(12313,100);
         Map<Integer,Double> WriteAli2=new ConcurrentHashMap<Integer, Double>();
         WriteAli2.put(12313,10.0);
-        sys.AddWrite(51345,WriteAli1,WriteAli2);
+        blService.AddWrite(51345,WriteAli1,WriteAli2);
         Map<Integer,Integer> WriteXiaomi1=new ConcurrentHashMap<Integer, Integer>();
         WriteXiaomi1.put(142356,50);
         WriteXiaomi1.put(4328,70);
         Map<Integer,Double> WriteXiaomi2=new ConcurrentHashMap<Integer, Double>();
         WriteXiaomi2.put(142356,10.0);
         WriteXiaomi2.put(4328,10.0);
-        sys.AddWrite(51328,WriteXiaomi1,WriteXiaomi2);
+        blService.AddWrite(51328,WriteXiaomi1,WriteXiaomi2);
 
         Map<Integer,Integer> o1=new HashMap<Integer, Integer>();
         o1.put(12313,150);
-        sys.MakeOrder(51345,Days,o1);
+        blService.MakeOrder(51345,Days,o1);
         Map<Integer,Integer> o2=new HashMap<Integer, Integer>();
         o2.put(5432,150);
         o2.put(22,150);
-        sys.MakeOrder(51321,Days1,o2);
+        blService.MakeOrder(51321,Days1,o2);
         Map<Integer,Integer> o3=new HashMap<Integer, Integer>();
         o3.put(142356,150);
         o3.put(46288,150);
         o3.put(4328,150);
-        sys.MakeOrder(51328,Days2,o3);
+        blService.MakeOrder(51328,Days2,o3);
 
-        sys.addNewItemDiscount("milk","20","20/04/2020","20/06/2020");
-        sys.addNewItemDiscount("Carrots","30","20/03/2020","20/06/2021");
-        sys.addNewItemDiscount("Potatoes","20","20/04/2020","21/04/2020");
+        blService.addNewItemDiscount("milk","20","20/04/2020","20/06/2020");
+        blService.addNewItemDiscount("Carrots","30","20/03/2020","20/06/2021");
+        blService.addNewItemDiscount("Potatoes","20","20/04/2020","21/04/2020");
 
-        sys.addNewCategoryDiscount("vegetables" ,"30","20/04/2020","20/06/2020");
-        sys.addNewCategoryDiscount("3 percent" ,"25","20/04/2020","20/06/2020");
+        blService.addNewCategoryDiscount("vegetables" ,"30","20/04/2020","20/06/2020");
+        blService.addNewCategoryDiscount("3 percent" ,"25","20/04/2020","20/06/2020");
 
-        sys.setNewPrice("milk","15","5");
-        sys.setNewPrice("milk","10","5");
-        sys.setNewPrice("cheese","15","10");
-        sys.setNewPrice("Carrots","8","3");
-        sys.setNewPrice("Potatoes","22","15");
-        sys.setNewPrice("Potatoes","20","13");
+        blService.setNewPrice("milk","15","5");
+        blService.setNewPrice("milk","10","5");
+        blService.setNewPrice("cheese","15","10");
+        blService.setNewPrice("Carrots","8","3");
+        blService.setNewPrice("Potatoes","22","15");
+        blService.setNewPrice("Potatoes","20","13");
 
-        sys.addAmounts("milk","50 50 30/05/2020");
-        sys.addAmounts("cheese","80 50 30/05/2020");
-        sys.addAmounts("Carrots","70 50 30/08/2020");
-        sys.addAmounts("Potatoes","65 50 30/08/2020");
-        sys.addAmounts("RedPotatoes","40 80 30/08/2020");
-        sys.addAmounts("cottage","50 110 30/05/2020");
+        blService.addAmounts("milk","50 50 30/05/2020");
+        blService.addAmounts("cheese","80 50 30/05/2020");
+        blService.addAmounts("Carrots","70 50 30/08/2020");
+        blService.addAmounts("Potatoes","65 50 30/08/2020");
+        blService.addAmounts("RedPotatoes","40 80 30/08/2020");
+        blService.addAmounts("cottage","50 110 30/05/2020");
 
 
-        sys.Logout();
+        blService.Logout();
 
-        sys.Login("Store2@gmail.com","S2_superLi");
+        blService.Login("Store2@gmail.com","S2_superLi");
         Map<Integer,String> contactAli22=new ConcurrentHashMap<Integer, String>();
         contactAli22.put(2087564,"yoni");
         contactAli22.put(2453214,"roi");
         Map<Integer,Integer> contactAli11=new ConcurrentHashMap<Integer, Integer>();
         contactAli11.put(2087564,0524536272);
         contactAli11.put(2453214,0523756223);
-        sys.AddSupplier("Ali",51345,"hprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli22,contactAli11);
+        blService.AddSupplier("Ali",51345,"hprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli22,contactAli11);
         Map<Integer,String> contactIKEA22=new ConcurrentHashMap<Integer, String>();
         contactIKEA22.put(208231,"Dov");
         contactIKEA22.put(4283214,"Leni");
         Map<Integer,Integer> contactIKEA11=new ConcurrentHashMap<Integer, Integer>();
         contactIKEA11.put(208231,05221336272);
         contactIKEA11.put(4283214,0523546253);
-        sys.AddSupplier("IKEA",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA22,contactIKEA11);
+        blService.AddSupplier("IKEA",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA22,contactIKEA11);
 
         Map<Integer,String> ProductAli11 =new ConcurrentHashMap<Integer, String>();
         ProductAli11.put(1213,"blanket");
@@ -743,7 +740,7 @@ public class Main {
         ProductAli22.put(1213,89.9);
         ProductAli22.put(43567,1399.9);
         Map<Integer,Integer>  ProductAli33=new ConcurrentHashMap<Integer, Integer>();
-        sys.AddContract(51345,false,Days,true,ProductAli33,ProductAli11,ProductAli22);
+        blService.AddContract(51345,false,Days,true,ProductAli33,ProductAli11,ProductAli22);
         Map<Integer,String> ProductIKEA11 =new ConcurrentHashMap<Integer, String>();
         ProductIKEA11.put(223,"Armchair");
         ProductIKEA11.put(345,"Desk");
@@ -753,35 +750,35 @@ public class Main {
         ProductIKEA22.put(345,1399.9);
         ProductIKEA22.put(1687,139.9);
         Map<Integer,Integer>  ProductIKEA33=new ConcurrentHashMap<Integer, Integer>();
-        sys.AddContract(51321,false,Days,true,ProductIKEA33,ProductIKEA11,ProductIKEA22);
+        blService.AddContract(51321,false,Days,true,ProductIKEA33,ProductIKEA11,ProductIKEA22);
 
         Map<Integer,Double> WriteAli22=new ConcurrentHashMap<Integer, Double>();
         WriteAli22.put(1213,13.0);
         Map<Integer,Integer> WriteAli11=new ConcurrentHashMap<Integer, Integer>();
         WriteAli11.put(1213,100);
-        sys.AddWrite(51328,WriteAli11,WriteAli22);
+        blService.AddWrite(51328,WriteAli11,WriteAli22);
         Map<Integer,Integer> WriteIKEA11=new ConcurrentHashMap<Integer, Integer>();
         WriteIKEA11.put(223,60);
         WriteIKEA11.put(345,90);
         Map<Integer,Double> WriteIKEA22=new ConcurrentHashMap<Integer, Double>();
         WriteIKEA22.put(223,12.0);
         WriteIKEA22.put(345,12.0);
-        sys.AddWrite(51321, WriteIKEA11,WriteIKEA22);
+        blService.AddWrite(51321, WriteIKEA11,WriteIKEA22);
 
-        sys.addNewItemDiscount("blanket","20","20/04/2020","20/06/2020");
-        sys.addNewItemDiscount("Desk","30","20/03/2020","20/06/2021");
+        blService.addNewItemDiscount("blanket","20","20/04/2020","20/06/2020");
+        blService.addNewItemDiscount("Desk","30","20/03/2020","20/06/2021");
 
-        sys.setNewPrice("blanket","15","5");
-        sys.setNewPrice("blanket","10","5");
-        sys.setNewPrice("Desk","15","10");
-        sys.setNewPrice("Chair","22","15");
+        blService.setNewPrice("blanket","15","5");
+        blService.setNewPrice("blanket","10","5");
+        blService.setNewPrice("Desk","15","10");
+        blService.setNewPrice("Chair","22","15");
 
-        sys.Logout();
+        blService.Logout();
     }
 
 
     private static void Add_Edit_Supplier(int status) {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -804,7 +801,7 @@ public class Main {
             boolean MoreContact = true;
 
             if (status == 2) {
-                String exist = sys.CheckSuplierExist(ID);
+                String exist = blService.CheckSuplierExist(ID);
                 while (!exist.equals("Exist")) {
                     System.out.println(exist);
                     System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
@@ -812,7 +809,7 @@ public class Main {
                     if (ans.equals("y")) {
                         System.out.println("Please enter the Supplier's ID");
                         ID = myScanner.nextInt();
-                        exist = sys.CheckSuplierExist(ID);
+                        exist = blService.CheckSuplierExist(ID);
                     } else {
                         {
                             contiue = false;
@@ -856,9 +853,9 @@ public class Main {
                 }
                 String Done="";
                 if (status == 1) {
-                    Done=sys.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                    Done=blService.AddSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 } else {
-                    Done=sys.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
+                    Done=blService.EditSupplier(name, ID,Address, Bank, Branch, bankNumber, payments, Contacts_ID, Contacts_number);
                 }
                 System.out.println(Done);
             }
@@ -866,7 +863,7 @@ public class Main {
     }
 
     private static void Add_Edit_Agreement(int status) {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -884,7 +881,7 @@ public class Main {
             System.out.println("Please enter the Supplier's ID");
             suplaier_ID = myScanner.nextInt();
             if (status == 2) {
-                String exist = sys.CheckSAgreementExist(suplaier_ID);
+                String exist = blService.CheckSAgreementExist(suplaier_ID);
                 if (!exist.equals("Done")) {
                     System.out.println(exist);
                     contiue = false;
@@ -944,7 +941,7 @@ public class Main {
                     minAmount = myScanner.nextInt();
                     System.out.println("Please enter its shelf number");
                     shelfNumber = myScanner.nextInt();
-                    int Id_Store = sys.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer,minAmount, shelfNumber );
+                    int Id_Store = blService.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer,minAmount, shelfNumber );
                     System.out.println("Please enter his Catalog Number");
                     int product_Id = myScanner.nextInt();
                     System.out.println("Please enter the price");
@@ -960,10 +957,10 @@ public class Main {
                 }
                 switch (status) {
                     case 1:
-                        sys.AddContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        blService.AddContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
                         break;
                     case 2:
-                        sys.EditContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
+                        blService.EditContract(suplaier_ID, fixeDays, Days, leading, ItemsID_ItemsIDSupplier, ProductIDVendor_Name, ProducttemsIDVendor_Price);
                         break;
                 }
             }
@@ -971,7 +968,7 @@ public class Main {
     }
 
     private static void Add_Edit_Write(int status) {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -985,7 +982,7 @@ public class Main {
 
             boolean contiue=true;
             if (status == 2) {
-                String exist = sys.CheckSWortExist(Suplaier_ID);
+                String exist = blService.CheckSWortExist(Suplaier_ID);
                 while (!exist.equals("Done")) {
                     System.out.println(exist);
                     System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
@@ -993,7 +990,7 @@ public class Main {
                     if (ans.equals("y")) {
                         System.out.println("Please enter the Supplier's ID");
                         Suplaier_ID = myScanner.nextInt();
-                        exist = sys.CheckSWortExist(Suplaier_ID);
+                        exist = blService.CheckSWortExist(Suplaier_ID);
                     } else {
                         {
                             contiue = false;
@@ -1026,10 +1023,10 @@ public class Main {
                 String Done;
                 switch (status) {
                     case 1:
-                        Done = sys.AddWrite(Suplaier_ID, ItemsID_Amount, ItemsID_Assumption);
+                        Done = blService.AddWrite(Suplaier_ID, ItemsID_Amount, ItemsID_Assumption);
                         break;
                     case 2:
-                        Done = sys.EditWrite(Suplaier_ID, ItemsID_Amount, ItemsID_Assumption);
+                        Done = blService.EditWrite(Suplaier_ID, ItemsID_Amount, ItemsID_Assumption);
                         break;
                 }
             }
@@ -1037,7 +1034,7 @@ public class Main {
     }
 
     private static void MakeOrder() {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -1049,7 +1046,7 @@ public class Main {
             LinkedList<Integer> Days=new LinkedList<Integer>();
             System.out.println("Please enter the Supplier's ID you want to order from");
             ID_Suplaier = myScanner.nextInt();
-            String exist = sys.CheckSuplierExist(ID_Suplaier);
+            String exist = blService.CheckSuplierExist(ID_Suplaier);
             if (!exist.equals("Exist")) {
                 conect = false;
                 System.out.println("the supplier is not exist in the system.");
@@ -1059,7 +1056,7 @@ public class Main {
                 while(moreDay) {
                     System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
                     day = myScanner.nextInt();
-                    conect = sys.CheckTheDay(ID_Suplaier, day);
+                    conect = blService.CheckTheDay(ID_Suplaier, day);
                     if(conect) {
                         Days.add(day);
                         System.out.println("Would you like to add another day? y/n");
@@ -1080,7 +1077,7 @@ public class Main {
                         int Product_Amount;
                         System.out.println("Please enter the Product's ID (According to the supplier)");
                         Product_ID = myScanner.nextInt();
-                        conect=sys.CheckProductexist(ID_Suplaier,Product_ID);
+                        conect=blService.CheckProductexist(ID_Suplaier,Product_ID);
                         if(conect) {
                             System.out.println("How many units of the product would you like to order??");
                             Product_Amount = myScanner.nextInt();
@@ -1095,9 +1092,9 @@ public class Main {
                             MoreProduct = false;
                         }
                     }
-                    int Done = sys.MakeOrder(ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
+                    int Done = blService.MakeOrder(ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
                     if (Done>=0){
-                        InterfaceOrder o = sys.getOrderDetails(Done);
+                        InterfaceOrder o = blService.getOrderDetails(Done);
                         if(o!=null){
                             PrintOrder(o);
                         }
@@ -1109,7 +1106,7 @@ public class Main {
     }
 
     private static void UpdateDetailsOrder() {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -1123,19 +1120,19 @@ public class Main {
             LinkedList<Integer> Days = new LinkedList<Integer>();
             System.out.println("Please enter the Order ID you want to change");
             ID_Order = myScanner.nextInt();
-            String Able = sys.CheckAbleToChangeOrder(ID_Order);
+            String Able = blService.CheckAbleToChangeOrder(ID_Order);
             if (!Able.equals("Able")) {
                 conect = false;
                 System.out.println("Too late to change order");
             }
             if (conect) {
-                ID_Suplaier = sys.GetSupplierID_PerOrder(ID_Order);
+                ID_Suplaier = blService.GetSupplierID_PerOrder(ID_Order);
                 boolean moreDay = true;
                 while (moreDay) {
                     int day;
                     System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
                     day = myScanner.nextInt();
-                    conect = sys.CheckTheDay(ID_Suplaier, day);
+                    conect = blService.CheckTheDay(ID_Suplaier, day);
                     if (conect) {
                         Days.add(day);
                         System.out.println("Would you like to add another day? y/n");
@@ -1155,7 +1152,7 @@ public class Main {
                     while (LessProduct) {
                         System.out.println("Please enter the Product's ID (According to the supplier)");
                         Product_ID = myScanner.nextInt();
-                        sys.RemoveProduct(ID_Order, Product_ID);
+                        blService.RemoveProduct(ID_Order, Product_ID);
                         System.out.println("Would you like to remove another product? y/n");
                         ans = myScanner.next();
                         if (ans.equals("n")) {
@@ -1172,7 +1169,7 @@ public class Main {
                     while ((MoreProduct)) {
                         System.out.println("Please enter the Product's ID (According to the supplier)");
                         Product_ID = myScanner.nextInt();
-                        conect = sys.CheckProductexist(ID_Suplaier, Product_ID);
+                        conect = blService.CheckProductexist(ID_Suplaier, Product_ID);
                         if (conect) {
                             System.out.println("How many units of the product would you like to order?");
                             Product_Amount = myScanner.nextInt();
@@ -1186,7 +1183,7 @@ public class Main {
                             MoreProduct = false;
                         }
                     }
-                    InterfaceOrder o = sys.ChangeOrder(ID_Order, ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
+                    InterfaceOrder o = blService.ChangeOrder(ID_Order, ID_Suplaier, Days, ItemsIDVendor_NumberOfItems);
                     if(o!=null){
                         PrintOrder(o);
                     }
@@ -1199,12 +1196,12 @@ public class Main {
     }
 
     private static void DisplayItems() {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
         if (conect) {
-            LinkedList<InterfaceContract> Contract = sys.GetContract();
+            LinkedList<InterfaceContract> Contract = blService.GetContract();
             for (InterfaceContract Con : Contract
             ) {
                 for (Map.Entry<Integer, String> e : Con.ProductIDVendor_Name.entrySet()) {
@@ -1226,12 +1223,12 @@ public class Main {
     }
 
     private static void DisplaySupplierDetails() {
-        boolean conect=sys.CheckConected();
+        boolean conect=blService.CheckConected();
         if(!conect){
             System.out.println("You should login");
         }
         if(conect) {
-            LinkedList<InterfaceSupplier> suppliers =sys.GetSupliers();
+            LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
             for (InterfaceSupplier Sup : suppliers
             ) {
                 System.out.print("\nname: " + Sup.Name + "\n" +
@@ -1258,7 +1255,7 @@ public class Main {
 
     private static void UpdateOrderStatus() {
 /*
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -1267,7 +1264,7 @@ public class Main {
             Scanner myScanner = new Scanner(System.in);
             System.out.println("Pleas enter the Order ID that arrived to the store");
             ID_Order = myScanner.nextInt();
-            InterfaceOrder order = sys.getOrderDetails(ID_Order);
+            InterfaceOrder order = blService.getOrderDetails(ID_Order);
             if(order!=null) {
                 Map ProductID_Amount=new HashMap<Integer, Integer>();
                 Map ProductID_Date=new HashMap<Integer, Integer>();
@@ -1284,7 +1281,7 @@ public class Main {
                         ProductID_Date.put(p.getKey(),date);
                     }
                 }
-                sys.AddToStore(ProductID_Amount,ProductID_Date);
+                blService.AddToStore(ProductID_Amount,ProductID_Date);
             }
             if (order==null)
                 System.out.println("the Order is mot exist in the system");
@@ -1292,7 +1289,7 @@ public class Main {
     }
 
     private static void DeleteSupplier() {
-        boolean conect = sys.CheckConected();
+        boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
         }
@@ -1301,12 +1298,12 @@ public class Main {
             int ID;
             System.out.println("Pleas enter the Supplier's ID");
             ID = myScanner.nextInt();
-            sys.DeleteSupplier(ID);
+            blService.DeleteSupplier(ID);
         }
     }
 
     private static void Logout() {
-        String ans=sys.Logout();
+        String ans=blService.Logout();
         System.out.println(ans);
     }
 
@@ -1336,7 +1333,7 @@ public class Main {
     private static void GetOrderDetails() {
         //todo changed!
         System.out.println("Orders that are scheduled to arrive today:");
-        LinkedList<InterfaceOrder> Orders=sys.GetOrderDetails();
+        LinkedList<InterfaceOrder> Orders=blService.GetOrderDetails();
         for (InterfaceOrder o:Orders
         ) {
             System.out.println("Order ID is: " + o.ID_Inventation);

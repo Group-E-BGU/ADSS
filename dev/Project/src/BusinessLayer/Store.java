@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import DataAccesslayer.*;
-import InterfaceLayer.*;
 
 public class Store {
 
@@ -834,7 +833,7 @@ public class Store {
     }
 
     public void sendWarning(ItemRecord itemRecord) {
-        SystemManager.sendWarning("Making new order of "+itemRecord.getName()+" after reaching total amount of : "+itemRecord.getTotalAmount()+" " +
+        BLService.sendWarning("Making new order of "+itemRecord.getName()+" after reaching total amount of : "+itemRecord.getTotalAmount()+" " +
                 " while min amount is : " +itemRecord.getMinAmount()+ "\n");
         AutomaticProductOrdering(itemRecord.getId(),itemRecord.getMinAmount()*2);
     }

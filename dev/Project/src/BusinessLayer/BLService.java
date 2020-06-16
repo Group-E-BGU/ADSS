@@ -1,7 +1,7 @@
 package BusinessLayer;
 
 import DataAccesslayer.*;
-import PresentationLayer.Menu;
+import PresentationLayer.Main;
 import javafx.util.Pair;
 
 import java.time.DayOfWeek;
@@ -701,7 +701,7 @@ public class BLService {
     }
 
     public static void sendWarning(String warning) {
-        Menu.printWarning(warning);
+        Main.printWarning(warning);
     }
 
     public String getItemAmountsByName(String name) {

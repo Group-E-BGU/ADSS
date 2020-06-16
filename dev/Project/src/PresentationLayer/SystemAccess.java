@@ -1,8 +1,6 @@
 package PresentationLayer;
 
 import BusinessLayer.*;
-import InterfaceLayer.SystemManager;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Scanner;
@@ -11,11 +9,10 @@ public class SystemAccess
 {
 
     static Scanner keyboard = new Scanner(System.in);
-//    private static SystemManager Sys = new SystemManager();
     static BLService blService = BLService.getInstance();
 
 
-    public static void register(SystemManager Sys)
+    public static void register()
     {
         List<String> available_locations = blService.getAvailableAddressesRegister();
         if(available_locations.isEmpty())
@@ -50,14 +47,14 @@ public class SystemAccess
         String password;
         System.out.println("Please enter your email");
         email = keyboard.nextLine();
-        String Ex=Sys.CheckEmailExist(email);
+        String Ex=blService.CheckEmailExist(email);
         if(!Ex.equals("Not Exist")){
             System.out.println(Ex);
         }
         else {
             System.out.println("Please enter password");
             password = keyboard.nextLine();
-            String Done = Sys.Register(email, password);
+            String Done = blService.Register(email, password);
             if (Done.equals("Done")) {
                 System.out.println("The registration was successful");
             } else
@@ -66,13 +63,13 @@ public class SystemAccess
     }
 
 
-    public static boolean login(SystemManager Sys)
+    public static boolean login()
     {
         String email;
         String password;
         System.out.println("Please enter your email");
         email = keyboard.nextLine();
-        String Ex = Sys.CheckEmailExist(email);
+        String Ex = blService.CheckEmailExist(email);
         boolean done = true;
         if(!Ex.equals("Exist")) {
             System.out.println(Ex);
@@ -81,7 +78,7 @@ public class SystemAccess
         if (done) {
             System.out.println("Please enter password");
             password = keyboard.nextLine();
-            String Done = Sys.Login(email, password);
+            String Done = blService.Login(email, password);
             if (!Done.equals("Done")) {
                 System.out.println("wrong password");
                 done=false;
