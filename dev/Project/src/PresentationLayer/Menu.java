@@ -1,8 +1,8 @@
 package PresentationLayer;
 
-import InterfaceLayer.InterfaceContract;
-import InterfaceLayer.InterfaceOrder;
-import InterfaceLayer.InterfaceSupplier;
+import BusinessLayer.InterfaceContract;
+import BusinessLayer.InterfaceOrder;
+import BusinessLayer.InterfaceSupplier;
 import InterfaceLayer.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

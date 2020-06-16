@@ -1,7 +1,5 @@
-package InterfaceLayer;
+package BusinessLayer;
 
-import BusinessLayer.Contract;
-import BusinessLayer.Wrotequantities;
 import java.util.Map;
 
 public class InterfaceSupplier {

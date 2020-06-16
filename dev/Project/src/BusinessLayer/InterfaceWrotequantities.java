@@ -1,4 +1,4 @@
-package InterfaceLayer;
+package BusinessLayer;
 
 import java.util.Map;
 

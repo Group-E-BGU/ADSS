@@ -4,9 +4,9 @@ package PresentationLayer;
 import java.math.BigInteger;
 
 import BusinessLayer.*;
-import InterfaceLayer.InterfaceContract;
-import InterfaceLayer.InterfaceOrder;
-import InterfaceLayer.InterfaceSupplier;
+import BusinessLayer.InterfaceContract;
+import BusinessLayer.InterfaceOrder;
+import BusinessLayer.InterfaceSupplier;
 import InterfaceLayer.SystemManager;
 
 import java.util.*;
