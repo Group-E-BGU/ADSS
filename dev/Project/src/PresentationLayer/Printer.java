@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Printer {
 
-    static BLService blService = new BLService();
+    static BLService blService = BLService.getInstance();
 
     public static void printAllWorkingTypes() {
         int number = 1;

@@ -9,6 +9,9 @@ import java.util.*;
 
 public class BLService {
 
+    private static BLService blService_instance = null;
+
+
     private History history;
     private Workers workers;
     private Data data;
@@ -17,7 +20,7 @@ public class BLService {
     private User logged_user;
     private Store current_Store;
 
-    public BLService() {
+    private BLService() {
         history = History.getInstance();
         workers = Workers.getInstance();
         data = Data.getInstance();
@@ -26,6 +29,13 @@ public class BLService {
         current_Store=null;
         systemcontroler=new system();
 
+    }
+
+    public static BLService getInstance(){
+        if(blService_instance == null){
+            blService_instance = new BLService();
+        }
+        return blService_instance;
     }
 //------------------------------------ Workers --------------------------------//
 

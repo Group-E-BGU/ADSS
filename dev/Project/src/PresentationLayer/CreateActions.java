@@ -13,7 +13,7 @@ import java.util.*;
 public class CreateActions {
 
     static Scanner keyboard = new Scanner(System.in);
-    static BLService blService = new BLService();
+    static BLService blService = BLService.getInstance();
 
 
     public void createShift() {

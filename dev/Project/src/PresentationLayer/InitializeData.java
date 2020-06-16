@@ -62,8 +62,8 @@ public class InitializeData {
             Address b = new Address("Tel Aviv","Eran","0547322165");
             Data.getInstance().getAddresses().put(a.getLocation(),a);
             Data.getInstance().getAddresses().put(b.getLocation(),b);
-            Shift sundayMorning_shift = new Shift(a,date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, new BLService().getWorker(111111111), new HashMap<>());
-            Shift mondayEvening_shift = new Shift(b,date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, new BLService().getWorker(222222222), new HashMap<>());
+            Shift sundayMorning_shift = new Shift(a,date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, BLService.getInstance().getWorker(111111111), new HashMap<>());
+            Shift mondayEvening_shift = new Shift(b,date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, BLService.getInstance().getWorker(222222222), new HashMap<>());
             history.getShifts().put(sundayMorning_shift.getShiftId(),sundayMorning_shift);
             history.getShifts().put(mondayEvening_shift.getShiftId(),mondayEvening_shift);
             Workers.getInstance().getAllWorkers().get(111111111).getWorker_shifts().add(sundayMorning_shift.getShiftId());

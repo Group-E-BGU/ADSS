@@ -17,7 +17,7 @@ public class Main {
     public static int id_lower_bound = 100000000;
     public static int id_upper_bound = 999999999;
     static Scanner keyboard = new Scanner(System.in);
-    static BLService blService = new BLService();
+    static BLService blService = BLService.getInstance();
     static InitializeData init_data = new InitializeData();
     static SystemManager sys = new SystemManager();
 

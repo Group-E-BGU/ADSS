@@ -12,7 +12,7 @@ public class SystemAccess
 
     static Scanner keyboard = new Scanner(System.in);
 //    private static SystemManager Sys = new SystemManager();
-    static BLService blService = new BLService();
+    static BLService blService = BLService.getInstance();
 
 
     public static void register(SystemManager Sys)
