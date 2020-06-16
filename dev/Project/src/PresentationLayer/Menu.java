@@ -10,11 +10,13 @@ public class Menu {
 
     private static SystemManager Sys = new SystemManager();
 
-    public static void main(String[] args) {
+ /*   public static void main(String[] args) {
         Sys.initializeDB();
         MainMenu();
     }
 
+
+  */
     private static void  MainMenu(){
         boolean con=true;
         System.out.println("Welcome to 'super Le'!\n");

@@ -61,7 +61,29 @@ public class Printer {
         System.out.println("4) View Addresses");
         System.out.println("5) View Trucks");
         System.out.println("6) View Products");
-        System.out.println("7) exit");
+        System.out.println("7) Add a new supplier");
+        System.out.println("8) Add an agreement to supplier");
+        System.out.println("9) Adding \"Quantity Write\" to supplier");
+        System.out.println("10) Make a Fix order");
+        System.out.println("11) Display the items in the super");
+        System.out.println("12) Display sll the supplier's details");
+        System.out.println("13) Update Order Status");
+        System.out.println("14) Edit supplier details");
+        System.out.println("15) Edit supplier's arrangement");
+        System.out.println("16) Edit \"Write Quantities\" of supplier");
+        System.out.println("17) Delete supplier");
+        System.out.println("18) Change item amount");
+        System.out.println("19) Move from storage to shelf");
+        System.out.println("20) Subtract from shelf");
+        System.out.println("21) Print inventory report");
+        System.out.println("22) Enter defected item");
+        System.out.println("23) Print defective report");
+        System.out.println("24) Enter new discount");
+        System.out.println("25) Enter new price");
+        System.out.println("26) Update DetailsOrder");
+        System.out.println("27) Check the Cheaper Supplier for specific product");
+        System.out.println("28) Logout");
+
     }
 
     public static void printWorkersView() {
@@ -320,7 +342,7 @@ public class Printer {
 
     }
 
-    public static void Addresses(List<String> available_addresses) {
+    public static void printAddresses(List<String> available_addresses) {
 
         String addresses="";
         for(String location : available_addresses)

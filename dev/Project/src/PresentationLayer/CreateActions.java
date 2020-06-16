@@ -480,7 +480,7 @@ public class CreateActions {
         Address address = null;
         List<String> available_addresses = blService.getAvailableAddresses(date, delivery_time);
         boolean address_chosen = false;
-        Printer.Addresses(available_addresses);
+        Printer.printAddresses(available_addresses);
         while (!address_chosen) {
             String location = keyboard.nextLine();
             if (blService.getAddress(location) == null) {

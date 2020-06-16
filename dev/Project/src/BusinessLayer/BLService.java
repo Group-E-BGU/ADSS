@@ -289,6 +289,11 @@ public class BLService {
         return true;
     }
 
+    public List<String> getAvailableAddressesRegister()
+    {
+        return null;
+    }
+
 //------------------------------ Truck --------------------------//
 
 
