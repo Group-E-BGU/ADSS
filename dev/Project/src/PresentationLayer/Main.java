@@ -23,6 +23,7 @@ public class Main {
         blService.initializeDB();
         init_data.createWorkers();
         init_data.createShifts();
+        init_data.createMenus();
         blService.loadFromDataBase();
 
 
@@ -62,10 +63,13 @@ public class Main {
 
     private static void actionList() {
         boolean terminate = false;
+        Map<Integer,MenuOption> allowed_options = Printer.initMenu(blService.getLogged_user().getUserType());
 
         while (!terminate) {
-            Printer.printMainMenu();
-            int choice = getChoice(1, 28);
+            Printer.printMainMenu(allowed_options);
+            int choice = getChoice(1, allowed_options.size());
+
+            choice = new LinkedList<>(allowed_options.keySet()).get(choice-1);
 
             switch (choice) {
                 case 1:

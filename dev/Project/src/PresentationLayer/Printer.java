@@ -2,7 +2,7 @@ package PresentationLayer;
 
 import BusinessLayer.*;
 import javafx.util.Pair;
-
+import BusinessLayer.User.UserType;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -53,8 +53,17 @@ public class Printer {
         }
     }
 
-    public static void printMainMenu() {
+    public static void printMainMenu(Map<Integer,MenuOption> options) {
 
+    //    initMenu(userType);
+
+        int i = 1;
+        for (MenuOption option : options.values()) {
+            System.out.println(i + ") " + option.getOption_text());
+            i++;
+        }
+
+ /*
         System.out.println("1) View Workers");
         System.out.println("2) View Shifts");
         System.out.println("3) View Deliveries");
@@ -83,7 +92,20 @@ public class Printer {
         System.out.println("26) Update DetailsOrder");
         System.out.println("27) Check the Cheaper Supplier for specific product");
         System.out.println("28) Logout");
+*/
+    }
 
+    public static Map<Integer,MenuOption> initMenu(UserType userType) {
+
+        Map<Integer,MenuOption> allowed_options = new HashMap<>();
+
+        for(Map.Entry<Integer,MenuOption> entry : InitializeData.menu_options.entrySet())
+        {
+            if(userType.equals(UserType.Master) || Arrays.asList(entry.getValue().getAllowed_users()).contains(userType))
+                allowed_options.put(entry.getKey(),entry.getValue());
+        }
+
+        return allowed_options;
     }
 
     public static void printWorkersView() {
@@ -146,9 +168,7 @@ public class Printer {
                 System.out.println("job : " + worker.getType().toString());
                 if (worker.getType() == WorkPolicy.WorkingType.Driver) {
                     System.out.println("License : " + ((Driver) worker).getLicense() + '\n');
-                }
-                else
-                {
+                } else {
                     System.out.println("\n");
                 }
 
@@ -228,19 +248,15 @@ public class Printer {
         System.out.println(trucks);
     }
 
-    public static void printTrucks(List<String> available_trucks)
-    {
+    public static void printTrucks(List<String> available_trucks) {
 
         String trucks = "";
 
         for (String truck_serial : available_trucks) {
             Truck truck = blService.getTruck(truck_serial);
-            if(truck== null)
-            {
-                System.out.println("Error in printing a truck with serial number : "+truck_serial+'\n');
-            }
-            else
-            {
+            if (truck == null) {
+                System.out.println("Error in printing a truck with serial number : " + truck_serial + '\n');
+            } else {
                 trucks += "Truck serial number : " + truck_serial + "\n" +
                         "Model : " + truck.getModel() + "\n" +
                         "Weight : " + truck.getWeight() + "\n" +
@@ -322,17 +338,14 @@ public class Printer {
         System.out.println("--------------------------------");
     }
 
-    public static void printDocuments(int delivery_id)
-    {
+    public static void printDocuments(int delivery_id) {
 
-        for(Document document : blService.getDelivery(delivery_id).getDocuments().values())
-        {
+        for (Document document : blService.getDelivery(delivery_id).getDocuments().values()) {
 
-            System.out.println("document id : "+document.getDocumentID());
+            System.out.println("document id : " + document.getDocumentID());
             System.out.println("Trade goods : \n");
-            for(Map.Entry<String,Integer> entry : document.getDeliveryGoods().entrySet())
-            {
-                System.out.println("Product name : "+blService.getProduct(entry.getKey()).getName() + "     , amount : "+entry.getValue()+'\n');
+            for (Map.Entry<String, Integer> entry : document.getDeliveryGoods().entrySet()) {
+                System.out.println("Product name : " + blService.getProduct(entry.getKey()).getName() + "     , amount : " + entry.getValue() + '\n');
             }
 
             System.out.println("\n");
@@ -344,9 +357,8 @@ public class Printer {
 
     public static void printAddresses(List<String> available_addresses) {
 
-        String addresses="";
-        for(String location : available_addresses)
-        {
+        String addresses = "";
+        for (String location : available_addresses) {
             Address a = blService.getAddress(location);
 
             addresses += "Location : " + a.getLocation() + "\n" +
