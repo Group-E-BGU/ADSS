@@ -114,18 +114,18 @@ public class InitializeData {
     public void createMenus()
     {
         int i=0;
-        menu_options.put(++i, new MenuOption("View Workers",new User.UserType[]{User.UserType.WorkersManager}));
-        menu_options.put(++i, new MenuOption("View Shifts",new User.UserType[]{User.UserType.WorkersManager}));
+        menu_options.put(++i, new MenuOption("View Workers",new User.UserType[]{User.UserType.WorkersManager, User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("View Shifts",new User.UserType[]{User.UserType.WorkersManager, User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("View Deliveries",new User.UserType[]{User.UserType.Logistic , User.UserType.StoreManager}));
-        menu_options.put(++i, new MenuOption("View Addresses",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("View Trucks",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("View Products",new User.UserType[]{}));
+        menu_options.put(++i, new MenuOption("View Addresses",new User.UserType[]{User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("View Trucks",new User.UserType[]{User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("View Products",new User.UserType[]{User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("Add a new supplier",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Add an agreement to supplier",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Adding \"Quantity Write\" to supplier",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Make a Fix order",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Display the items in the super",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Display sll the supplier's details",new User.UserType[]{}));
+        menu_options.put(++i, new MenuOption("Display the items in the super",new User.UserType[]{User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("Display sll the supplier's details",new User.UserType[]{User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("Update Order Status",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Edit supplier details",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Edit supplier's arrangement",new User.UserType[]{}));
@@ -134,14 +134,14 @@ public class InitializeData {
         menu_options.put(++i, new MenuOption("Change item amount",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Move from storage to shelf",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Subtract from shelf",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Print inventory report",new User.UserType[]{}));
+        menu_options.put(++i, new MenuOption("Print inventory report",new User.UserType[]{User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("Enter defected item",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Print defective report",new User.UserType[]{}));
+        menu_options.put(++i, new MenuOption("Print defective report",new User.UserType[]{User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("Enter new discount",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Enter new price",new User.UserType[]{}));
         menu_options.put(++i, new MenuOption("Update DetailsOrder",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Check the Cheaper Supplier for specific product",new User.UserType[]{}));
-        menu_options.put(++i, new MenuOption("Logout",new User.UserType[]{User.UserType.WorkersManager, User.UserType.Logistic, User.UserType.Stock}));
+        menu_options.put(++i, new MenuOption("Check the Cheaper Supplier for specific product",new User.UserType[]{User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("Logout", User.UserType.values()));
     }
 
 }

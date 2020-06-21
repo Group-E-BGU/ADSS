@@ -4,6 +4,7 @@ import BusinessLayer.*;
 import javafx.util.Pair;
 import BusinessLayer.User.UserType;
 
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -124,8 +125,8 @@ public class Printer {
             System.out.println(workers_string + '\n');
         }
 
+    */
 
-     */
 
         if(blService.getAllWorkers().isEmpty())
         {
@@ -146,16 +147,82 @@ public class Printer {
             System.out.println(tableString);
         }
 
+
         System.out.println("1) Register a worker");
         System.out.println("2) select a worker");
         System.out.println("3) return\n");
     }
 
     public static void printShiftsView() {
+
+    /*
+        if(blService.getAllShifts().isEmpty())
+        {
+            System.out.println("no shifts in the dataBase!!!!!");
+        }
+        else
+        {
+
+            Map<Integer, String> tables_info = new HashMap<>();
+            Map<Integer, List<String>> columns_names = new HashMap<>();
+            Map<Integer, List<List<String>>> rows_data = new HashMap<>();
+
+
+
+            for(Shift shift : blService.getAllShifts().values())
+            {
+                String table_name = "SHIFT #"+shift.getShiftId();
+                List<String> table_headers = Arrays.asList("ADDRESS", "DATE", "TIME", "BOSS");
+                List<List<String>> table_rows = Arrays.asList(
+                        Arrays.asList(shift.getAddress().getLocation(), new SimpleDateFormat("dd/MM/yyyy").format(shift.getShiftDate()),shift.getShiftTime().toString(), shift.getBoss().getName())
+                );
+
+                tables_info.put(0, table_name);
+                columns_names.put(0, table_headers);
+                rows_data.put(0, table_rows);
+
+
+                String working_name = "WORKING TEAM";
+                List<String> working_headers = Arrays.asList("NAME","JOB");
+                List<List<String>> working_rows = new LinkedList<>();
+
+
+                for(List<Integer> workers_id : shift.getWorkingTeam().values())
+                {
+                    for(Integer worker_id : workers_id)
+                    {
+                        Worker worker = blService.getWorker(worker_id);
+                        working_rows.add(Arrays.asList(worker.getName(),worker.getType().toString()));
+
+                    }
+                }
+
+                if(working_rows.isEmpty())
+                {
+                    working_rows.add(Arrays.asList("",""));
+                }
+
+                tables_info.put(1, working_name);
+                columns_names.put(1, working_headers);
+                rows_data.put(1, working_rows);
+
+                System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
+
+
+            }
+
+
+        }
+
+     */
+
+
         for (Shift shift : blService.getAllShifts().values()) {
             System.out.println(shift.toString());
             border();
         }
+
+
 
         System.out.println("1) select a shift");
         System.out.println("2) create a shift");
@@ -226,13 +293,14 @@ public class Printer {
 
     public static void printAddressesView() {
 
-        printAllAddresses();
+        //printAllAddresses();
+        printAddresses(new LinkedList<>(blService.getAllAddresses().keySet()));
         System.out.println("1) Add an address");
         System.out.println("2) Return");
 
     }
 
-    public static void printAllAddresses() {
+/*    public static void printAllAddresses() {
         Map<String, Address> addresses_map = blService.getAllAddresses();
 
         String addresses = "";
@@ -245,6 +313,8 @@ public class Printer {
 
         System.out.println(addresses);
     }
+
+ */
 
 //------------------------------------ Trucks ---------------------------------//
 
@@ -378,9 +448,31 @@ public class Printer {
 
     }
 
-    public static void printAddresses(List<String> available_addresses) {
+    public static void printAddresses(List<String> available_addresses)
+    {
 
-        String addresses = "";
+
+        if(available_addresses==null || available_addresses.isEmpty())
+        {
+            System.out.println("Error : didnt find any address!!!!!");
+        }
+        else
+        {
+            List<String> headersList = Arrays.asList("LOCATION", "CONTACT NAME", "PHONE NUMBER");
+            List<List<String>> rowsList = new LinkedList<>();
+
+            for (String location : available_addresses)
+            {
+                Address address = blService.getAddress(location);
+                List<String> address_details = Arrays.asList(location,address.getContactName(),address.getPhoneNumber());
+                rowsList.add(address_details);
+            }
+
+            String tableString = objectToTableString(headersList,rowsList,10);
+            System.out.println(tableString);
+        }
+
+    /*    String addresses = "";
         for (String location : available_addresses) {
             Address a = blService.getAddress(location);
 
@@ -391,6 +483,8 @@ public class Printer {
         }
 
         System.out.println(addresses);
+
+     */
     }
 
     private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data , int additional_space) {
@@ -473,8 +567,6 @@ public class Printer {
             }
         }
 
-        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
         // we need now to actually find the appropriate length for each column for each table
 
         for (Map.Entry<Integer, List<List<String>>> table : rows_data.entrySet()) {
@@ -490,9 +582,6 @@ public class Printer {
                 }
             }
         }
-
-
-        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 
         // now instead of having one sum which represents the width of a single table , we will need a sum array
@@ -534,8 +623,6 @@ public class Printer {
         Board board = new Board(biggest_sum);   // sum = width of all + number of columns + 1
 
 
-        //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
         List<Integer> tmp = new LinkedList<>();
 
         // now we need to create the tables with this width
@@ -574,7 +661,6 @@ public class Printer {
 
             Table table = new Table(board, biggest_sum, columns, rows, columns_widths);
 
-//            System.out.println(board.setInitialBlock(table.tableToBlocks()).getPreview());
 
             int get_index = 0, append_index = 0;
 
@@ -588,18 +674,16 @@ public class Printer {
             tmp.add(get_index);
 
             if (table_number == 0) {
-                board.setInitialBlock(block); // not sure about sum-2
+                board.setInitialBlock(block);
             }
             else
             {
                 int z = tmp.remove(0);
-                board.getBlock(z).setBelowBlock(block); // not sure about sum-2
+                board.getBlock(z).setBelowBlock(block);
 
             }
 
             board.appendTableTo(append_index, Board.APPEND_BELOW, table);
-
-            //        append_index = append_index + (2*columns.size())+1;
 
 
         }

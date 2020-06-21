@@ -2,8 +2,6 @@ package PresentationLayer;
 
 import BusinessLayer.User.UserType;
 
-import java.util.Arrays;
-
 public class MenuOption {
 
     private String option_text;

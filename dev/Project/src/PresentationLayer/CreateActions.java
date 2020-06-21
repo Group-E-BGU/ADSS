@@ -20,7 +20,8 @@ public class CreateActions {
 
         System.out.println("Choose an address for this shift by typing its location :");
         Address address = null;
-        Printer.printAllAddresses();
+        //    Printer.printAllAddresses();
+        Printer.printAddresses(new LinkedList<>(blService.getAllAddresses().keySet()));
         boolean address_chosen = false;
         while (!address_chosen) {
             String location = keyboard.nextLine();
@@ -303,9 +304,8 @@ public class CreateActions {
         System.out.println("Enter the contact's phone number:");
         String phone_number = keyboard.nextLine();
 
-        if (blService.addAddress(new Address(location, contact_name, phone_number))) {
-            System.out.println("The address has been added successfully!");
-        } else {
+        if (!blService.addAddress(new Address(location, contact_name, phone_number)))
+        {
             System.out.println("Error : Couldn't add address");
         }
 
@@ -503,7 +503,9 @@ public class CreateActions {
         String source = address.getLocation();
 
         Printer.border();
-        Printer.printAllAddresses();
+        //    Printer.printAllAddresses();
+        Printer.printAddresses(new LinkedList<>(blService.getAllAddresses().keySet()));
+
 
         System.out.println("Choose destinations : ");
         boolean destinations_chosen = false;

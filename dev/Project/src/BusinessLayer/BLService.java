@@ -636,7 +636,7 @@ public class BLService {
     public String Login(String email, String password) {
         String Done=systemcontroler.Login(email,password);
         if(Done.equals("Done")){
-            logged_user=new User(email,password, User.UserType.Master);
+            logged_user=new User(email,password, User.UserType.StoreManager);
             current_Store=Store.createInstance(email);
         }
         //initialize();

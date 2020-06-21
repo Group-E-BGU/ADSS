@@ -130,8 +130,7 @@ public class Main {
                     System.out.println(amount);
                     if (!amount.equals("No such item in inventory")) {
                         System.out.println("Choose to add or to remove:\n1.Add\n2.Remove");
-                        int add_choice = keyboard.nextInt();
-                        keyboard.nextLine();
+                        int add_choice = getChoice(1,2);
                         if (add_choice == 1) {
                             System.out.println("Please enter new storage and shelf amounts and expiration date in the following format(dd/MM/yyyy)");
                             String amounts = keyboard.nextLine();
@@ -139,16 +138,13 @@ public class Main {
                         } else if (add_choice == 2) {
                             System.out.println(blService.getItemIdsByName(name));
                             System.out.println("Please enter item id or -1 if done");
-                            int id = keyboard.nextInt();
+                            int id = getChoice(-1,Integer.MAX_VALUE);
                             while (id != -1) {
                                 System.out.println(blService.removeItem(name, id));
                                 System.out.println("Please enter item id or -1 if done");
-                                id = keyboard.nextInt();
+                                id = getChoice(-1,Integer.MAX_VALUE);
                             }
 
-                        } else {
-                            System.out.println("number out of range");
-                            break;
                         }
                     }
                     break;
@@ -173,11 +169,11 @@ public class Main {
                     if (!amount.equals("No such item in inventory")) {
                         System.out.println(blService.getItemIdsByName(name));
                         System.out.println("Please enter item id or -1 if done");
-                        int id = keyboard.nextInt();
+                        int id = getChoice(-1,Integer.MAX_VALUE);
                         while (id != -1) {
                             System.out.println(blService.removeItemFromShelf(name, id));
                             System.out.println("Please enter item id or -1 if done");
-                            id = keyboard.nextInt();
+                            id = getChoice(-1,Integer.MAX_VALUE);
                         }
                     }
                     break;
