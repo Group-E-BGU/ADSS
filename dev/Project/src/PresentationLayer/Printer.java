@@ -3,6 +3,7 @@ package PresentationLayer;
 import BusinessLayer.*;
 import javafx.util.Pair;
 import BusinessLayer.User.UserType;
+
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -53,9 +54,9 @@ public class Printer {
         }
     }
 
-    public static void printMainMenu(Map<Integer,MenuOption> options) {
+    public static void printMainMenu(Map<Integer, MenuOption> options) {
 
-    //    initMenu(userType);
+        //    initMenu(userType);
 
         int i = 1;
         for (MenuOption option : options.values()) {
@@ -95,14 +96,13 @@ public class Printer {
 */
     }
 
-    public static Map<Integer,MenuOption> initMenu(UserType userType) {
+    public static Map<Integer, MenuOption> initMenu(UserType userType) {
 
-        Map<Integer,MenuOption> allowed_options = new HashMap<>();
+        Map<Integer, MenuOption> allowed_options = new HashMap<>();
 
-        for(Map.Entry<Integer,MenuOption> entry : InitializeData.menu_options.entrySet())
-        {
-            if(userType.equals(UserType.Master) || Arrays.asList(entry.getValue().getAllowed_users()).contains(userType))
-                allowed_options.put(entry.getKey(),entry.getValue());
+        for (Map.Entry<Integer, MenuOption> entry : InitializeData.menu_options.entrySet()) {
+            if (userType.equals(UserType.Master) || Arrays.asList(entry.getValue().getAllowed_users()).contains(userType))
+                allowed_options.put(entry.getKey(), entry.getValue());
         }
 
         return allowed_options;
@@ -368,5 +368,50 @@ public class Printer {
         }
 
         System.out.println(addresses);
+    }
+
+    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data) {
+
+
+        if (rows_data == null || columns_names == null || rows_data.isEmpty() || rows_data.get(0).size() != columns_names.size())
+            throw new IllegalArgumentException();
+
+
+        Integer[] widths = new Integer[rows_data.get(0).size()];
+
+        int k = 0;
+        for (String column_name : columns_names) {
+            widths[k] = column_name.length();
+
+            k++;
+        }
+
+
+        for (List<String> row_data : rows_data) {
+            int field_num = 0;
+            for (String field : row_data) {
+                if (field.length() > widths[field_num]) {
+                    widths[field_num] = field.length();
+                }
+
+                field_num++;
+            }
+        }
+
+        int sum = columns_names.size() + 1;
+
+        for (Integer width : widths) {
+            sum = sum + width;
+        }
+
+        Board board = new Board(sum);   // sum = width of all + number of columns + 1
+        Table table = new Table(board, sum, columns_names, rows_data);
+        List<Integer> colWidthsListEdited = Arrays.asList(widths);
+        table.setGridMode(Table.GRID_FULL).setColWidthsList(colWidthsListEdited);
+        Block tableBlock = table.tableToBlocks();
+        board.setInitialBlock(tableBlock);
+        board.build();
+        return board.getPreview();
+
     }
 }
