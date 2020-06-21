@@ -110,6 +110,8 @@ public class Printer {
 
     public static void printWorkersView() {
 
+
+    /*
         String workers_string = "";
         for (Worker worker : blService.getAllWorkers().values()) {
             workers_string = workers_string + worker.toString() + '\n';
@@ -122,6 +124,27 @@ public class Printer {
             System.out.println(workers_string + '\n');
         }
 
+
+     */
+
+        if(blService.getAllWorkers().isEmpty())
+        {
+            System.out.println("no Workers in the dataBase!!!!!");
+        }
+        else
+        {
+            List<String> headersList = Arrays.asList("ID", "NAME", "JOB");
+            List<List<String>> rowsList = new LinkedList<>();
+
+            for (Worker worker : blService.getAllWorkers().values())
+            {
+                List<String> worker_details = Arrays.asList(String.valueOf(worker.getId()),worker.getName(),worker.getType().toString());
+                rowsList.add(worker_details);
+            }
+
+            String tableString = objectToTableString(headersList,rowsList,10);
+            System.out.println(tableString);
+        }
 
         System.out.println("1) Register a worker");
         System.out.println("2) select a worker");
@@ -370,7 +393,7 @@ public class Printer {
         System.out.println(addresses);
     }
 
-    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data) {
+    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data , int additional_space) {
 
 
         if (rows_data == null || columns_names == null || rows_data.isEmpty() || rows_data.get(0).size() != columns_names.size())
@@ -381,7 +404,7 @@ public class Printer {
 
         int k = 0;
         for (String column_name : columns_names) {
-            widths[k] = column_name.length();
+            widths[k] = column_name.length()+additional_space;
 
             k++;
         }
@@ -404,8 +427,16 @@ public class Printer {
             sum = sum + width;
         }
 
+
         Board board = new Board(sum);   // sum = width of all + number of columns + 1
         Table table = new Table(board, sum, columns_names, rows_data);
+
+        List<Integer> colAlignList = new LinkedList<>();
+
+        for(int i=0 ; i<columns_names.size();i++)
+            colAlignList.add(Block.DATA_CENTER);
+
+        table.setColAlignsList(colAlignList);
         List<Integer> colWidthsListEdited = Arrays.asList(widths);
         table.setGridMode(Table.GRID_FULL).setColWidthsList(colWidthsListEdited);
         Block tableBlock = table.tableToBlocks();
