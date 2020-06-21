@@ -414,4 +414,168 @@ public class Printer {
         return board.getPreview();
 
     }
+
+    private static String objectToComplexTableString(Map<Integer, String> tables_info, Map<Integer, List<String>> columns_names, Map<Integer, List<List<String>>> rows_data) {
+
+// tables_info <tableNumber,tableName>
+// columns_names <tableNumber , tableColumnsNames>
+// rows_data <tableNumber, tableRows>
+
+        if (rows_data == null || columns_names == null || rows_data.isEmpty())
+            throw new IllegalArgumentException();
+
+
+        Map<Integer, Integer[]> widths = new HashMap<>();
+
+        // we need now to fill for each table its width , first we assume that the column name is the longest
+
+
+        for (Map.Entry<Integer, List<String>> table : columns_names.entrySet()) {
+            int table_number = table.getKey();
+            widths.put(table_number, new Integer[columns_names.get(table_number).size()]);
+
+            int k = 0;
+            for (String column_name : columns_names.get(table_number)) {
+                widths.get(table_number)[k] = column_name.length();
+
+                k++;
+            }
+        }
+
+        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+        // we need now to actually find the appropriate length for each column for each table
+
+        for (Map.Entry<Integer, List<List<String>>> table : rows_data.entrySet()) {
+            int table_number = table.getKey();
+            for (List<String> row_data : rows_data.get(table_number)) {
+                int field_num = 0;
+                for (String field : row_data) {
+                    if (field.length() > widths.get(table_number)[field_num]) {
+                        widths.get(table_number)[field_num] = field.length();
+                    }
+
+                    field_num++;
+                }
+            }
+        }
+
+
+        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+
+        // now instead of having one sum which represents the width of a single table , we will need a sum array
+        // because we have multiple tables
+
+
+        Integer[] sums = new Integer[tables_info.keySet().size()];
+
+        for (Map.Entry<Integer, List<String>> table : columns_names.entrySet()) {
+            int table_number = table.getKey();
+            sums[table_number] = table.getValue().size() + 1;
+
+        }
+
+
+        // add the width for each table to the sum
+        //we also need to check an extreme case , is the table name longer than the total width of its columns ?
+
+
+        for (Map.Entry<Integer, Integer[]> table_width : widths.entrySet()) {
+
+            int total_width = 0;
+            for (Integer column_width : table_width.getValue()) {
+                total_width = total_width + column_width;
+            }
+
+            if (total_width >= tables_info.get(table_width.getKey()).length())
+                sums[table_width.getKey()] = sums[table_width.getKey()] + total_width;
+            else
+                sums[table_width.getKey()] = sums[table_width.getKey()] + tables_info.get(table_width.getKey()).length();
+        }
+
+        // now we chose the biggest width in all tables to determinate the length for the rest
+
+        int biggest_sum = Collections.max(Arrays.asList(sums));
+
+        // create the board
+
+        Board board = new Board(biggest_sum);   // sum = width of all + number of columns + 1
+
+
+        //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+        List<Integer> tmp = new LinkedList<>();
+
+        // now we need to create the tables with this width
+
+        for (Integer table_number : tables_info.keySet()) {
+
+            int sum = sums[table_number];
+
+            List<String> columns = columns_names.get(table_number);
+            List<List<String>> rows = rows_data.get(table_number);
+
+            List<Integer> columns_widths = new LinkedList<>();
+            int total_width = 0;
+            for (Integer width : widths.get(table_number)) {
+                columns_widths.add(width);
+                total_width = total_width + width;
+            }
+
+
+            // if less then distribute the empty space between the columns
+            if (sum < biggest_sum) {
+                int result = (biggest_sum - sum) / columns_names.get(table_number).size();
+                for (int i = 0; i < columns_widths.size(); i++) {
+                    columns_widths.set(i, columns_widths.get(i) + result);
+                }
+
+                int remains = biggest_sum - (sum + result * columns_names.get(table_number).size());
+                while (remains != 0) {
+                    int min_width = Collections.min(columns_widths);
+                    columns_widths.set(columns_widths.indexOf(min_width), min_width + 1);
+                    remains--;
+                }
+
+            }
+
+
+            Table table = new Table(board, biggest_sum, columns, rows, columns_widths);
+
+//            System.out.println(board.setInitialBlock(table.tableToBlocks()).getPreview());
+
+            int get_index = 0, append_index = 0;
+
+
+            // create block from table
+            Block block = new Block(board, biggest_sum - 2, 1, tables_info.get(table_number)).setDataAlign(Block.DATA_CENTER);
+
+            append_index = block.getIndex();
+            get_index = append_index + columns.size() + 1;
+
+            tmp.add(get_index);
+
+            if (table_number == 0) {
+                board.setInitialBlock(block); // not sure about sum-2
+            }
+            else
+            {
+                int z = tmp.remove(0);
+                board.getBlock(z).setBelowBlock(block); // not sure about sum-2
+
+            }
+
+            board.appendTableTo(append_index, Board.APPEND_BELOW, table);
+
+            //        append_index = append_index + (2*columns.size())+1;
+
+
+        }
+
+        return board.invalidate().build().getPreview();
+
+
+    }
+
 }
