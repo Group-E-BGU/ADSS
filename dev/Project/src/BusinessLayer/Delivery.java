@@ -7,6 +7,7 @@ public class Delivery{
     public static int counter=0;
     private int delivery_id;
     private Date date;
+    private Shift.ShiftTime shiftTime;
     private String source;
     private String truckSerialNumber;
     private int driverID;
@@ -14,9 +15,10 @@ public class Delivery{
     private List<String> logs;
     private int truckWeight;
 
-    public Delivery(Date date, String source, String truckSerialNumber, int driverID , int truckWeight){
+    public Delivery(Date date, Shift.ShiftTime shiftTime, String source, String truckSerialNumber, int driverID , int truckWeight){
         this.delivery_id = counter++;
         this.date = date;
+        this.shiftTime = shiftTime;
         this.source = source;
         this.truckSerialNumber = truckSerialNumber;
         this.driverID = driverID;
@@ -108,6 +110,8 @@ public class Delivery{
     public int getDelivery_id() {
         return delivery_id;
     }
+
+    public Shift.ShiftTime getShiftTime() {return shiftTime;}
 
     @Override
     public String toString()

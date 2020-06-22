@@ -603,7 +603,7 @@ public class CreateActions {
                     System.out.println("Error : driver id not valid!");
                 } else {
                     driver_chosen = true;
-                    Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
+                    Delivery delivery = new Delivery(date,source_shift.getShiftTime(), source, truck_serial_number, driver_id, total_weight);
                     delivery.setDocuments(documents);
                     delivery.setLogs(logs);
                     if (total_weight > delivery_truck.getMaxAllowedWeight()) {

@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class BLService {
 
@@ -28,14 +29,14 @@ public class BLService {
         workers = Workers.getInstance();
         data = Data.getInstance();
         dal = new DAL();
-        logged_user=null;
-        current_Store=null;
-        systemcontroler=new system();
+        logged_user = null;
+        current_Store = null;
+        systemcontroler = new system();
 
     }
 
-    public static BLService getInstance(){
-        if(blService_instance == null){
+    public static BLService getInstance() {
+        if (blService_instance == null) {
             blService_instance = new BLService();
         }
         return blService_instance;
@@ -82,16 +83,14 @@ public class BLService {
             Driver driver = ((Driver) getWorker(driver_id));
             if (driver.getLicense().equals(license)) {
                 boolean av = true;
-                for(Integer shift_id : driver.getWorker_shifts())
-                {
+                for (Integer shift_id : driver.getWorker_shifts()) {
                     Shift shift = getShift(shift_id);
-                    if(shift.getShiftDate().equals(shiftDate) && shift.getShiftTime().equals(shiftTime))
-                    {
+                    if (shift.getShiftDate().equals(shiftDate) && shift.getShiftTime().equals(shiftTime)) {
                         av = false;
                         break;
                     }
                 }
-                if(av)
+                if (av)
                     delivery_drivers.add(driver_id);
             }
         }
@@ -160,11 +159,9 @@ public class BLService {
         }//to make sure that the day index is correct
 
 
-
-        Map<Integer,Shift> shMap =  history.getShifts();
-        for (Map.Entry<Integer,Shift>entry : shMap.entrySet())
-        {
-            if(entry.getValue().getShiftTime().equals(shiftTime) && entry.getValue().getShiftDate().equals(date) && (entry.getValue().getBoss().getId() == worker_id || entry.getValue().getWorkingTeam().values().contains(worker_id)))
+        Map<Integer, Shift> shMap = history.getShifts();
+        for (Map.Entry<Integer, Shift> entry : shMap.entrySet()) {
+            if (entry.getValue().getShiftTime().equals(shiftTime) && entry.getValue().getShiftDate().equals(date) && (entry.getValue().getBoss().getId() == worker_id || entry.getValue().getWorkingTeam().values().contains(worker_id)))
                 return false;
         }
 
@@ -255,9 +252,8 @@ public class BLService {
         if (!isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime()) || getWorker(worker_id).getType() != workingType)
             return false;
 
-        for (Map.Entry<WorkPolicy.WorkingType, List<Integer>> entry : sh.getWorkingTeam().entrySet())
-        {
-            if(entry.getValue().contains(worker_id) )
+        for (Map.Entry<WorkPolicy.WorkingType, List<Integer>> entry : sh.getWorkingTeam().entrySet()) {
+            if (entry.getValue().contains(worker_id))
                 return false;
         }
 
@@ -309,8 +305,7 @@ public class BLService {
         return true;
     }
 
-    public List<String> getAvailableAddressesRegister()
-    {
+    public List<String> getAvailableAddressesRegister() {
         return null;
     }
 
@@ -431,12 +426,9 @@ public class BLService {
 
         data.setDeliveries(deliveryMap);
 
-        for(Shift shift : getAllShifts().values())
-        {
-            for(List<Integer> working_type : shift.getWorkingTeam().values())
-            {
-                for(Integer worker_id : working_type)
-                {
+        for (Shift shift : getAllShifts().values()) {
+            for (List<Integer> working_type : shift.getWorkingTeam().values()) {
+                for (Integer worker_id : working_type) {
                     getWorker(worker_id).getWorker_shifts().add(shift.getShiftId());
                 }
             }
@@ -444,46 +436,6 @@ public class BLService {
 
         return true;
     }
-
-    public Delivery arrangeDelivery(String source, Map<String, Document> documents) {
-        Delivery delivery = new Delivery();
-        int totalWeight = getTotalWeight(documents);
-        Truck truck = Data.getInstance().getProperTruck(totalWeight);
-        Driver driver = Data.getInstance().getProperDriver(totalWeight);
-        Date date = null;
-
-        delivery.setTruckSerialNumber(truck.getSerialNumber());
-        delivery.setDriverID(driver.getId());
-        delivery.setDocuments(documents);
-        delivery.setSource(source);
-
-        if (totalWeight <= truck.getMaxAllowedWeight())
-            date = getDeliveryDate(driver);
-
-        delivery.setDate(date);
-        delivery.setDeliveryId(new DeliveryDAO().save(delivery));
-
-        return delivery;
-    }
-
-    private Date getDeliveryDate(Driver driver) {
-        // todo
-        // returns the first date that the driver could deliver the delivery in
-        return null;
-    }
-
-    private int getTotalWeight(Map<String, Document> deliveryGoods) {
-        return -1;
-        // todo
-    }
-
-    public void rearrangeDelivery(Delivery delivery, Map<String, Document> documents) {
-        int totalWeight = getTotalWeight(documents);
-
-        if (totalWeight <= Data.getInstance().getTrucks().get(delivery.getTruckSerialNumber()).getMaxAllowedWeight())
-            delivery.setDate(getDeliveryDate((new DriverDAO()).get(delivery.getDriverID())));
-    }
-
 
     public Map<Integer, Delivery> getAllDeliveries() {
         return data.getDeliveries();
@@ -520,30 +472,24 @@ public class BLService {
 
     }
 
-    public List<String> getBigTrucks(int weight , Shift shift)
-    {
+    public List<String> getBigTrucks(int weight, Shift shift) {
 
         List<String> big = new LinkedList<>();
 
-        for(Truck truck : getAllTrucks().values())
-        {
+        for (Truck truck : getAllTrucks().values()) {
 
-            if(truck.getMaxAllowedWeight()-truck.getWeight() >= weight)
-            {
+            if (truck.getMaxAllowedWeight() - truck.getWeight() >= weight) {
                 boolean av = true;
 
-                for(Delivery delivery : getAllDeliveries().values())
-                {
+                for (Delivery delivery : getAllDeliveries().values()) {
 
-                    if(delivery.getTruckSerialNumber().equals(truck.getSerialNumber()) && delivery.getDate().equals(shift.getShiftDate()))
-                    {
-                       av = false;
-                       break;
+                    if (delivery.getTruckSerialNumber().equals(truck.getSerialNumber()) && delivery.getDate().equals(shift.getShiftDate())) {
+                        av = false;
+                        break;
                     }
                 }
 
-                if(av)
-                {
+                if (av) {
                     big.add(truck.getSerialNumber());
                 }
 
@@ -561,151 +507,150 @@ public class BLService {
         Mapper.InitializeDB();
     }
 
-    public String AddSupplier(String name, int ID,String Address, String bank, String branch, int bankNumber,
+    public String AddSupplier(String name, int ID, String Address, String bank, String branch, int bankNumber,
                               String payments, Map<Integer, String> Contacts_ID,
                               Map<Integer, Integer> Contacts_number) {//  List<DALItem> Items)
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done = current_Store.AddSuplier(name, ID,Address,bank, branch,bankNumber, payments, Contacts_ID,Contacts_number);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.AddSuplier(name, ID, Address, bank, branch, bankNumber, payments, Contacts_ID, Contacts_number);
 
         return Done;
     }
 
     public String AddContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days,
-                              boolean leading,  Map<Integer,Integer>  ItemsID_ItemsIDSupplier, Map<Integer, String> productIDVendor_name,
+                              boolean leading, Map<Integer, Integer> ItemsID_ItemsIDSupplier, Map<Integer, String> productIDVendor_name,
                               Map<Integer, Double> producttemsIDVendor_price) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.AddContract(suplaier_id,fixeDays, days,leading,ItemsID_ItemsIDSupplier, productIDVendor_name,producttemsIDVendor_price);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.AddContract(suplaier_id, fixeDays, days, leading, ItemsID_ItemsIDSupplier, productIDVendor_name, producttemsIDVendor_price);
         return Done;
     }
 
     public String AddWrite(int suplaier_id, Map<Integer, Integer> itemsID_amount, Map<Integer, Double> itemsID_assumption) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.AddWrite(suplaier_id, itemsID_amount,itemsID_assumption);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.AddWrite(suplaier_id, itemsID_amount, itemsID_assumption);
         return Done;
     }
 
     public int MakeOrder(int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
-        int Done=-1;
-        if(current_Store!=null)
-            Done= current_Store.MakeOrder(id_suplaier,day,itemsIDVendor_numberOfItems);
+        int Done = -1;
+        if (current_Store != null)
+            Done = current_Store.MakeOrder(id_suplaier, day, itemsIDVendor_numberOfItems);
         return Done;
     }
 
     public String EditSupplier(String name, int id, String address, String bank, String branch, int bankNumber, String payments, Map<Integer, String> contacts_id, Map<Integer, Integer> contacts_number) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done = current_Store.EditSuplier(name, id,address ,bank, branch,bankNumber, payments,contacts_id,contacts_number);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.EditSuplier(name, id, address, bank, branch, bankNumber, payments, contacts_id, contacts_number);
         return Done;
     }
 
     public String DeleteSupplier(int id) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null) {
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null) {
             Done = current_Store.Delete(id);
             //     Done = logged_user.DeleteSupplier(id);
         }
         return Done;
     }
 
-    public String EditContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days, boolean leading,Map<Integer,Integer>  ItemsID_ItemsIDSupplier,
+    public String EditContract(int suplaier_id, boolean fixeDays, LinkedList<Integer> days, boolean leading, Map<Integer, Integer> ItemsID_ItemsIDSupplier,
                                Map<Integer, String> productIDVendor_name, Map<Integer, Double> producttemsIDVendor_price) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null) {
-            Done = current_Store.EditContract(suplaier_id, fixeDays, days, leading,ItemsID_ItemsIDSupplier, productIDVendor_name, producttemsIDVendor_price);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null) {
+            Done = current_Store.EditContract(suplaier_id, fixeDays, days, leading, ItemsID_ItemsIDSupplier, productIDVendor_name, producttemsIDVendor_price);
         }
         return Done;
     }
 
     public String EditWrite(int suplaier_id, Map<Integer, Integer> itemsID_amount, Map<Integer, Double> itemsID_assumption) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.EditWrite(suplaier_id, itemsID_amount,itemsID_assumption);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.EditWrite(suplaier_id, itemsID_amount, itemsID_assumption);
         return Done;
     }
 
     public String CheckEmailExist(String email) {
-        String Done=systemcontroler.CheckEmailExist(email);
+        String Done = systemcontroler.CheckEmailExist(email);
         return Done;
     }
 
     public String Register(String email, String password) {
-        String Done=systemcontroler.Register(email,password);
+        String Done = systemcontroler.Register(email, password);
         return Done;
     }
 
     public String Login(String email, String password) {
-        String Done=systemcontroler.Login(email,password);
-        if(Done.equals("Done")){
-            logged_user=new User(email,password, null);
-            current_Store=Store.createInstance(email);
+        String Done = systemcontroler.Login(email, password);
+        if (Done.equals("Done")) {
+            logged_user = new User(email, password, null);
+            current_Store = Store.createInstance(email);
         }
         //initialize();
         return Done;
     }
 
-    public User getLogged_user()
-    {
+    public User getLogged_user() {
         return logged_user;
     }
 
     public LinkedList<InterfaceContract> GetContract() {
-        LinkedList<InterfaceContract> list=new LinkedList<InterfaceContract>();
-        if(current_Store!=null)
-            list=current_Store.GetContract();
+        LinkedList<InterfaceContract> list = new LinkedList<InterfaceContract>();
+        if (current_Store != null)
+            list = current_Store.GetContract();
         return list;
     }
 
     public LinkedList<InterfaceSupplier> GetSupliers() {
-        LinkedList<InterfaceSupplier> list=new LinkedList<InterfaceSupplier>();
-        if(current_Store!=null)
-            list=current_Store.GetSupliers();
+        LinkedList<InterfaceSupplier> list = new LinkedList<InterfaceSupplier>();
+        if (current_Store != null)
+            list = current_Store.GetSupliers();
         return list;
     }
 
-    public String ChangOrderStatus (int id_order) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.ChangOrderStatus(id_order);
+    public String ChangOrderStatus(int id_order) {
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.ChangOrderStatus(id_order);
         return Done;
     }
 
     public String CheckSuplierExist(int id) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.CheckSuplierExit(id);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.CheckSuplierExit(id);
         return Done;
     }
 
     public String CheckSAgreementExist(int suplaier_id) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store.CheckSAgreementExit(suplaier_id);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.CheckSAgreementExit(suplaier_id);
         return Done;
     }
 
     public String CheckSWortExist(int suplaier_id) {
-        String Done="you must be logged in before doing any actions";
-        if(current_Store!=null)
-            Done=current_Store. CheckSWortExit(suplaier_id);
+        String Done = "you must be logged in before doing any actions";
+        if (current_Store != null)
+            Done = current_Store.CheckSWortExit(suplaier_id);
         return Done;
     }
 
     public String Logout() {
         //todo changed
-        if(logged_user==null| current_Store==null){
+        if (logged_user == null | current_Store == null) {
             return "you need to Login before you logout";
         }
         current_Store.Logout();
-        current_Store=null;
-        logged_user=null;
+        current_Store = null;
+        logged_user = null;
         return "logout successfully";
     }
 
     public boolean CheckConected() {
-        return current_Store!=null;
+        return current_Store != null;
     }
 
     public static void sendWarning(String warning) {
@@ -716,51 +661,52 @@ public class BLService {
         return current_Store.getItemAmountsByName(name);
     }
 
-    public String addAmounts(String name,String amounts){ return  current_Store.addAmounts(name,amounts);}
+    public String addAmounts(String name, String amounts) {
+        return current_Store.addAmounts(name, amounts);
+    }
 
     public String setNewAmounts(String name, String amounts) {
-        return current_Store.setNewAmounts(name,amounts);
+        return current_Store.setNewAmounts(name, amounts);
     }
 
     public String getItemIdsByName(String name) {
         return current_Store.getItemIdsByName(name);
     }
 
-    public String removeItem(String name,int id) {
-        return current_Store.removeItem(name,id);
+    public String removeItem(String name, int id) {
+        return current_Store.removeItem(name, id);
     }
 
     public String moveToShelf(String name, String amount) {
-        return current_Store.moveToShelf(name,amount);
+        return current_Store.moveToShelf(name, amount);
     }
 
     public String removeItemFromShelf(String name, int id) {
         return current_Store.removeItemFromShelf(name, id);
     }
 
-    public String setDefectedItem(String  name, String id){
+    public String setDefectedItem(String name, String id) {
         try {
             int ID = Integer.parseInt(id);
             return current_Store.setDefectedItem(name, ID);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "Item's ID is invalid";
         }
     }
+
     @SuppressWarnings("depercation")
     public String addNewItemDiscount(String itemName, String percentage, String begDate, String enDate) {
         java.sql.Date beginDate, endDate;
         int perc;
-        if(begDate.length()!=10 || enDate.length() != 10)
+        if (begDate.length() != 10 || enDate.length() != 10)
             return "Please enter valid arguments";
-        try{
-            beginDate = new java.sql.Date(Integer.parseInt(begDate.substring(6))-1900,Integer.parseInt(begDate.substring(3,5))-1,Integer.parseInt(begDate.substring(0,2)));
-            endDate = new java.sql.Date(Integer.parseInt(enDate.substring(6))-1900,Integer.parseInt(enDate.substring(3,5))-1,Integer.parseInt(enDate.substring(0,2)));
+        try {
+            beginDate = new java.sql.Date(Integer.parseInt(begDate.substring(6)) - 1900, Integer.parseInt(begDate.substring(3, 5)) - 1, Integer.parseInt(begDate.substring(0, 2)));
+            endDate = new java.sql.Date(Integer.parseInt(enDate.substring(6)) - 1900, Integer.parseInt(enDate.substring(3, 5)) - 1, Integer.parseInt(enDate.substring(0, 2)));
             perc = Integer.parseInt(percentage);
-            if(perc < 1 || perc > 100)
+            if (perc < 1 || perc > 100)
                 return "Please enter valid arguments";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "Please enter valid arguments";
         }
         return current_Store.addItemDiscount(itemName, perc, beginDate, endDate);
@@ -769,47 +715,44 @@ public class BLService {
     public String addNewCategoryDiscount(String categoryName, String percentage, String begDate, String enDate) {
         java.sql.Date beginDate, endDate;
         int perc;
-        if(begDate.length()!=10 || enDate.length() != 10)
+        if (begDate.length() != 10 || enDate.length() != 10)
             return "Please enter valid arguments";
-        try{
-            beginDate = new java.sql.Date(Integer.parseInt(begDate.substring(6))-1900,Integer.parseInt(begDate.substring(3,5))-1,Integer.parseInt(begDate.substring(0,2)));
-            endDate = new java.sql.Date(Integer.parseInt(enDate.substring(6))-1900,Integer.parseInt(enDate.substring(3,5))-1,Integer.parseInt(enDate.substring(0,2)));
+        try {
+            beginDate = new java.sql.Date(Integer.parseInt(begDate.substring(6)) - 1900, Integer.parseInt(begDate.substring(3, 5)) - 1, Integer.parseInt(begDate.substring(0, 2)));
+            endDate = new java.sql.Date(Integer.parseInt(enDate.substring(6)) - 1900, Integer.parseInt(enDate.substring(3, 5)) - 1, Integer.parseInt(enDate.substring(0, 2)));
             perc = Integer.parseInt(percentage);
-            if(perc < 1 || perc > 100)
+            if (perc < 1 || perc > 100)
                 return "Please enter valid arguments";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "Please enter valid arguments";
         }
         return current_Store.addNewCategoryDiscount(categoryName, perc, beginDate, endDate);
     }
 
-    public String setNewPrice(String name, String price,String rPrice){
+    public String setNewPrice(String name, String price, String rPrice) {
         try {
             int newPrice = Integer.parseInt(price);
-            if(newPrice<=0){
+            if (newPrice <= 0) {
                 return "Price must greater than 0";
             }
             int retailPrice = Integer.parseInt(rPrice);
-            if(retailPrice<=0){
+            if (retailPrice <= 0) {
                 return "Price must greater than 0";
             }
-            return current_Store.setNewPrice(name, newPrice,retailPrice);
-        }
-        catch (Exception e){
+            return current_Store.setNewPrice(name, newPrice, retailPrice);
+        } catch (Exception e) {
             return "Item's price must be a number";
         }
     }
 
-    public String printDefectedReport(String reportBegin, String reportEnd){
+    public String printDefectedReport(String reportBegin, String reportEnd) {
         java.sql.Date beginDate, endDate;
-        if(reportBegin.length()!=10 || reportEnd.length() != 10)
+        if (reportBegin.length() != 10 || reportEnd.length() != 10)
             return "Please enter valid arguments";
-        try{
-            beginDate = new java.sql.Date(Integer.parseInt(reportBegin.substring(6))-1900,Integer.parseInt(reportBegin.substring(3,5))-1,Integer.parseInt(reportBegin.substring(0,2)));
-            endDate = new java.sql.Date(Integer.parseInt(reportEnd.substring(6))-1900,Integer.parseInt(reportEnd.substring(3,5))-1,Integer.parseInt(reportEnd.substring(0,2)));
-        }
-        catch (Exception e){
+        try {
+            beginDate = new java.sql.Date(Integer.parseInt(reportBegin.substring(6)) - 1900, Integer.parseInt(reportBegin.substring(3, 5)) - 1, Integer.parseInt(reportBegin.substring(0, 2)));
+            endDate = new java.sql.Date(Integer.parseInt(reportEnd.substring(6)) - 1900, Integer.parseInt(reportEnd.substring(3, 5)) - 1, Integer.parseInt(reportEnd.substring(0, 2)));
+        } catch (Exception e) {
             return "Please enter valid dates";
         }
         return current_Store.printDefectedReport(beginDate, endDate);
@@ -820,8 +763,7 @@ public class BLService {
         String report = "";
         if (categories[0].equals("all")) {
             report = current_Store.getAllInventoryReport();
-        }
-        else {
+        } else {
             for (int i = 0; i < categories.length; i++) {
                 report = report + current_Store.getInventoryReport(categories[i]) + "\n";
             }
@@ -830,15 +772,15 @@ public class BLService {
     }
 
     public boolean CheckTheDay(int id_suplaier, int day) {
-        return current_Store.CheckTheDay(id_suplaier,day);
+        return current_Store.CheckTheDay(id_suplaier, day);
     }
 
     public boolean CheckProductexist(int id_suplaier, int product_id) {
-        return current_Store.CheckProductexist(id_suplaier,product_id);
+        return current_Store.CheckProductexist(id_suplaier, product_id);
     }
 
     public int FindId_P_Store(String product_name, String category, String subcategory, String sub_subcategory, String manufacturer, int minAmount, int shelfNumber) {
-        return current_Store.FindId_P_Store(product_name,category,subcategory,sub_subcategory,manufacturer,minAmount,shelfNumber);
+        return current_Store.FindId_P_Store(product_name, category, subcategory, sub_subcategory, manufacturer, minAmount, shelfNumber);
     }
 
     public String CheckAbleToChangeOrder(int id_order) {
@@ -846,11 +788,11 @@ public class BLService {
     }
 
     public void RemoveProduct(int id_order, int product_id) {
-        current_Store.RemoveProduct(id_order,product_id);
+        current_Store.RemoveProduct(id_order, product_id);
     }
 
     public InterfaceOrder ChangeOrder(int Id_Order, int id_suplaier, LinkedList<Integer> day, Map<Integer, Integer> itemsIDVendor_numberOfItems) {
-        return current_Store.ChangeOrder(Id_Order,id_suplaier, day ,itemsIDVendor_numberOfItems);
+        return current_Store.ChangeOrder(Id_Order, id_suplaier, day, itemsIDVendor_numberOfItems);
 
     }
 
@@ -868,7 +810,7 @@ public class BLService {
     }
 
     public void AddToStore(Map productID_amount, Map productID_date) {
-        current_Store.AddToStore(productID_amount,productID_date);
+        current_Store.AddToStore(productID_amount, productID_date);
     }
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
@@ -876,233 +818,120 @@ public class BLService {
     }
 
 
-
-
 //----------------------------------------------- new arrange delivery ----------------------------------------//
 
-/*
-    public static void arrangeDelivery(Date max_date) {
 
-        boolean date_chosen = false;
-        Date date = null;
-        SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+    public void arrangeDelivery(Date delivery_date, Shift.ShiftTime shiftTime, String source_location ,String destination_location, Map<String, Integer> delivery_products) {
 
-        while (!date_chosen) {
-            System.out.println("enter the date for this delivery using this format dd/mm/yyyy or type EXIT to cancel ...");
-            String date_string = keyboard.nextLine();
-            if (date_string.equals("EXIT") || date_string.equals("exit"))
-                return;
 
-            try {
-                date = date_format.parse(date_string);
-                System.out.println("Your delivery date will be : " + new SimpleDateFormat("EEEE").format(date) + " " + date_string);
-                date_chosen = true;
-            } catch (ParseException pe) {
-                System.out.println("Error : invalid date input");
-            }
+        // check if there are shifts in the destination with the given date and time for 7 days
+
+        int products_weight = 0;
+        for(Map.Entry<String,Integer> product : delivery_products.entrySet())
+        {
+            int product_weight = getProduct(product.getKey()).getWeight();
+            products_weight = products_weight + (product_weight * product.getValue());
         }
 
+        Date potential_date = delivery_date;
+        Shift des_shift = null;
 
-        Shift.ShiftTime delivery_time = null;
-
-        boolean chosen_time = false;
-
-        while (!chosen_time) {
-            System.out.println("Type M for Morning , Type E for Evening");
-            String choice = keyboard.nextLine();
-
-            if (choice.equals("M") || choice.equals("m")) {
-                delivery_time = Shift.ShiftTime.Morning;
-                chosen_time = true;
-            } else if (choice.equals("E") || choice.equals("e")) {
-                delivery_time = Shift.ShiftTime.Evening;
-                chosen_time = true;
-            } else
-                System.out.println("Error : invalid input!");
-
-        }
-
-
-        List<String> available_trucks = blService.getAvailableTrucks(date, delivery_time);
-
-        if (available_trucks.isEmpty()) {
-            System.out.println("There are no available trucks for this delivery! aborting the arrangement...");
+        Address destination_address = getAddress(destination_location);
+        if(destination_address==null)
+        {
+            System.out.println("Error : invalid location");
             return;
         }
 
-        Printer.printTrucks(available_trucks);
-
-        System.out.println("Choose a truck by its serial number : ");
-
-        boolean truck_chosen = false;
-        String truck_serial_number = null;
-
-        while (!truck_chosen) {
-            truck_serial_number = keyboard.nextLine();
-            if (!available_trucks.contains(truck_serial_number)) {
-                System.out.println("Error : the truck with the serial number " + truck_serial_number + " is not a valid option! try again ? y/n");
-                if (!getConfirmation()) {
-                    System.out.println("Delivery arrangement canceled");
-                    return;
-                }
-            } else
-                truck_chosen = true;
-        }
-
-        System.out.println("Choose a source for this delivery by typing the location :\n");
-        Address address = null;
-        List<String> available_addresses = blService.getAvailableAddresses(date, delivery_time);
-        boolean address_chosen = false;
-        Printer.printAddresses(available_addresses);
-        while (!address_chosen) {
-            String location = keyboard.nextLine();
-            if (blService.getAddress(location) == null) {
-                System.out.println("Error : no address found with " + location + " as its location! , Do you want to try again? y/n");
-                if (!getConfirmation()) {
-                    System.out.println("Delivery arrangement canceled");
-                    return;
-                }
-            } else if (blService.getShift(blService.getAddress(location), date, delivery_time) == null) {
-                System.out.println("Error : no shift in this address is available at the chosen date!");
-            } else {
-                address_chosen = true;
-                address = blService.getAddress(location);
-            }
-        }
-
-        Truck delivery_truck = blService.getTruck(truck_serial_number);
-        Shift source_shift = blService.getShift(address, date, delivery_time);
-
-        String source = address.getLocation();
-
-        Printer.border();
-        //    Printer.printAllAddresses();
-        Printer.printAddresses(new LinkedList<>(blService.getAllAddresses().keySet()));
+        int additional_days = 0 ;
+        boolean done = false;
+        while(!done && additional_days<8)
+        {
 
 
-        System.out.println("Choose destinations : ");
-        boolean destinations_chosen = false;
-        Map<String, Document> documents = new HashMap<>();
+            des_shift = getShift(null,potential_date,shiftTime);
 
-        while (!destinations_chosen) {
-            String des = keyboard.nextLine();
-            if (blService.getAddress(des) == null) {
-                System.out.println("Error : no address found with " + des + " as its location! , Do you want to try again? y/n");
-                if (!getConfirmation()) {
-                    System.out.println("Delivery arrangement canceled");
-                    return;
-                }
-            } else if (des.equals(source)) {
-                System.out.println("Error : The source can't be a destination! , Do you want to try again? y/n");
-                if (!getConfirmation()) {
-                    System.out.println("Delivery arrangement canceled");
-                    return;
-                }
-            } else if (blService.getShift(blService.getAddress(des), date, delivery_time) == null) {
-                System.out.println("Error : no available shift at this destination at the chosen time");
-            } else if (!blService.stockKeeperAvailable(blService.getShift(blService.getAddress(des), date, delivery_time))) {
-                System.out.println("Error : no working stock keeper at the destination at the chosen time");
-            } else {
-
-                boolean products_chosen = false;
-                Map<String, Integer> delivery_products = new HashMap<>();
-                while (!products_chosen) {
-                    System.out.println("Choose the product you want to deliver by typing the CN");
-                    Printer.printAllProducts();
-                    String product_cn = keyboard.nextLine();
-                    if (blService.getProduct(product_cn) == null) {
-                        System.out.println("Error : no product with such cn found! try again ? y/n");
-                        if (!getConfirmation()) {
-                            System.out.println("Delivery arrangement canceled");
-                            return;
-                        }
-                    } else {
-                        if (delivery_products.containsKey(product_cn)) {
-                            System.out.println("Warning : you already added this type of product to your delivery. the amount you choose now will be the new one");
-                        } else
-                            System.out.println("Type the amount you want to deliver from this product , it must be bigger than zero : ");
-                        int amount = getChoice(1, Integer.MAX_VALUE);
-                        delivery_products.put(product_cn, amount);
-                        System.out.println("add another product delivery to this destination ? y/n");
-                        if (!getConfirmation()) {
-                            products_chosen = true;
-                        }
-
-                    }
-                }
-
-                Document document = new Document();
-                document.setDeliveryGoods(delivery_products);
-                documents.put(des, document);
-
-                System.out.println("Choose another destination ? y/n");
-                if (!getConfirmation()) {
-                    destinations_chosen = true;
-                }
-            }
-        }
+            if(des_shift!=null && stockKeeperAvailable(des_shift))
+            {
+                // check if there is an available driver and truck
+                // first check for the driver either already working in this shift or free
 
 
-        int total_weight = delivery_truck.getWeight();
-        List<String> logs = new LinkedList<>();
-        for (Document doc : documents.values()) {
-            for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
-                total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
-            }
-        }
+                List<Integer> shift_deliveries = getDeliveries(source_location,des_shift.getShiftDate(),des_shift.getShiftTime()) ;
+                List<Integer> free_drivers = getAvailableWorkers(potential_date,shiftTime, WorkPolicy.WorkingType.Driver);
 
+                if(shift_deliveries!=null && !shift_deliveries.isEmpty())
+                {
+                    // check if the deliveries can handle the extra weight
+                    for(Integer delivery_id : shift_deliveries)
+                    {
+                        Delivery delivery = getDelivery(delivery_id);
+                        Truck truck = getTruck(delivery.getTruckSerialNumber());
+                //        int free_storage = truck.getMaxAllowedWeight() - delivery.get
+                        if(truck.getMaxAllowedWeight() - truck.getWeight() - products_weight > 0)
+                        {
+                            // we found a delivery ------> Done
 
-        String license = null;
-        if (total_weight > 1000) {
-            license = "B";
-        } else {
-            license = "A";
-        }
-        List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
-
-        if (drivers_ids.isEmpty() && license.equals("A")) {
-            drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), "B");
-        }
-        if (drivers_ids.isEmpty()) {
-            System.out.println("Error : no available drivers for this delivery ... abort");
-        } else {
-            Printer.printWorkers(drivers_ids);
-            System.out.println("Select one of these drivers by typing his id to assign to this delivery");
-            int driver_id = -1;
-            boolean driver_chosen = false;
-            while (!driver_chosen) {
-                driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
-                if (!drivers_ids.contains(driver_id)) {
-                    System.out.println("Error : driver id not valid!");
-                } else {
-                    driver_chosen = true;
-                    Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
-                    delivery.setDocuments(documents);
-                    delivery.setLogs(logs);
-                    if (total_weight > delivery_truck.getMaxAllowedWeight()) {
-                        System.out.println("Error : the truck's weight exceeds its allowed weight");
-                        if (!rearrangeDelivery(delivery, source_shift)) {
-                            return;
+                            done = true;
                         }
                     }
-                    total_weight = delivery_truck.getWeight();
-                    for (Document doc : documents.values()) {
-                        for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
-                            total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
-                        }
-                    }
-                    driver_id = delivery.getDriverID();
-                    blService.work(driver_id, source_shift.getShiftId());
-                    blService.addDelivery(delivery);
                 }
+
+            }
+            else
+            {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(potential_date);
+                cal.add(Calendar.DAY_OF_WEEK, 1);
+                potential_date = cal.getTime();
+                additional_days++;
             }
 
         }
+
+        if (getShift(getAddress(destination_location),delivery_date, shiftTime) == null) {
+            System.out.println("Error : no shift in this address is available at the chosen date!");
+        }
+
+        // check if there are shifts in the destination with stockKeepers working in the same time of source shift
+        // calculate total weight
+        // check if there is an available truck in that time ALSO check if there is a suitable driver
+        // then we can finish
+
 
 
     }
 
 
- */
+    public List<Integer> getDeliveries(String source , Date date , Shift.ShiftTime shiftTime)
+    {
+        // source is a specific supplier
+        List<Integer> deliveries = new LinkedList<>();
+        for(Delivery delivery : getAllDeliveries().values())
+        {
+            if(delivery.getSource().equals(source) && delivery.getDate().equals(date) && delivery.getShiftTime().equals(shiftTime) )
+            {
+                deliveries.add(delivery.getDeliveryID());
+            }
+        }
+        return deliveries;
+    }
+
+    // returns -1 if no delivery found
+    public int getDeliveryProductsWeight(int delivery_id)
+    {
+        int weight = -1;
+        Delivery delivery = getDelivery(delivery_id);
+        for(Document doc : delivery.getDocuments().values())
+        {
+            for(Map.Entry<String,Integer> product : doc.getDeliveryGoods().entrySet())
+            {
+                int product_weight = getProduct(product.getKey()).getWeight();
+                weight = weight + (product_weight * product.getValue());
+            }
+        }
+
+        return weight;
+    }
 
 }
