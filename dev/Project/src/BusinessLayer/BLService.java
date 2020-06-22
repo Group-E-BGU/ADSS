@@ -2,8 +2,11 @@ package BusinessLayer;
 
 import DataAccesslayer.*;
 import PresentationLayer.Main;
+import PresentationLayer.Printer;
 import javafx.util.Pair;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
 
@@ -636,7 +639,7 @@ public class BLService {
     public String Login(String email, String password) {
         String Done=systemcontroler.Login(email,password);
         if(Done.equals("Done")){
-            logged_user=new User(email,password, User.UserType.StoreManager);
+            logged_user=new User(email,password, null);
             current_Store=Store.createInstance(email);
         }
         //initialize();
@@ -871,4 +874,235 @@ public class BLService {
     public LinkedList<InterfaceOrder> GetOrderDetails() {
         return current_Store.GetOrderDetails();
     }
+
+
+
+
+//----------------------------------------------- new arrange delivery ----------------------------------------//
+
+/*
+    public static void arrangeDelivery(Date max_date) {
+
+        boolean date_chosen = false;
+        Date date = null;
+        SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+
+        while (!date_chosen) {
+            System.out.println("enter the date for this delivery using this format dd/mm/yyyy or type EXIT to cancel ...");
+            String date_string = keyboard.nextLine();
+            if (date_string.equals("EXIT") || date_string.equals("exit"))
+                return;
+
+            try {
+                date = date_format.parse(date_string);
+                System.out.println("Your delivery date will be : " + new SimpleDateFormat("EEEE").format(date) + " " + date_string);
+                date_chosen = true;
+            } catch (ParseException pe) {
+                System.out.println("Error : invalid date input");
+            }
+        }
+
+
+        Shift.ShiftTime delivery_time = null;
+
+        boolean chosen_time = false;
+
+        while (!chosen_time) {
+            System.out.println("Type M for Morning , Type E for Evening");
+            String choice = keyboard.nextLine();
+
+            if (choice.equals("M") || choice.equals("m")) {
+                delivery_time = Shift.ShiftTime.Morning;
+                chosen_time = true;
+            } else if (choice.equals("E") || choice.equals("e")) {
+                delivery_time = Shift.ShiftTime.Evening;
+                chosen_time = true;
+            } else
+                System.out.println("Error : invalid input!");
+
+        }
+
+
+        List<String> available_trucks = blService.getAvailableTrucks(date, delivery_time);
+
+        if (available_trucks.isEmpty()) {
+            System.out.println("There are no available trucks for this delivery! aborting the arrangement...");
+            return;
+        }
+
+        Printer.printTrucks(available_trucks);
+
+        System.out.println("Choose a truck by its serial number : ");
+
+        boolean truck_chosen = false;
+        String truck_serial_number = null;
+
+        while (!truck_chosen) {
+            truck_serial_number = keyboard.nextLine();
+            if (!available_trucks.contains(truck_serial_number)) {
+                System.out.println("Error : the truck with the serial number " + truck_serial_number + " is not a valid option! try again ? y/n");
+                if (!getConfirmation()) {
+                    System.out.println("Delivery arrangement canceled");
+                    return;
+                }
+            } else
+                truck_chosen = true;
+        }
+
+        System.out.println("Choose a source for this delivery by typing the location :\n");
+        Address address = null;
+        List<String> available_addresses = blService.getAvailableAddresses(date, delivery_time);
+        boolean address_chosen = false;
+        Printer.printAddresses(available_addresses);
+        while (!address_chosen) {
+            String location = keyboard.nextLine();
+            if (blService.getAddress(location) == null) {
+                System.out.println("Error : no address found with " + location + " as its location! , Do you want to try again? y/n");
+                if (!getConfirmation()) {
+                    System.out.println("Delivery arrangement canceled");
+                    return;
+                }
+            } else if (blService.getShift(blService.getAddress(location), date, delivery_time) == null) {
+                System.out.println("Error : no shift in this address is available at the chosen date!");
+            } else {
+                address_chosen = true;
+                address = blService.getAddress(location);
+            }
+        }
+
+        Truck delivery_truck = blService.getTruck(truck_serial_number);
+        Shift source_shift = blService.getShift(address, date, delivery_time);
+
+        String source = address.getLocation();
+
+        Printer.border();
+        //    Printer.printAllAddresses();
+        Printer.printAddresses(new LinkedList<>(blService.getAllAddresses().keySet()));
+
+
+        System.out.println("Choose destinations : ");
+        boolean destinations_chosen = false;
+        Map<String, Document> documents = new HashMap<>();
+
+        while (!destinations_chosen) {
+            String des = keyboard.nextLine();
+            if (blService.getAddress(des) == null) {
+                System.out.println("Error : no address found with " + des + " as its location! , Do you want to try again? y/n");
+                if (!getConfirmation()) {
+                    System.out.println("Delivery arrangement canceled");
+                    return;
+                }
+            } else if (des.equals(source)) {
+                System.out.println("Error : The source can't be a destination! , Do you want to try again? y/n");
+                if (!getConfirmation()) {
+                    System.out.println("Delivery arrangement canceled");
+                    return;
+                }
+            } else if (blService.getShift(blService.getAddress(des), date, delivery_time) == null) {
+                System.out.println("Error : no available shift at this destination at the chosen time");
+            } else if (!blService.stockKeeperAvailable(blService.getShift(blService.getAddress(des), date, delivery_time))) {
+                System.out.println("Error : no working stock keeper at the destination at the chosen time");
+            } else {
+
+                boolean products_chosen = false;
+                Map<String, Integer> delivery_products = new HashMap<>();
+                while (!products_chosen) {
+                    System.out.println("Choose the product you want to deliver by typing the CN");
+                    Printer.printAllProducts();
+                    String product_cn = keyboard.nextLine();
+                    if (blService.getProduct(product_cn) == null) {
+                        System.out.println("Error : no product with such cn found! try again ? y/n");
+                        if (!getConfirmation()) {
+                            System.out.println("Delivery arrangement canceled");
+                            return;
+                        }
+                    } else {
+                        if (delivery_products.containsKey(product_cn)) {
+                            System.out.println("Warning : you already added this type of product to your delivery. the amount you choose now will be the new one");
+                        } else
+                            System.out.println("Type the amount you want to deliver from this product , it must be bigger than zero : ");
+                        int amount = getChoice(1, Integer.MAX_VALUE);
+                        delivery_products.put(product_cn, amount);
+                        System.out.println("add another product delivery to this destination ? y/n");
+                        if (!getConfirmation()) {
+                            products_chosen = true;
+                        }
+
+                    }
+                }
+
+                Document document = new Document();
+                document.setDeliveryGoods(delivery_products);
+                documents.put(des, document);
+
+                System.out.println("Choose another destination ? y/n");
+                if (!getConfirmation()) {
+                    destinations_chosen = true;
+                }
+            }
+        }
+
+
+        int total_weight = delivery_truck.getWeight();
+        List<String> logs = new LinkedList<>();
+        for (Document doc : documents.values()) {
+            for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
+                total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
+            }
+        }
+
+
+        String license = null;
+        if (total_weight > 1000) {
+            license = "B";
+        } else {
+            license = "A";
+        }
+        List<Integer> drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), license);
+
+        if (drivers_ids.isEmpty() && license.equals("A")) {
+            drivers_ids = blService.getDeliveryDriver(source_shift.getShiftDate(), source_shift.getShiftTime(), "B");
+        }
+        if (drivers_ids.isEmpty()) {
+            System.out.println("Error : no available drivers for this delivery ... abort");
+        } else {
+            Printer.printWorkers(drivers_ids);
+            System.out.println("Select one of these drivers by typing his id to assign to this delivery");
+            int driver_id = -1;
+            boolean driver_chosen = false;
+            while (!driver_chosen) {
+                driver_id = getChoice(Main.id_lower_bound, Main.id_upper_bound);
+                if (!drivers_ids.contains(driver_id)) {
+                    System.out.println("Error : driver id not valid!");
+                } else {
+                    driver_chosen = true;
+                    Delivery delivery = new Delivery(date, source, truck_serial_number, driver_id, total_weight);
+                    delivery.setDocuments(documents);
+                    delivery.setLogs(logs);
+                    if (total_weight > delivery_truck.getMaxAllowedWeight()) {
+                        System.out.println("Error : the truck's weight exceeds its allowed weight");
+                        if (!rearrangeDelivery(delivery, source_shift)) {
+                            return;
+                        }
+                    }
+                    total_weight = delivery_truck.getWeight();
+                    for (Document doc : documents.values()) {
+                        for (Map.Entry<String, Integer> entry : doc.getDeliveryGoods().entrySet()) {
+                            total_weight = total_weight + (blService.getProduct(entry.getKey()).getWeight() * entry.getValue());
+                        }
+                    }
+                    driver_id = delivery.getDriverID();
+                    blService.work(driver_id, source_shift.getShiftId());
+                    blService.addDelivery(delivery);
+                }
+            }
+
+        }
+
+
+    }
+
+
+ */
+
 }

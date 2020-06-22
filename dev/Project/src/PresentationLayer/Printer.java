@@ -20,6 +20,14 @@ public class Printer {
         }
     }
 
+    public static void printAllUserTypes() {
+        int number = 1;
+        for (User.UserType userType : User.UserType.values()) {
+            System.out.println(number + ") " + userType.toString());
+            number++;
+        }
+    }
+
     public static void printWorkingShifts(Worker w) {
 
         if (w.getWorker_shifts().isEmpty())

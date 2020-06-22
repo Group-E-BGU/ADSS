@@ -2,6 +2,7 @@ package PresentationLayer;
 
 import BusinessLayer.*;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,6 +15,19 @@ public class SystemAccess
 
     public static void register()
     {
+
+
+        // #1 register
+        // first of all enter location
+
+        // telephone number     --. PrimaryKey
+
+        // user name
+
+        // ---------------------------------------------  //
+
+        // which type
+
         /*
         List<String> available_locations = blService.getAvailableAddressesRegister();
         if(available_locations.isEmpty())
@@ -88,6 +102,8 @@ public class SystemAccess
             }
         }
         if(done) {
+
+            chooseType();
             System.out.println(email + " welcome to your super!");
             //       GetOrderDetails();
             //       Action();
@@ -97,6 +113,19 @@ public class SystemAccess
         return false;
     }
 
+
+
+    private static void chooseType()
+    {
+
+        List<User.UserType> types = Arrays.asList(User.UserType.values());
+        System.out.println("Select user permissions : ");
+        Printer.printAllUserTypes();
+        int userType_id = getChoice(1, types.size());
+        User.UserType userType = types.get(userType_id - 1);
+        blService.getLogged_user().setUserType(userType);
+
+    }
 
     private static int getChoice(int lower_bound, int upper_bound) {
         for (; ; ) {

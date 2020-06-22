@@ -29,4 +29,9 @@ public class User {
     {
         return userType;
     }
+
+    public void setUserType(UserType userType)
+    {
+        this.userType = userType;
+    }
 }
