@@ -128,22 +128,18 @@ public class Printer {
     */
 
 
-        if(blService.getAllWorkers().isEmpty())
-        {
+        if (blService.getAllWorkers().isEmpty()) {
             System.out.println("no Workers in the dataBase!!!!!");
-        }
-        else
-        {
+        } else {
             List<String> headersList = Arrays.asList("ID", "NAME", "JOB");
             List<List<String>> rowsList = new LinkedList<>();
 
-            for (Worker worker : blService.getAllWorkers().values())
-            {
-                List<String> worker_details = Arrays.asList(String.valueOf(worker.getId()),worker.getName(),worker.getType().toString());
+            for (Worker worker : blService.getAllWorkers().values()) {
+                List<String> worker_details = Arrays.asList(String.valueOf(worker.getId()), worker.getName(), worker.getType().toString());
                 rowsList.add(worker_details);
             }
 
-            String tableString = objectToTableString(headersList,rowsList,10);
+            String tableString = objectToTableString(headersList, rowsList, 10);
             System.out.println(tableString);
         }
 
@@ -155,74 +151,23 @@ public class Printer {
 
     public static void printShiftsView() {
 
-    /*
-        if(blService.getAllShifts().isEmpty())
-        {
+
+        if (blService.getAllShifts().isEmpty()) {
             System.out.println("no shifts in the dataBase!!!!!");
-        }
-        else
-        {
+        } else {
 
-            Map<Integer, String> tables_info = new HashMap<>();
-            Map<Integer, List<String>> columns_names = new HashMap<>();
-            Map<Integer, List<List<String>>> rows_data = new HashMap<>();
-
-
-
-            for(Shift shift : blService.getAllShifts().values())
-            {
-                String table_name = "SHIFT #"+shift.getShiftId();
-                List<String> table_headers = Arrays.asList("ADDRESS", "DATE", "TIME", "BOSS");
-                List<List<String>> table_rows = Arrays.asList(
-                        Arrays.asList(shift.getAddress().getLocation(), new SimpleDateFormat("dd/MM/yyyy").format(shift.getShiftDate()),shift.getShiftTime().toString(), shift.getBoss().getName())
-                );
-
-                tables_info.put(0, table_name);
-                columns_names.put(0, table_headers);
-                rows_data.put(0, table_rows);
-
-
-                String working_name = "WORKING TEAM";
-                List<String> working_headers = Arrays.asList("NAME","JOB");
-                List<List<String>> working_rows = new LinkedList<>();
-
-
-                for(List<Integer> workers_id : shift.getWorkingTeam().values())
-                {
-                    for(Integer worker_id : workers_id)
-                    {
-                        Worker worker = blService.getWorker(worker_id);
-                        working_rows.add(Arrays.asList(worker.getName(),worker.getType().toString()));
-
-                    }
-                }
-
-                if(working_rows.isEmpty())
-                {
-                    working_rows.add(Arrays.asList("",""));
-                }
-
-                tables_info.put(1, working_name);
-                columns_names.put(1, working_headers);
-                rows_data.put(1, working_rows);
-
-                System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
-
-
+            for (Integer shift_id : blService.getAllShifts().keySet()) {
+                printShift(shift_id);
             }
 
-
         }
 
-     */
-
-
+    /*
         for (Shift shift : blService.getAllShifts().values()) {
             System.out.println(shift.toString());
             border();
         }
-
-
+    */
 
         System.out.println("1) select a shift");
         System.out.println("2) create a shift");
@@ -235,9 +180,15 @@ public class Printer {
             System.out.println("Error : no worker with such id");
             return;
         }
+
+        /*
         System.out.println("Worker name : " + w.getName());
         System.out.println("Worker id : " + w.getId());
         System.out.println("job : " + w.getType().toString() + "\n");
+
+         */
+
+        printWorkerTable(worker_id);
 
         System.out.println("1) Print Schedule");
         System.out.println("2) Print contract");
@@ -284,8 +235,9 @@ public class Printer {
     }
 
     public static void printShiftView(int shift_id) {
-        Shift shift = blService.getShift(shift_id);
-        System.out.println(shift.toString());
+    //    Shift shift = blService.getShift(shift_id);
+        printShift(shift_id);
+        //    System.out.println(shift.toString());
         System.out.println("1) print available workers for this shift");
         System.out.println("2) return");
     }
@@ -323,10 +275,28 @@ public class Printer {
         printAllTrucks();
         System.out.println("1) Add a truck");
         System.out.println("2) Return");
-
     }
 
+
     public static void printAllTrucks() {
+
+        if(blService.getAllTrucks().isEmpty())
+        {
+            System.out.println("No trucks in the database");
+            return;
+        }
+
+        List<String> headersList = Arrays.asList("SERIAL NUMBER", "MODEL", "WEIGHT","MAX ALLOWED WEIGHT");
+        List<List<String>> rowsList = new LinkedList<>();
+
+        for (Truck truck : blService.getAllTrucks().values()) {
+            List<String> truck_details = Arrays.asList(truck.getSerialNumber(), truck.getModel(),String.valueOf(truck.getWeight()),String.valueOf(truck.getMaxAllowedWeight()));
+            rowsList.add(truck_details);
+        }
+
+        String tableString = objectToTableString(headersList, rowsList, 10);
+        System.out.println(tableString);
+    /*
         Map<String, Truck> trucks_map = blService.getAllTrucks();
 
         String trucks = "";
@@ -339,12 +309,14 @@ public class Printer {
         }
 
         System.out.println(trucks);
+
+     */
     }
+
 
     public static void printTrucks(List<String> available_trucks) {
 
         String trucks = "";
-
         for (String truck_serial : available_trucks) {
             Truck truck = blService.getTruck(truck_serial);
             if (truck == null) {
@@ -359,7 +331,6 @@ public class Printer {
         }
 
         System.out.println(trucks);
-
     }
 
 //------------------------------------ Products ---------------------------------//
@@ -448,27 +419,22 @@ public class Printer {
 
     }
 
-    public static void printAddresses(List<String> available_addresses)
-    {
+    public static void printAddresses(List<String> available_addresses) {
 
 
-        if(available_addresses==null || available_addresses.isEmpty())
-        {
+        if (available_addresses == null || available_addresses.isEmpty()) {
             System.out.println("Error : didnt find any address!!!!!");
-        }
-        else
-        {
+        } else {
             List<String> headersList = Arrays.asList("LOCATION", "CONTACT NAME", "PHONE NUMBER");
             List<List<String>> rowsList = new LinkedList<>();
 
-            for (String location : available_addresses)
-            {
+            for (String location : available_addresses) {
                 Address address = blService.getAddress(location);
-                List<String> address_details = Arrays.asList(location,address.getContactName(),address.getPhoneNumber());
+                List<String> address_details = Arrays.asList(location, address.getContactName(), address.getPhoneNumber());
                 rowsList.add(address_details);
             }
 
-            String tableString = objectToTableString(headersList,rowsList,10);
+            String tableString = objectToTableString(headersList, rowsList, 10);
             System.out.println(tableString);
         }
 
@@ -487,7 +453,68 @@ public class Printer {
      */
     }
 
-    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data , int additional_space) {
+
+//------------------------------------ Table Prints ---------------------------------//
+
+    private static void printWorkerTable(int worker_id) {
+        Worker worker = blService.getWorker(worker_id);
+        List<String> headersList = Arrays.asList("ID", "NAME", "JOB");
+        List<List<String>> rowsList = new LinkedList<>();
+        List<String> worker_details = Arrays.asList(String.valueOf(worker.getId()), worker.getName(), worker.getType().toString());
+        rowsList.add(worker_details);
+        String tableString = objectToTableString(headersList, rowsList, 10);
+        System.out.println(tableString);
+    }
+
+    private static void printShift(int shift_id) {
+
+        Shift shift = blService.getShift(shift_id);
+
+        Map<Integer, String> tables_info = new HashMap<>();
+        Map<Integer, List<String>> columns_names = new HashMap<>();
+        Map<Integer, List<List<String>>> rows_data = new HashMap<>();
+
+
+        String table_name = "SHIFT #" + shift.getShiftId();
+        List<String> table_headers = Arrays.asList("ADDRESS", "DATE", "TIME", "BOSS");
+        List<List<String>> table_rows = Arrays.asList(
+                Arrays.asList(shift.getAddress().getLocation(), new SimpleDateFormat("dd/MM/yyyy").format(shift.getShiftDate()), shift.getShiftTime().toString(), shift.getBoss().getName())
+        );
+
+        tables_info.put(0, table_name);
+        columns_names.put(0, table_headers);
+        rows_data.put(0, table_rows);
+
+
+        String working_name = "WORKING TEAM";
+        List<String> working_headers = Arrays.asList("NAME", "JOB");
+        List<List<String>> working_rows = new LinkedList<>();
+
+
+        for (List<Integer> workers_id : shift.getWorkingTeam().values()) {
+            for (Integer worker_id : workers_id) {
+                Worker worker = blService.getWorker(worker_id);
+                working_rows.add(Arrays.asList(worker.getName(), worker.getType().toString()));
+
+            }
+        }
+
+        if (working_rows.isEmpty()) {
+            working_rows.add(Arrays.asList("", ""));
+        }
+
+        tables_info.put(1, working_name);
+        columns_names.put(1, working_headers);
+        rows_data.put(1, working_rows);
+
+        System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
+
+
+    }
+
+    // Table printing functions
+
+    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data, int additional_space) {
 
 
         if (rows_data == null || columns_names == null || rows_data.isEmpty() || rows_data.get(0).size() != columns_names.size())
@@ -498,7 +525,7 @@ public class Printer {
 
         int k = 0;
         for (String column_name : columns_names) {
-            widths[k] = column_name.length()+additional_space;
+            widths[k] = column_name.length() + additional_space;
 
             k++;
         }
@@ -527,7 +554,7 @@ public class Printer {
 
         List<Integer> colAlignList = new LinkedList<>();
 
-        for(int i=0 ; i<columns_names.size();i++)
+        for (int i = 0; i < columns_names.size(); i++)
             colAlignList.add(Block.DATA_CENTER);
 
         table.setColAlignsList(colAlignList);
@@ -587,7 +614,6 @@ public class Printer {
         // now instead of having one sum which represents the width of a single table , we will need a sum array
         // because we have multiple tables
 
-
         Integer[] sums = new Integer[tables_info.keySet().size()];
 
         for (Map.Entry<Integer, List<String>> table : columns_names.entrySet()) {
@@ -618,6 +644,8 @@ public class Printer {
 
         int biggest_sum = Collections.max(Arrays.asList(sums));
 
+        System.out.println(biggest_sum);
+
         // create the board
 
         Board board = new Board(biggest_sum);   // sum = width of all + number of columns + 1
@@ -629,7 +657,6 @@ public class Printer {
 
         for (Integer table_number : tables_info.keySet()) {
 
-            int sum = sums[table_number];
 
             List<String> columns = columns_names.get(table_number);
             List<List<String>> rows = rows_data.get(table_number);
@@ -641,15 +668,16 @@ public class Printer {
                 total_width = total_width + width;
             }
 
+            int desired = total_width + columns.size() + 1;
 
             // if less then distribute the empty space between the columns
-            if (sum < biggest_sum) {
-                int result = (biggest_sum - sum) / columns_names.get(table_number).size();
+            if (desired < biggest_sum) {
+                int result = (biggest_sum - desired) / columns_names.get(table_number).size();
                 for (int i = 0; i < columns_widths.size(); i++) {
                     columns_widths.set(i, columns_widths.get(i) + result);
                 }
 
-                int remains = biggest_sum - (sum + result * columns_names.get(table_number).size());
+                int remains = biggest_sum - (desired + result * columns_names.get(table_number).size());
                 while (remains != 0) {
                     int min_width = Collections.min(columns_widths);
                     columns_widths.set(columns_widths.indexOf(min_width), min_width + 1);
@@ -660,6 +688,7 @@ public class Printer {
 
 
             Table table = new Table(board, biggest_sum, columns, rows, columns_widths);
+            table.setGridMode(Table.GRID_FULL);
 
 
             int get_index = 0, append_index = 0;
@@ -675,9 +704,7 @@ public class Printer {
 
             if (table_number == 0) {
                 board.setInitialBlock(block);
-            }
-            else
-            {
+            } else {
                 int z = tmp.remove(0);
                 board.getBlock(z).setBelowBlock(block);
 

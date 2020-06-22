@@ -14,6 +14,7 @@ public class SystemAccess
 
     public static void register()
     {
+        /*
         List<String> available_locations = blService.getAvailableAddressesRegister();
         if(available_locations.isEmpty())
         {
@@ -42,6 +43,8 @@ public class SystemAccess
                 address_chosen = true;
             }
         }
+
+         */
 
         String email;
         String password;
