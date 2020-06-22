@@ -2,25 +2,22 @@ package BusinessLayer;
 
 import DataAccesslayer.*;
 import PresentationLayer.Main;
-import PresentationLayer.Printer;
 import javafx.util.Pair;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class BLService {
 
     private static BLService blService_instance = null;
 
-
-    private History history;
-    private Workers workers;
-    private Data data;
-    private DAL dal;
-    private system systemcontroler;
+    static int MAX_B_WEIGHT = 1000;
+    private final History history;
+    private final Workers workers;
+    private final Data data;
+    private final DAL dal;
+    private final system systemcontroler;
     private User logged_user;
     private Store current_Store;
 
@@ -821,65 +818,80 @@ public class BLService {
 //----------------------------------------------- new arrange delivery ----------------------------------------//
 
 
-    public void arrangeDelivery(Date delivery_date, Shift.ShiftTime shiftTime, String source_location ,String destination_location, Map<String, Integer> delivery_products) {
+    public void arrangeDelivery(Date delivery_date, Shift.ShiftTime shiftTime, String source_location, String destination_location, Map<String, Integer> delivery_products) {
 
 
         // check if there are shifts in the destination with the given date and time for 7 days
 
-        int products_weight = 0;
-        for(Map.Entry<String,Integer> product : delivery_products.entrySet())
-        {
-            int product_weight = getProduct(product.getKey()).getWeight();
-            products_weight = products_weight + (product_weight * product.getValue());
-        }
+        int products_weight = getDocProductsWeight(delivery_products);
 
         Date potential_date = delivery_date;
         Shift des_shift = null;
 
         Address destination_address = getAddress(destination_location);
-        if(destination_address==null)
-        {
+        if (destination_address == null) {
             System.out.println("Error : invalid location");
             return;
         }
 
-        int additional_days = 0 ;
+        int additional_days = 0;
         boolean done = false;
-        while(!done && additional_days<8)
-        {
+        while (!done && additional_days < 8) {
 
 
-            des_shift = getShift(null,potential_date,shiftTime);
+            des_shift = getShift(null, potential_date, shiftTime);
 
-            if(des_shift!=null && stockKeeperAvailable(des_shift))
-            {
+            if (des_shift != null && stockKeeperAvailable(des_shift)) {
                 // check if there is an available driver and truck
                 // first check for the driver either already working in this shift or free
 
 
-                List<Integer> shift_deliveries = getDeliveries(source_location,des_shift.getShiftDate(),des_shift.getShiftTime()) ;
-                List<Integer> free_drivers = getAvailableWorkers(potential_date,shiftTime, WorkPolicy.WorkingType.Driver);
+                List<Integer> shift_deliveries = getDeliveries(source_location, des_shift.getShiftDate(), des_shift.getShiftTime());
+                List<Integer> free_drivers = getAvailableWorkers(potential_date, shiftTime, WorkPolicy.WorkingType.Driver);
+                List<String> free_trucks = getAvailableTrucks(potential_date, shiftTime);
 
-                if(shift_deliveries!=null && !shift_deliveries.isEmpty())
-                {
+                if (shift_deliveries != null && !shift_deliveries.isEmpty()) {
                     // check if the deliveries can handle the extra weight
-                    for(Integer delivery_id : shift_deliveries)
-                    {
+                    for (Integer delivery_id : shift_deliveries) {
                         Delivery delivery = getDelivery(delivery_id);
                         Truck truck = getTruck(delivery.getTruckSerialNumber());
-                //        int free_storage = truck.getMaxAllowedWeight() - delivery.get
-                        if(truck.getMaxAllowedWeight() - truck.getWeight() - products_weight > 0)
-                        {
-                            // we found a delivery ------> Done
-
-                            done = true;
+                        int free_storage = truck.getMaxAllowedWeight() - delivery.getTruckWeight() - products_weight;
+                        if (free_storage >= 0) {
+                            // we found a delivery , check if the driver's license still relevant or replace the driver ------> Done
+                            done = updateDelivery(delivery, destination_address, delivery_products);
+                            break;
                         }
                     }
                 }
 
-            }
-            else
-            {
+                if (!done && !free_drivers.isEmpty() && !free_trucks.isEmpty()) {
+                    // we will start a new delivery , start with finding a suitable truck
+                    for (String truck_cn : free_trucks) {
+                        Truck truck = getTruck(truck_cn);
+                        int truck_total_weight = products_weight + truck.getWeight();
+                        if (truck.getMaxAllowedWeight() - truck_total_weight >= 0) {
+                            // find suitable driver
+
+                            int driver_id = getOptimalDriver(free_drivers, truck_total_weight);
+                            if (driver_id != -1) {
+                                // found a driver
+                                Delivery delivery = new Delivery(potential_date, shiftTime, source_location, truck_cn, driver_id, truck_total_weight);
+                                Document document = new Document();
+                                document.setDeliveryGoods(delivery_products);
+                                delivery.getDocuments().put(destination_location, document);
+
+                                work(driver_id, des_shift.getShiftId());
+                                addDelivery(delivery);
+
+                                done = true;
+
+                            }
+                        }
+                    }
+
+                }
+
+            } else {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(potential_date);
                 cal.add(Calendar.DAY_OF_WEEK, 1);
@@ -889,9 +901,8 @@ public class BLService {
 
         }
 
-        if (getShift(getAddress(destination_location),delivery_date, shiftTime) == null) {
-            System.out.println("Error : no shift in this address is available at the chosen date!");
-        }
+        if (!done)
+            System.out.println("couldn't arrange a delivery");
 
         // check if there are shifts in the destination with stockKeepers working in the same time of source shift
         // calculate total weight
@@ -899,39 +910,160 @@ public class BLService {
         // then we can finish
 
 
-
     }
 
 
-    public List<Integer> getDeliveries(String source , Date date , Shift.ShiftTime shiftTime)
-    {
+    public List<Integer> getDeliveries(String source, Date date, Shift.ShiftTime shiftTime) {
         // source is a specific supplier
         List<Integer> deliveries = new LinkedList<>();
-        for(Delivery delivery : getAllDeliveries().values())
-        {
-            if(delivery.getSource().equals(source) && delivery.getDate().equals(date) && delivery.getShiftTime().equals(shiftTime) )
-            {
+        for (Delivery delivery : getAllDeliveries().values()) {
+            if (delivery.getSource().equals(source) && delivery.getDate().equals(date) && delivery.getShiftTime().equals(shiftTime)) {
                 deliveries.add(delivery.getDeliveryID());
             }
         }
         return deliveries;
     }
 
-    // returns -1 if no delivery found
-    public int getDeliveryProductsWeight(int delivery_id)
-    {
-        int weight = -1;
-        Delivery delivery = getDelivery(delivery_id);
-        for(Document doc : delivery.getDocuments().values())
-        {
-            for(Map.Entry<String,Integer> product : doc.getDeliveryGoods().entrySet())
-            {
-                int product_weight = getProduct(product.getKey()).getWeight();
-                weight = weight + (product_weight * product.getValue());
+    public int getDocProductsWeight(Map<String, Integer> delivery_goods) {
+        int products_weight = 0;
+        for (Map.Entry<String, Integer> product : delivery_goods.entrySet()) {
+            int product_weight = getProduct(product.getKey()).getWeight();
+            products_weight = products_weight + (product_weight * product.getValue());
+        }
+
+        return products_weight;
+    }
+
+    public boolean updateDelivery(Delivery delivery, Address destination, Map<String, Integer> delivery_goods) {
+        // IMPORTANT : CHECK IF THE DESTINATION EXISTS IN THIS DELIVERY ( USE REPLACE THEN )
+
+        int updated_weight = delivery.getTruckWeight() + getDocProductsWeight(delivery_goods);
+        Driver delivery_driver = (Driver) getWorker(delivery.getDriverID());
+        if (delivery_driver.getLicense().equals("B") && updated_weight > MAX_B_WEIGHT) {
+
+            // we need to replace driver if possible . if not , cancel the update
+
+            List<Integer> free_drivers = getAvailableWorkers(delivery.getDate(), delivery.getShiftTime(), WorkPolicy.WorkingType.Driver);
+
+            // no free drivers
+            if (free_drivers.isEmpty())
+                return false;
+
+            int replacement_id = getOptimalDriver(free_drivers, updated_weight);
+
+            // no free A license driver
+            if (replacement_id == -1)
+                return false;
+
+            // now replace the drivers
+
+            int old_driver_id = delivery.getDriverID();
+            int delivery_shift = getDeliveryShift(delivery);
+
+            delivery.setDriverID(replacement_id);
+            work(replacement_id, delivery_shift);
+            removeFromShift(delivery_shift, old_driver_id);
+            SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String replace_driver_log = "Replaced delivery driver from : " + old_driver_id + " to " + replacement_id + " at " + date_format.format(new Date());
+            delivery.getLogs().add(replace_driver_log);
+
+
+        }
+
+        // check if the destination is already in this delivery
+
+        SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String log = "";
+        if (delivery.getDocuments().containsKey(destination.getLocation())) {
+            updateDocument(delivery.getDelivery_id(), destination.getLocation(), delivery_goods);
+            log = "updated " + destination.getLocation() + " order at " + date_format.format(new Date());
+
+        } else {
+            Document document = new Document();
+            document.setDeliveryGoods(delivery_goods);
+            getDelivery(delivery.getDeliveryID()).getDocuments().put(destination.getLocation(), document);
+            log = "added " + destination.getLocation() + " as a new destination at " + date_format.format(new Date());
+        }
+
+        getDelivery(delivery.getDeliveryID()).setTruckWeight(updated_weight);
+        delivery.getLogs().add(log);
+
+        return true;
+
+    }
+
+    public int getOptimalDriver(List<Integer> drivers, int delivery_weight) {
+        // delivery weight = truck weight + products weight
+        // returns -1 if there are no options , for example : needed A and list contains none of A license drivers
+
+        int result = -1;
+
+        String needed_license = "B";
+        if (delivery_weight > MAX_B_WEIGHT) {
+            needed_license = "A";
+        }
+
+        for (Integer driver_id : drivers) {
+            Worker driver = getWorker(driver_id);
+            if (((Driver) driver).getLicense().equals(needed_license)) {
+                result = driver_id;
+                break;
             }
         }
 
-        return weight;
+        if (result == -1 && needed_license.equals("B")) {
+            needed_license = "A";
+            for (Integer driver_id : drivers) {
+                Worker driver = getWorker(driver_id);
+                if (((Driver) driver).getLicense().equals(needed_license)) {
+                    result = driver_id;
+                    break;
+                }
+            }
+
+        }
+
+        return result;
+    }
+
+    public int getDeliveryShift(Delivery delivery) {
+        int delivery_shift_id = -1;
+        Worker driver = getWorker(delivery.getDriverID());
+        for (Integer shift_id : driver.getWorker_shifts()) {
+            Shift shift = getShift(shift_id);
+            if (shift.getShiftDate().equals(delivery.getDate()) && shift.getShiftTime().equals(delivery.getShiftTime()))
+                return shift_id;
+        }
+
+        return delivery_shift_id;
+    }
+
+    public boolean removeFromShift(int shift_id, int worker_id) {
+        Worker worker = getWorker(worker_id);
+        Shift shift = getShift(shift_id);
+
+        if (!shift.getWorkingTeam().get(worker.getType()).contains(worker_id))
+            return false;
+
+        getShift(shift_id).getWorkingTeam().get(worker.getType()).remove(worker_id);
+        getWorker(worker_id).getWorker_shifts().remove(shift_id);
+
+        return true;
+    }
+
+    public void updateDocument(int delivery_id, String destination, Map<String, Integer> products) {
+
+        for (Map.Entry<String, Integer> product : products.entrySet()) {
+
+            String product_cn = product.getKey();
+            Map<String, Integer> destination_goods = getDelivery(delivery_id).getDocuments().get(destination).getDeliveryGoods();
+            if (destination_goods.containsKey(product.getKey())) {
+                destination_goods.replace(product.getKey(), destination_goods.get(product_cn) + product.getValue());
+            } else {
+                destination_goods.put(product.getKey(), product.getValue());
+            }
+
+        }
     }
 
 }
