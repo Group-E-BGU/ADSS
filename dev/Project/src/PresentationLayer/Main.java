@@ -1201,24 +1201,7 @@ public class Main {
             System.out.println("You need to connect before you take any action");
         }
         if (conect) {
-            LinkedList<InterfaceContract> Contract = blService.GetContract();
-            for (InterfaceContract Con : Contract
-            ) {
-                for (Map.Entry<Integer, String> e : Con.ProductIDVendor_Name.entrySet()) {
-                    int P = e.getKey();
-                    String N = e.getValue();
-                    for (Map.Entry<Integer, Double> entry : Con.productIDVendor_Price.entrySet()) {
-                        int p = entry.getKey();
-                        Double price = entry.getValue();
-                        if (P == p) {
-                            System.out.println("supplierId: " + Con.Suplaier_ID);
-                            System.out.println("product name: " + N);
-                            System.out.println("product Id_Supplier: " + p);
-                            System.out.println("Price: " + price + "\n");
-                        }
-                    }
-                }
-            }
+            Printer.printSuperItems();
         }
     }
 
@@ -1228,33 +1211,12 @@ public class Main {
             System.out.println("You should login");
         }
         if(conect) {
-            LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
-            for (InterfaceSupplier Sup : suppliers
-            ) {
-                System.out.print("\nname: " + Sup.Name + "\n" +
-                        "Id: " + Sup.ID + "\n" +
-                        "Payment with: " + Sup.Payments + "\n" +
-                        "Bank: " + Sup.Bank + "\n" +
-                        "Branch: " + Sup.Branch + "\n" +
-                        "Bank number: " + Sup.BankNumber + "\n");
-                System.out.println("Contacts:");
-                for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
-                ) {
-                    System.out.println("name: " + i.getValue());
-                    System.out.println("ID: " + i.getKey());
-                    for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
-                    ) {
-                        if (i.getKey().intValue()==e.getKey().intValue()) {
-                            System.out.println("number: " + e.getValue() + "\n");
-                        }
-                    }
-                }
-            }
+            Printer.printAllSuppliers();
         }
     }
 
     private static void UpdateOrderStatus() {
-/*
+
         boolean conect = blService.CheckConected();
         if (!conect) {
             System.out.println("You need to connect before you take any action");
@@ -1285,7 +1247,7 @@ public class Main {
             }
             if (order==null)
                 System.out.println("the Order is mot exist in the system");
-        }*/
+        }
     }
 
     private static void DeleteSupplier() {

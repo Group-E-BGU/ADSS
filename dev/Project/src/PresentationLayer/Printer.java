@@ -243,7 +243,7 @@ public class Printer {
     }
 
     public static void printShiftView(int shift_id) {
-    //    Shift shift = blService.getShift(shift_id);
+        //    Shift shift = blService.getShift(shift_id);
         printShift(shift_id);
         //    System.out.println(shift.toString());
         System.out.println("1) print available workers for this shift");
@@ -288,17 +288,16 @@ public class Printer {
 
     public static void printAllTrucks() {
 
-        if(blService.getAllTrucks().isEmpty())
-        {
+        if (blService.getAllTrucks().isEmpty()) {
             System.out.println("No trucks in the database");
             return;
         }
 
-        List<String> headersList = Arrays.asList("SERIAL NUMBER", "MODEL", "WEIGHT","MAX ALLOWED WEIGHT");
+        List<String> headersList = Arrays.asList("SERIAL NUMBER", "MODEL", "WEIGHT", "MAX ALLOWED WEIGHT");
         List<List<String>> rowsList = new LinkedList<>();
 
         for (Truck truck : blService.getAllTrucks().values()) {
-            List<String> truck_details = Arrays.asList(truck.getSerialNumber(), truck.getModel(),String.valueOf(truck.getWeight()),String.valueOf(truck.getMaxAllowedWeight()));
+            List<String> truck_details = Arrays.asList(truck.getSerialNumber(), truck.getModel(), String.valueOf(truck.getWeight()), String.valueOf(truck.getMaxAllowedWeight()));
             rowsList.add(truck_details);
         }
 
@@ -575,6 +574,111 @@ public class Printer {
 
     }
 
+
+    public static void printSuperItems() {
+
+        List<String> headersList = Arrays.asList("PRODUCT NAME", "SupplierID", "id_supplier", "PRICE");
+        List<List<String>> rowsList = new LinkedList<>();
+
+        LinkedList<InterfaceContract> Contract = blService.GetContract();
+        for (InterfaceContract Con : Contract
+        ) {
+            for (Map.Entry<Integer, String> e : Con.ProductIDVendor_Name.entrySet()) {
+                int P = e.getKey();
+                String N = e.getValue();
+                for (Map.Entry<Integer, Double> entry : Con.productIDVendor_Price.entrySet()) {
+                    int p = entry.getKey();
+                    Double price = entry.getValue();
+
+                    if (P == p) {
+                        List<String> product_details = Arrays.asList(N, String.valueOf(Con.Suplaier_ID), String.valueOf(p), String.valueOf(price));
+                        rowsList.add(product_details);
+
+                    }
+                }
+            }
+        }
+
+        String tableString = objectToTableString(headersList, rowsList, 10);
+        System.out.println(tableString);
+    }
+
+    public static void printAllSuppliers()
+    {
+       /* LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
+        for (InterfaceSupplier Sup : suppliers
+        ) {
+            System.out.print("\nname: " + Sup.Name + "\n" +
+                    "Id: " + Sup.ID + "\n" +
+                    "Payment with: " + Sup.Payments + "\n" +
+                    "Bank: " + Sup.Bank + "\n" +
+                    "Branch: " + Sup.Branch + "\n" +
+                    "Bank number: " + Sup.BankNumber + "\n");
+            System.out.println("Contacts:");
+            for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
+            ) {
+                System.out.println("name: " + i.getValue());
+                System.out.println("ID: " + i.getKey());
+                for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
+                ) {
+                    if (i.getKey().intValue()==e.getKey().intValue()) {
+                        System.out.println("number: " + e.getValue() + "\n");
+                    }
+                }
+            }
+        }
+
+        */
+
+        LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
+        for (InterfaceSupplier Sup : suppliers
+        ) {
+
+            Map<Integer, String> tables_info = new HashMap<>();
+            Map<Integer, List<String>> columns_names = new HashMap<>();
+            Map<Integer, List<List<String>>> rows_data = new HashMap<>();
+
+
+            String table_name = "Supplier ID # "+Sup.ID;
+
+            List<String> table_headers = Arrays.asList("NAME", "PAYMENT METHOD", "BANK","BRANCH","BANK NUMBER");
+            List<List<String>> table_rows = Arrays.asList(
+                    Arrays.asList(Sup.Name, Sup.Payments, Sup.Bank,Sup.Branch,String.valueOf(Sup.BankNumber))
+            );
+
+            tables_info.put(0, table_name);
+            columns_names.put(0, table_headers);
+            rows_data.put(0, table_rows);
+
+
+            String working_name = "CONTRACTS";
+            List<String> working_headers = Arrays.asList("ID", "NAME","NUMBER");
+            List<List<String>> working_rows = new LinkedList<>();
+
+            for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
+            ) {
+                for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
+                ) {
+                    if (i.getKey().intValue()==e.getKey().intValue()) {
+                        working_rows.add(Arrays.asList(String.valueOf(i.getKey()), i.getValue(),String.valueOf(e.getValue())));
+                    }
+                }
+            }
+
+            if (working_rows.isEmpty()) {
+                working_rows.add(Arrays.asList("", ""));
+            }
+            tables_info.put(1, working_name);
+            columns_names.put(1, working_headers);
+            rows_data.put(1, working_rows);
+
+            System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
+
+        }
+
+
+    }
+
     private static String objectToComplexTableString(Map<Integer, String> tables_info, Map<Integer, List<String>> columns_names, Map<Integer, List<List<String>>> rows_data) {
 
 // tables_info <tableNumber,tableName>
@@ -652,8 +756,6 @@ public class Printer {
 
         int biggest_sum = Collections.max(Arrays.asList(sums));
 
-        System.out.println(biggest_sum);
-
         // create the board
 
         Board board = new Board(biggest_sum);   // sum = width of all + number of columns + 1
@@ -694,9 +796,15 @@ public class Printer {
 
             }
 
+            List<Integer> colAlignList = new LinkedList<>();
+
+            for (int i = 0; i < columns_names.get(table_number).size(); i++)
+                colAlignList.add(Block.DATA_CENTER);
+
 
             Table table = new Table(board, biggest_sum, columns, rows, columns_widths);
             table.setGridMode(Table.GRID_FULL);
+            table.setColAlignsList(colAlignList);
 
 
             int get_index = 0, append_index = 0;
