@@ -6,6 +6,8 @@ import javafx.util.Pair;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class BLService {
@@ -551,8 +553,8 @@ public class BLService {
         return Done;
     }
 
-    public String Register(String email, String password) {
-        String Done = systemcontroler.Register(email, password);
+    public String Register(String Address,String name, String phoneNumber, String password) {
+        String Done = systemcontroler.Register(Address,name,phoneNumber, password);
         return Done;
     }
 
@@ -791,13 +793,11 @@ public class BLService {
         return current_Store.GetOrderDetails();
     }
 
-
 //----------------------------------------------- new arrange delivery ----------------------------------------//
 
+    public void arrangeDelivery(Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
 
-    public void arrangeDelivery(Date delivery_date, Shift.ShiftTime shiftTime, String source_location, String destination_location, Map<String, Integer> delivery_products) {
-
-
+        Shift.ShiftTime shiftTime= Shift.ShiftTime.Morning;
         // check if there are shifts in the destination with the given date and time for 7 days
 
         int products_weight = getDocProductsWeight(delivery_products);
@@ -888,7 +888,6 @@ public class BLService {
 
 
     }
-
 
     public List<Integer> getDeliveries(String source, Date date, Shift.ShiftTime shiftTime) {
         // source is a specific supplier
@@ -1041,6 +1040,51 @@ public class BLService {
                 destination_goods.put(product.getKey(), product.getValue());
             }
 
+        }
+    }
+
+    public String DoDelivery(){  //todo auto or pressing?
+       if(LocalDate.now().getDayOfWeek().getValue()+1==1)
+       {
+           LinkedList<Order> Orders = new LinkedList<Order>();
+           for (int i = 1; i < 8; i++) {
+               LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(i, current_Store.getAddress());
+               for (int order : ooo
+               ) {
+                   Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
+                   Orders.add(o);
+               }
+           }
+           for (Order o : Orders
+           ) {
+               DoDelivery(o);
+           }
+           return "done";
+       }
+       return "we do delivery just on sunday";
+    }
+
+    public void DoDelivery(Order o){
+        if (!o.isAuto()) {
+            Supplier s = current_Store.getMapSupplier().GetSupplier(o.getID_Vendor(), current_Store.getAddress());
+            Contract c = current_Store.getMapContract().getContract(s.getID(), current_Store.getAddress());
+            if (!c.isLeading()) {
+                Map<String, Integer> Products = new HashMap<String, Integer>();
+                for (Map.Entry<Integer, Integer> e : o.getItemsID_NumberOfItems().entrySet()) {
+                    String CN = e.getKey().toString();
+                    Products.put(CN, e.getValue());
+                }
+                for (int day : o.getDay()
+                ) {
+                    LocalDate date=LocalDate.now();
+                    date=date.plusDays(day-1);
+                    Date d= java.util.Date.from(date.atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());  //todo check if works
+
+                    arrangeDelivery(d,s.getPayments(),current_Store.getAddress(),Products);
+                }
+            }
         }
     }
 

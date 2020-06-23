@@ -446,7 +446,7 @@ public class Printer {
 
     /*    String addresses = "";
         for (String location : available_addresses) {
-            Address a = blService.getAddress(location);
+            Address a = blService.getPayments(location);
 
             addresses += "Location : " + a.getLocation() + "\n" +
                     "Contact Name : " + a.getContactName() + "\n" +

@@ -42,7 +42,7 @@ public class SystemAccess
             System.out.println("please choose one of the available addresses : ");
             Printer.printAddresses(available_locations);
             String location = keyboard.nextLine();
-            if(blService.getAddress(location)==null || !available_locations.contains(location))
+            if(blService.getPayments(location)==null || !available_locations.contains(location))
             {
                 System.out.println("Error : please type the location of the desired address!");
                 System.out.println("do you want to try again ? y/n");
@@ -60,18 +60,24 @@ public class SystemAccess
 
          */
 
-        String email;
+        String address;
         String password;
-        System.out.println("Please enter your email");
-        email = keyboard.nextLine();
-        String Ex=blService.CheckEmailExist(email);
+        String phoneNumber;
+        String name;
+        System.out.println("Please enter your Address");
+        address = keyboard.nextLine();
+        String Ex=blService.CheckEmailExist(address);
         if(!Ex.equals("Not Exist")){
             System.out.println(Ex);
         }
         else {
+            System.out.println("Please enter name");
+            name = keyboard.nextLine();
+            System.out.println("Please enter phone number");
+            phoneNumber = keyboard.nextLine();
             System.out.println("Please enter password");
             password = keyboard.nextLine();
-            String Done = blService.Register(email, password);
+            String Done = blService.Register(address, name,phoneNumber,password);
             if (Done.equals("Done")) {
                 System.out.println("The registration was successful");
             } else

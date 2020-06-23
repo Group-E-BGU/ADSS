@@ -19,11 +19,11 @@ public class system {
         return s;
     }
 
-    public String Register(String email, String password) {
-    String s=CheckEmailExist(email);
-    if(s.equals("Not Exist")){
-        MapUser.WriteUser(email,password);
-        MapStore.WriteStore(email, 0, 0, 0 );
+    public String Register(String address, String name, String phoneNumber, String password) {
+    String s=CheckEmailExist(address);
+    if(s.equals("Not Exist")){ //todo- add to the database information
+        MapUser.WriteUser(address,password);
+        MapStore.WriteStore(address, 0, 0, 0 );
         return "Done";
     }
     return s;

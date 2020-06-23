@@ -586,8 +586,8 @@ public class Main {
     }
 
     private static void AddArguments() {
-        blService.Register("A@gmail.com","123");
-        blService.Register("Store2@gmail.com","S2_superLi");
+        blService.Register("A@gmail.com","123","","");
+        blService.Register("Store2@gmail.com","S2_superLi","","");
 
         blService.Login("A@gmail.com","123");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
@@ -828,7 +828,6 @@ public class Main {
                 bankNumber = myScanner.nextInt();
                 System.out.println("Please enter the Supplier's payments");
                 payments = myScanner.next();
-
                 while (MoreContact) {
                     String ContactName;
                     int ContactId;

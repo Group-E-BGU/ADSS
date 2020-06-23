@@ -9,12 +9,13 @@ public class InterfaceSupplier {
     public String Branch;
     public int BankNumber;
     public String Payments;
+    public String Address;
     public Map<Integer, String> ContactsID_Name;
     public Map<Integer, Integer> ContactsID_number;
     public InterfaceContract Contract;
     public InterfaceWrotequantities Worte;
 
-    public InterfaceSupplier(String name, int ID, String bank,String branch, int bankNumber,
+    public InterfaceSupplier(String name, int ID, String Address,String bank,String branch, int bankNumber,
                              String payments, Map<Integer, String> Contacts_ID,
                              Map<Integer, Integer> Contacts_number,InterfaceContract contract,
                                      InterfaceWrotequantities worte) {
@@ -24,6 +25,7 @@ public class InterfaceSupplier {
         Branch=branch;
         BankNumber = bankNumber;
         Payments = payments;
+        Address = Address;
         Contract = null;
         Worte = null;
         ContactsID_Name=Contacts_ID;

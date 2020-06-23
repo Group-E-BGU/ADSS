@@ -9,7 +9,8 @@ public class Supplier {
     private String Bank;
     private String Branch;
     private int BankNumber;
-    private String Payments;
+    private String address;
+    private String payments;
     private Map<Integer, String> ContactsID_Name;
     private Map<Integer, Integer> ContactsID_number;
     private Contract Contract;
@@ -23,11 +24,20 @@ public class Supplier {
         Bank=bank;
         Branch=branch;
         BankNumber = bankNumber;
-        Payments = payments;
+        address = payments;
+        payments=payments;
         Contract = null;
         Worte = null;
         ContactsID_Name=Contacts_ID;
         ContactsID_number=Contacts_number;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setPayments(String payments) {
+        this.payments = payments;
     }
 
     public String getName() {
@@ -74,8 +84,8 @@ public class Supplier {
         BankNumber = bankNumber;
     }
 
-    public void setPayments(String payments) {
-        Payments = payments;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public void setContactsID_Name(Map<Integer, String> contactsID_Name) {
@@ -99,7 +109,7 @@ public class Supplier {
     }
 
     public String getPayments() {
-        return Payments;
+        return payments;
     }
 
     public Map<Integer, String> getContactsID_Name() {
