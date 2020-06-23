@@ -16,7 +16,7 @@ public class MapperItemRecord {
     public void InsertItemRecord(String name,int id, int minAmount, int storageAmount, int shelfAmount, int totalAmount, int shelfNumber, String manufacture, String storeId){
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO ItemRecord VALUES (?,?,?,?,?,?,?,?,?)";
 

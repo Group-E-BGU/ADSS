@@ -20,7 +20,7 @@ public class MapperOrder {
         WriteDays(storeId,IdOrder,days);
             try {
                 Class.forName("org.sqlite.JDBC");
-                conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+                conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
                 String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?)";
 

@@ -27,7 +27,7 @@ public class MapperDiscount {
     public void InsertItemDiscount(int id, int percentage, java.sql.Date beginDate, java.sql.Date endDate, int irId, String storeEmail) {
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO itemDiscount VALUES (?,?,?,?,?,?)";
 

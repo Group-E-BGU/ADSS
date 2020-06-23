@@ -3,6 +3,7 @@ package DataAccesslayer;
 import BusinessLayer.Address;
 import BusinessLayer.Delivery;
 import BusinessLayer.Document;
+import BusinessLayer.Shift;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -25,6 +26,7 @@ public class DeliveryDAO {
         List<String> logs;
         int truckWeight;
         Map<String, Document> documents;
+        Shift.ShiftTime shiftTime;
 
         String sql = "SELECT * FROM Deliveries WHERE id = ?";
 
@@ -44,8 +46,9 @@ public class DeliveryDAO {
                 driverID = rs.getInt("driverId");
                 truckWeight = rs.getInt("truckWeight");
                 logs = decodeLogs(rs.getString("logs"));
+                shiftTime = rs.getInt("shiftTime") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
 
-                delivery = new Delivery(date, source, truckSerialNumber,driverID,truckWeight);
+                delivery = new Delivery(date, shiftTime, source, truckSerialNumber,driverID,truckWeight);
                 delivery.setDeliveryId(id);
 
                 delivery.setDocuments(documents);
@@ -101,6 +104,7 @@ public class DeliveryDAO {
         int driverID;
         Map<String, Document> documents;
         int deliveryId;
+        Shift.ShiftTime shiftTime;
 
 
         try (Connection conn = DAL.connect();
@@ -119,8 +123,9 @@ public class DeliveryDAO {
                 int truckWeight = rs.getInt("truckWeight");
                 List<String> logs = decodeLogs(rs.getString("logs"));
                 deliveryId = rs.getInt("id");
+                shiftTime = rs.getInt("shiftTime") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
 
-                delivery = new Delivery(date, source, truckSerialNumber,driverID,truckWeight);
+                delivery = new Delivery(date, shiftTime, source, truckSerialNumber,driverID,truckWeight);
                 delivery.setDeliveryId(deliveryId);
                 delivery.setDocuments(documents);
                 delivery.setLogs(logs);
@@ -138,7 +143,7 @@ public class DeliveryDAO {
 
     public int save(Delivery delivery) {
 
-        String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight, shiftTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
@@ -155,6 +160,7 @@ public class DeliveryDAO {
         int truckWeight = delivery.getTruckWeight();
         Map<String, Document> documents = delivery.getDocuments();
         int deliveryID = -1;
+        int shiftTime = delivery.getShiftTime() == Shift.ShiftTime.Morning ? 0 : 1;
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -165,6 +171,7 @@ public class DeliveryDAO {
             pstmt.setString(5, encodeDocuments(documents));
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(7, truckWeight);
+            pstmt.setInt(8, shiftTime);
             pstmt.executeUpdate();
 
             System.out.println("Delivery has been added successfully");

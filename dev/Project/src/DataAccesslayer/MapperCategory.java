@@ -21,7 +21,7 @@ public class MapperCategory {
     public List<Category> getAllCategories(String storeId) {
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "SELECT * " +
                     "FROM Category " +

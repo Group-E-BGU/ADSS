@@ -32,7 +32,7 @@ public class MapperSupplier {
         }
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO Supplier VALUES (?,?,?,?,?,?,?,?)";
 

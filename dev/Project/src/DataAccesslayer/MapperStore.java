@@ -8,7 +8,7 @@ public class MapperStore {
     public void WriteStore(String email, int itemeId, int numOfProduct, int NumOfOrder ){
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO  Store VALUES (?,?,?,?)";
 

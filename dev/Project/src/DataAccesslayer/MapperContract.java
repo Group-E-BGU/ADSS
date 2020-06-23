@@ -32,7 +32,7 @@ public class MapperContract {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO Contract VALUES (?,?,?,?)";
 

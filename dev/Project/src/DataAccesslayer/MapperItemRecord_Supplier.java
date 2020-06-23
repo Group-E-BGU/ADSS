@@ -9,7 +9,7 @@ public class MapperItemRecord_Supplier
     public void WriteItemRecord_Supplier(String storeId, int PId, String MainCategory, String SubCategory, String SubSubCategory, String name,String manufacturer ){
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO ItemRecord_Supplier VALUES (?,?,?,?,?,?,?)";
 

@@ -22,7 +22,7 @@ public class MapperPrice {
     public void InsertPrice(int id,int IRID, int storePrice, int retailPrice) {
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
             String sqlstmt = "INSERT INTO price VALUES (?,?,?,?)";
 

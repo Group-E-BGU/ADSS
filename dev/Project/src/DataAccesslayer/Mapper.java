@@ -18,7 +18,7 @@ public class Mapper {
     public static void InitializeDB() {
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
             //todo add storeId to the praymery key in every table..
             Statement stmt = conn.createStatement();
             String sqlStmt = "CREATE TABLE IF NOT EXISTS Store(" +
