@@ -380,7 +380,7 @@ public class CreateActions {
         }
     }
 
-    private static double getDoubleChoice(double lower_bound, double upper_bound) {
+    public static double getDoubleChoice(double lower_bound, double upper_bound) {
         for (; ; ) {
 
             String keyboard_input = keyboard.nextLine();

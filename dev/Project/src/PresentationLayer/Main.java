@@ -561,9 +561,9 @@ public class Main {
         //todo change!
         Scanner myScanner = new Scanner(System.in);
         System.out.println("Please enter the product ID");
-        int ProdudtId = myScanner.nextInt();
+        int ProdudtId = getChoice(0,Integer.MAX_VALUE);
         System.out.println("Please enter the amount of the product you would like to invite");
-        int Amount = myScanner.nextInt();
+        int Amount = getChoice(0,Integer.MAX_VALUE);;
         InterfaceSupplier Supplier=blService.GetTheCyeeperSuplier(ProdudtId,Amount);
         if(Supplier==null){
             System.out.println("there is no supplier that supply this product");
@@ -792,7 +792,7 @@ public class Main {
             Map<Integer, Integer> Contacts_number = new ConcurrentHashMap<Integer, Integer>();
 
             System.out.println("Please enter the Supplier's ID");
-            ID = myScanner.nextInt();
+            ID = getChoice(0,Integer.MAX_VALUE);
 
             boolean contiue = true;
             boolean MoreContact = true;
@@ -802,10 +802,10 @@ public class Main {
                 while (!exist.equals("Exist")) {
                     System.out.println(exist);
                     System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
-                    String ans = myScanner.next();
+                    String ans = myScanner.nextLine();
                     if (ans.equals("y")) {
                         System.out.println("Please enter the Supplier's ID");
-                        ID = myScanner.nextInt();
+                        ID = getChoice(0,Integer.MAX_VALUE);;
                         exist = blService.CheckSuplierExist(ID);
                     } else {
                         {
@@ -817,32 +817,32 @@ public class Main {
             }
             if (contiue) {
                 System.out.println("Please enter the Supplier's name");
-                name = myScanner.next();
+                name = myScanner.nextLine();
                 System.out.println("Pleas enter the Supplier's address");
-                Address = myScanner.next();
+                Address = myScanner.nextLine();
                 System.out.println("Please enter the Supplier's Bank");
-                Bank = myScanner.next();
+                Bank = myScanner.nextLine();
                 System.out.println("Please enter the Supplier's Branch's Bank");
-                Branch = myScanner.next();
+                Branch = myScanner.nextLine();
                 System.out.println("Please enter the Supplier's bankNumber");
-                bankNumber = myScanner.nextInt();
+                bankNumber = getChoice(0,Integer.MAX_VALUE);;
                 System.out.println("Please enter the Supplier's payments");
-                payments = myScanner.next();
+                payments = myScanner.nextLine();
                 while (MoreContact) {
                     String ContactName;
                     int ContactId;
                     System.out.println("Please enter the Contact's name");
-                    ContactName = myScanner.next();
+                    ContactName = myScanner.nextLine();
                     System.out.println("Please enter the Contact's Id");
-                    ContactId = myScanner.nextInt();
+                    ContactId = getChoice(id_lower_bound,id_upper_bound);
                     Contacts_ID.put(ContactId, ContactName);
                     int PhoneNumber;
                     System.out.println("Please enter the Contact's Phone number");
-                    PhoneNumber = myScanner.nextInt();
+                    PhoneNumber = getChoice(0,Integer.MAX_VALUE);;
                     Contacts_number.put(ContactId, PhoneNumber);
                     String ans;
                     System.out.println("Do you have more contact? y/n");
-                    ans = myScanner.next();
+                    ans = myScanner.nextLine();
                     if (ans.equals("n")) {
                         MoreContact = false;
                     }
@@ -875,7 +875,7 @@ public class Main {
             boolean contiue = true;
 
             System.out.println("Please enter the Supplier's ID");
-            suplaier_ID = myScanner.nextInt();
+            suplaier_ID = getChoice(0,Integer.MAX_VALUE);;
             if (status == 2) {
                 String exist = blService.CheckSAgreementExist(suplaier_ID);
                 if (!exist.equals("Done")) {
@@ -886,21 +886,21 @@ public class Main {
             if (contiue) {
 
                 System.out.println("Does the supplier bring the supply on regular days? y/n");
-                String ans = myScanner.next();
+                String ans = myScanner.nextLine();
                 if (ans.equals("y")) {
                     fixeDays = true;
                     System.out.println("Please enter one day that the supply are expected to arrive. in number");
-                    int day = myScanner.nextInt();
+                    int day = getChoice(0,Integer.MAX_VALUE);;
                     Days.add(day);
                     boolean MoreDay = true;
                     while (MoreDay) {
                         System.out.println("Is the supply expected to arrive in more days? y/n");
-                        ans = myScanner.next();
+                        ans = myScanner.nextLine();
                         if (ans.equals("n"))
                             MoreDay = false;
                         else {
                             System.out.println("Please enter the extra day. in number");
-                            day = myScanner.nextInt();
+                            day = getChoice(1,7);;
                             if (day < 8 && day > 0) {
                                 Days.add(day);
                             } else {
@@ -910,7 +910,7 @@ public class Main {
                     }
                 }
                 System.out.println("Does the supplier bring the supplier by himself (or it required for transport Syss)? y/n");
-                ans = myScanner.next();
+                ans = myScanner.nextLine();
                 if (ans.equals("n")) {
                     leading = false;
                 }
@@ -924,29 +924,29 @@ public class Main {
                     int minAmount;
                     int shelfNumber;
                     System.out.println("Which product the supplier will supply to the store?\n" + "Please enter its name");
-                    Product_Name = myScanner.next();
+                    Product_Name = myScanner.nextLine();
                     System.out.println("Please enter its category");
-                    category = myScanner.next();
+                    category = myScanner.nextLine();
                     System.out.println("Please enter its subcategory");
-                    subcategory = myScanner.next();
+                    subcategory = myScanner.nextLine();
                     System.out.println("Please enter its sub_subcategory");
-                    sub_subcategory = myScanner.next();
+                    sub_subcategory = myScanner.nextLine();
                     System.out.println("Please enter its manufacturer");
-                    manufacturer = myScanner.next();
+                    manufacturer = myScanner.nextLine();
                     System.out.println("Please enter its min amount");
-                    minAmount = myScanner.nextInt();
+                    minAmount = getChoice(0,Integer.MAX_VALUE);;
                     System.out.println("Please enter its shelf number");
-                    shelfNumber = myScanner.nextInt();
+                    shelfNumber = getChoice(0,Integer.MAX_VALUE);;
                     int Id_Store = blService.FindId_P_Store(Product_Name, category, subcategory, sub_subcategory, manufacturer,minAmount, shelfNumber );
                     System.out.println("Please enter his Catalog Number");
-                    int product_Id = myScanner.nextInt();
+                    int product_Id = getChoice(0,Integer.MAX_VALUE);;
                     System.out.println("Please enter the price");
-                    double Product_Price = myScanner.nextInt();
+                    double Product_Price = getDoubleChoice(0,Double.MAX_VALUE);
                     ItemsID_ItemsIDSupplier.put(Id_Store, product_Id);
                     ProductIDVendor_Name.put(product_Id, Product_Name);
                     ProducttemsIDVendor_Price.put(product_Id, Product_Price);
                     System.out.println("Does the supplier provide another product? y/n");
-                    ans = myScanner.next();
+                    ans = myScanner.nextLine();
                     if (ans.equals("n")) {
                         MoreProduct = false;
                     }
@@ -974,7 +974,7 @@ public class Main {
             Map<Integer, Double> ItemsID_Assumption =new ConcurrentHashMap<Integer, Double>();
             Scanner myScanner = new Scanner(System.in);
             System.out.println("Please enter the Supplier's ID");
-            Suplaier_ID = myScanner.nextInt();
+            Suplaier_ID = getChoice(0,Integer.MAX_VALUE);
 
             boolean contiue=true;
             if (status == 2) {
@@ -982,10 +982,10 @@ public class Main {
                 while (!exist.equals("Done")) {
                     System.out.println(exist);
                     System.out.println("Do you want to continue and enter the supplier Id again? y/n ");
-                    String ans = myScanner.next();
+                    String ans = myScanner.nextLine();
                     if (ans.equals("y")) {
                         System.out.println("Please enter the Supplier's ID");
-                        Suplaier_ID = myScanner.nextInt();
+                        Suplaier_ID = getChoice(0,Integer.MAX_VALUE);;
                         exist = blService.CheckSWortExist(Suplaier_ID);
                     } else {
                         {
@@ -1003,15 +1003,15 @@ public class Main {
                     int Product_Amount;
                     double Product_Assumption;
                     System.out.println("Please enter the Product's ID");
-                    Product_ID = myScanner.nextInt();
+                    Product_ID = getChoice(0,Integer.MAX_VALUE);;
                     System.out.println("How many units of this product should be purchased to get the discount?");
-                    Product_Amount = myScanner.nextInt();
+                    Product_Amount = getChoice(0,Integer.MAX_VALUE);;
                     System.out.println("What percentage of discount will the product receive?");
-                    Product_Assumption = myScanner.nextInt();
+                    Product_Assumption = getDoubleChoice(0,100);
                     ItemsID_Amount.put(Product_ID, Product_Amount);
                     ItemsID_Assumption.put(Product_ID, Product_Assumption);
                     System.out.println("Would you like to add another product? y/n");
-                    String ans = myScanner.next();
+                    String ans = myScanner.nextLine();
                     if (ans.equals("n")) {
                         MoreProduct = false;
                     }
@@ -1041,7 +1041,7 @@ public class Main {
             int day;
             LinkedList<Integer> Days=new LinkedList<Integer>();
             System.out.println("Please enter the Supplier's ID you want to order from");
-            ID_Suplaier = myScanner.nextInt();
+            ID_Suplaier = getChoice(0,Integer.MAX_VALUE);;
             String exist = blService.CheckSuplierExist(ID_Suplaier);
             if (!exist.equals("Exist")) {
                 conect = false;
@@ -1051,12 +1051,12 @@ public class Main {
                 boolean moreDay=true;
                 while(moreDay) {
                     System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
-                    day = myScanner.nextInt();
+                    day = getChoice(1,7);
                     conect = blService.CheckTheDay(ID_Suplaier, day);
                     if(conect) {
                         Days.add(day);
                         System.out.println("Would you like to add another day? y/n");
-                        String ans = myScanner.next();
+                        String ans = myScanner.nextLine();
                         if (ans.equals("n")) {
                             moreDay = false;
                         }
@@ -1072,18 +1072,18 @@ public class Main {
                         int Product_ID;
                         int Product_Amount;
                         System.out.println("Please enter the Product's ID (According to the supplier)");
-                        Product_ID = myScanner.nextInt();
+                        Product_ID = getChoice(0,Integer.MAX_VALUE);;
                         conect=blService.CheckProductexist(ID_Suplaier,Product_ID);
                         if(conect) {
                             System.out.println("How many units of the product would you like to order??");
-                            Product_Amount = myScanner.nextInt();
+                            Product_Amount = getChoice(0,Integer.MAX_VALUE);;
                             ItemsIDVendor_NumberOfItems.put(Product_ID, Product_Amount);
                         }
                         else{
                             System.out.println("This product is not included in the agreement with the supplier.");
                         }
                         System.out.println("Would you like to add another product? y/n");
-                        String ans = myScanner.next();
+                        String ans = myScanner.nextLine();
                         if (ans.equals("n")) {
                             MoreProduct = false;
                         }
@@ -1115,7 +1115,7 @@ public class Main {
             Scanner myScanner = new Scanner(System.in);
             LinkedList<Integer> Days = new LinkedList<Integer>();
             System.out.println("Please enter the Order ID you want to change");
-            ID_Order = myScanner.nextInt();
+            ID_Order = getChoice(0,Integer.MAX_VALUE);;
             String Able = blService.CheckAbleToChangeOrder(ID_Order);
             if (!Able.equals("Able")) {
                 conect = false;
@@ -1127,12 +1127,12 @@ public class Main {
                 while (moreDay) {
                     int day;
                     System.out.println("Please enter the day that the order is expected to arrive the store. in number!");
-                    day = myScanner.nextInt();
+                    day = getChoice(1,7);;
                     conect = blService.CheckTheDay(ID_Suplaier, day);
                     if (conect) {
                         Days.add(day);
                         System.out.println("Would you like to add another day? y/n");
-                        String ans = myScanner.next();
+                        String ans = myScanner.nextLine();
                         if (ans.equals("n")) {
                             moreDay = false;
                         }
@@ -1141,16 +1141,16 @@ public class Main {
                 if (conect) {
                     boolean LessProduct = false;
                     System.out.println("Would you like to remove product from the Order?  y/n");
-                    String ans = myScanner.next();
+                    String ans = myScanner.nextLine();
                     if (ans.equals("y")) {
                         LessProduct = true;
                     }
                     while (LessProduct) {
                         System.out.println("Please enter the Product's ID (According to the supplier)");
-                        Product_ID = myScanner.nextInt();
+                        Product_ID = getChoice(0,Integer.MAX_VALUE);;
                         blService.RemoveProduct(ID_Order, Product_ID);
                         System.out.println("Would you like to remove another product? y/n");
-                        ans = myScanner.next();
+                        ans = myScanner.nextLine();
                         if (ans.equals("n")) {
                             LessProduct = false;
                         }
@@ -1158,23 +1158,23 @@ public class Main {
 
                     boolean MoreProduct = false;
                     System.out.println("Would you like to add Product to the Order? n/y");
-                    ans = myScanner.next();
+                    ans = myScanner.nextLine();
                     if (ans.equals("y")) {
                         MoreProduct = true;
                     }
                     while ((MoreProduct)) {
                         System.out.println("Please enter the Product's ID (According to the supplier)");
-                        Product_ID = myScanner.nextInt();
+                        Product_ID = getChoice(0,Integer.MAX_VALUE);;
                         conect = blService.CheckProductexist(ID_Suplaier, Product_ID);
                         if (conect) {
                             System.out.println("How many units of the product would you like to order?");
-                            Product_Amount = myScanner.nextInt();
+                            Product_Amount = getChoice(0,Integer.MAX_VALUE);;
                             ItemsIDVendor_NumberOfItems.put(Product_ID, Product_Amount);
                         } else {
                             System.out.println("This product is not included in the agreement with the supplier.");
                         }
                         System.out.println("Would you like to add another product? y/n");
-                        ans = myScanner.next();
+                        ans = myScanner.nextLine();
                         if (ans.equals("n")) {
                             MoreProduct = false;
                         }
@@ -1210,7 +1210,7 @@ public class Main {
             Printer.printAllSuppliers();
         }
     }
-
+/*
     private static void UpdateOrderStatus() {
 
         boolean conect = blService.CheckConected();
@@ -1221,7 +1221,7 @@ public class Main {
             int ID_Order;
             Scanner myScanner = new Scanner(System.in);
             System.out.println("Pleas enter the Order ID that arrived to the store");
-            ID_Order = myScanner.nextInt();
+            ID_Order = getChoice(0,Integer.MAX_VALUE);;
             InterfaceOrder order = blService.getOrderDetails(ID_Order);
             if(order!=null) {
                 Map ProductID_Amount=new HashMap<Integer, Integer>();
@@ -1229,10 +1229,10 @@ public class Main {
                 for (Map.Entry p:order.ItemsID_ItemsIDVendor.entrySet()
                 ) {
                     System.out.println("Did the item with ID "+ p.getKey() +"arrive at the store? y/n");
-                    String ans=myScanner.next();
+                    String ans=myScanner.nextLine();
                     if(ans.equals("y")|ans.equals("N")){
                         System.out.println("Please enter the number of units that came from this product");
-                        int amount=myScanner.nextInt();
+                        int amount=getChoice(0,Integer.MAX_VALUE);;
                         ProductID_Amount.put(p.getKey(),amount);
                         System.out.println("Please enter the expiry date for the product");
                         int date=myScanner.nextInt();
@@ -1246,6 +1246,8 @@ public class Main {
         }
     }
 
+ */
+
     private static void DeleteSupplier() {
         boolean conect = blService.CheckConected();
         if (!conect) {
@@ -1255,7 +1257,7 @@ public class Main {
             Scanner myScanner = new Scanner(System.in);
             int ID;
             System.out.println("Pleas enter the Supplier's ID");
-            ID = myScanner.nextInt();
+            ID = getChoice(0,Integer.MAX_VALUE);
             blService.DeleteSupplier(ID);
         }
     }
@@ -1329,6 +1331,21 @@ public class Main {
                 System.out.println("Error : Enter a numeric input!");
             }
 
+        }
+    }
+
+    public static double getDoubleChoice(double lower_bound, double upper_bound) {
+        for (; ; ) {
+
+            String keyboard_input = keyboard.nextLine();
+            try {
+                double choice_number = Double.parseDouble(keyboard_input);
+                if (choice_number < lower_bound || choice_number > upper_bound) {
+                    System.out.println("Error : number out of bounds!");
+                } else return choice_number;
+            } catch (NumberFormatException numberFormatException) {
+                System.out.println("Error : Enter a numeric input!");
+            }
         }
     }
 
