@@ -797,8 +797,11 @@ public class BLService {
 
     public void arrangeDelivery(Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
 
-        Shift.ShiftTime shiftTime= Shift.ShiftTime.Morning;
         // check if there are shifts in the destination with the given date and time for 7 days
+
+        Shift.ShiftTime shiftTime= Shift.ShiftTime.Morning;
+        int arranged_delivery_id = -1;
+
 
         int products_weight = getDocProductsWeight(delivery_products);
 
@@ -836,7 +839,11 @@ public class BLService {
                         if (free_storage >= 0) {
                             // we found a delivery , check if the driver's license still relevant or replace the driver ------> Done
                             done = updateDelivery(delivery, destination_address, delivery_products);
-                            break;
+                            if(done)
+                            {
+                                arranged_delivery_id = delivery.getDelivery_id();
+                                break;
+                            }
                         }
                     }
                 }
@@ -862,17 +869,27 @@ public class BLService {
 
                                 done = true;
 
+                                arranged_delivery_id = delivery.getDelivery_id();
+                                break;
+
                             }
                         }
                     }
 
                 }
 
-            } else {
+            }
+            if(!done && shiftTime.equals(Shift.ShiftTime.Morning))
+            {
+                shiftTime = Shift.ShiftTime.Evening;
+            }
+            else if(!done)
+            {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(potential_date);
                 cal.add(Calendar.DAY_OF_WEEK, 1);
                 potential_date = cal.getTime();
+                shiftTime = Shift.ShiftTime.Morning;
                 additional_days++;
             }
 
@@ -880,6 +897,8 @@ public class BLService {
 
         if (!done)
             System.out.println("couldn't arrange a delivery");
+        else
+            System.out.println("delivery arranged/update , deliveryID = "+arranged_delivery_id);
 
         // check if there are shifts in the destination with stockKeepers working in the same time of source shift
         // calculate total weight
