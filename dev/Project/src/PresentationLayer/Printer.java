@@ -43,20 +43,19 @@ public class Printer {
     public static void printSchedule(int worker_id) {
         Map<Pair<DayOfWeek, Shift.ShiftTime>, Boolean> worker_schedule = Workers.getInstance().getAllWorkers().get(worker_id).getSchedule();
         List<Pair<DayOfWeek, Shift.ShiftTime>> schedules_date = new LinkedList<>(worker_schedule.keySet());
-        Collections.sort(schedules_date, new Comparator<Pair<DayOfWeek, Shift.ShiftTime>>() {
-            @Override
-            public int compare(Pair<DayOfWeek, Shift.ShiftTime> o1, Pair<DayOfWeek, Shift.ShiftTime> o2) {
+        schedules_date.sort((o1, o2) -> {
 
-                if ((o1.getKey().getValue() + 1) % 8 < (o2.getKey().getValue() + 1) % 8)
+            if ((o1.getKey().getValue() + 1) % 8 < (o2.getKey().getValue() + 1) % 8)
+                return -1;
+
+            if (o1.getKey().equals(o2.getKey())) {
+                if (o1.getValue().equals(o2.getValue()))
+                    return 0;
+                if (o1.getValue() == Shift.ShiftTime.Morning)
                     return -1;
-
-                if (o1.getKey().equals(o2.getKey())) {
-                    if (o1.getValue() == Shift.ShiftTime.Morning)
-                        return -1;
-                    return 1;
-                }
-                return 0;
+                return 1;
             }
+            return 0;
         });
         for (Pair<DayOfWeek, Shift.ShiftTime> p : schedules_date) {
             System.out.println(p.getKey() + " , " + p.getValue().toString() + " : " + worker_schedule.get(p));
@@ -205,9 +204,9 @@ public class Printer {
         System.out.println("5) Return");
     }
 
-    public static void printWorkers(List<Integer> drivers_ids) {
+    public static void printWorkers(List<Integer> workers_ids) {
 
-        for (Integer id : drivers_ids) {
+        for (Integer id : workers_ids) {
             Worker worker = blService.getWorker(id);
             if (worker == null) {
                 System.out.println("Error while printing the worker with the id : " + id);
@@ -238,8 +237,8 @@ public class Printer {
 
     public static void printAvailableWorkers(int shift_id) {
         Shift shift = blService.getShift(shift_id);
-        String available_workers = blService.AvilableWorkerstoString(shift.getShiftDate(), shift.getShiftTime());
-        System.out.println(available_workers);
+        List<Integer> available_workers = blService.getAvailableWorkers(shift.getShiftDate(), shift.getShiftTime());
+        printWorkers(available_workers);
     }
 
     public static void printShiftView(int shift_id) {
@@ -651,26 +650,26 @@ public class Printer {
             rows_data.put(0, table_rows);
 
 
-            String working_name = "CONTRACTS";
-            List<String> working_headers = Arrays.asList("ID", "NAME","NUMBER");
-            List<List<String>> working_rows = new LinkedList<>();
+            String contact_title = "CONTACTS";
+            List<String> contact_headers = Arrays.asList("ID", "NAME","NUMBER");
+            List<List<String>> contact_rows = new LinkedList<>();
 
             for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
             ) {
                 for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
                 ) {
                     if (i.getKey().intValue()==e.getKey().intValue()) {
-                        working_rows.add(Arrays.asList(String.valueOf(i.getKey()), i.getValue(),String.valueOf(e.getValue())));
+                        contact_rows.add(Arrays.asList(String.valueOf(i.getKey()), i.getValue(),String.valueOf(e.getValue())));
                     }
                 }
             }
 
-            if (working_rows.isEmpty()) {
-                working_rows.add(Arrays.asList("", ""));
+            if (contact_rows.isEmpty()) {
+                contact_rows.add(Arrays.asList("", ""));
             }
-            tables_info.put(1, working_name);
-            columns_names.put(1, working_headers);
-            rows_data.put(1, working_rows);
+            tables_info.put(1, contact_title);
+            columns_names.put(1, contact_headers);
+            rows_data.put(1, contact_rows);
 
             System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
 

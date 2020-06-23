@@ -176,20 +176,6 @@ public class BLService {
         return false;
     }
 
-    public String AvilableWorkerstoString(Date date, Shift.ShiftTime shiftTime) {
-        String workers_string = "";
-        for (Worker worker : Workers.getInstance().getAllWorkers().values()) {
-            if (isAvailable(worker.getId(), date, shiftTime)) {
-                workers_string = workers_string + worker.toString() + '\n';
-            }
-        }
-        if (workers_string.equals("")) {
-            return workers_string;
-        }
-        workers_string = workers_string.substring(0, workers_string.length() - 1);
-        return workers_string;
-    }
-
     public boolean work(Integer worker_id, Integer shift_id) {
         if (isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime())) {
             getWorker(worker_id).getWorker_shifts().add(shift_id);
@@ -212,14 +198,8 @@ public class BLService {
 
     public Shift getShift(Address address, Date date, Shift.ShiftTime shiftTime) {
         for (Shift shift : getAllShifts().values()) {
-            if (shift.getAddress().getLocation().equals(address.getLocation())) {
-                if (shift.getShiftDate().equals(date)) {
-                    if (shift.getShiftTime().equals(shiftTime)) {
-                        return shift;
-                    }
-                }
-            }
-            //     return shift;
+            if (shift.getAddress().getLocation().equals(address.getLocation()) && shift.getShiftDate().equals(date) && shift.getShiftTime().equals(shiftTime))
+                return shift;
         }
 
         return null;
@@ -327,11 +307,9 @@ public class BLService {
 
     public boolean truckIsAvailable(String truck_serial, Date date, Shift.ShiftTime shift_time) {
         for (Delivery delivery : getAllDeliveries().values()) {
-            if (delivery.getTruckSerialNumber().equals(truck_serial)) {
+            if (delivery.getTruckSerialNumber().equals(truck_serial) && delivery.getDate().equals(date) && delivery.getShiftTime().equals(shift_time))
                 return false;
-            }
         }
-
         return true;
     }
 
@@ -457,7 +435,6 @@ public class BLService {
     public List<String> getAvailableAddresses(Date date, Shift.ShiftTime delivery_time) {
 
         List<String> aa = new LinkedList<>();
-
 
         for (Shift shift : getAllShifts().values()) {
             if (shift.getShiftDate().equals(date) && shift.getShiftTime().equals(delivery_time)) {
@@ -993,6 +970,7 @@ public class BLService {
     }
 
     public int getOptimalDriver(List<Integer> drivers, int delivery_weight) {
+        //make sure that drivers only contains available drivers , if you wish to hire one.
         // delivery weight = truck weight + products weight
         // returns -1 if there are no options , for example : needed A and list contains none of A license drivers
 
