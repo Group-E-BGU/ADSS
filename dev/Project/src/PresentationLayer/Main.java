@@ -109,21 +109,18 @@ public class Main {
                     DisplaySupplierDetails();
                     break;
                 case 13:
-                    UpdateOrderStatus();
-                    break;
-                case 14:
                     Add_Edit_Supplier(2);
                     break;
-                case 15:
+                case 14:
                     Add_Edit_Agreement(2);
                     break;
-                case 16:
+                case 15:
                     Add_Edit_Write(2);
                     break;
-                case 17:
+                case 16:
                     DeleteSupplier();
                     break;
-                case 18: {
+                case 17: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
                     String amount = blService.getItemAmountsByName(name);
@@ -149,7 +146,7 @@ public class Main {
                     }
                     break;
                 }
-                case 19: {
+                case 18: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
                     String amount = blService.getItemAmountsByName(name);
@@ -161,7 +158,7 @@ public class Main {
                     }
                     break;
                 }
-                case 20: {
+                case 19: {
                     System.out.println("Please enter item name");
                     String name = keyboard.nextLine();
                     String amount = blService.getItemAmountsByName(name);
@@ -179,13 +176,13 @@ public class Main {
                     break;
 
                 }
-                case 21: {
+                case 20: {
                     System.out.println("Please enter categories or 'all'");
                     String names = keyboard.nextLine();
                     System.out.println(blService.getInventoryReport(names));
                     break;
                 }
-                case 22: {
+                case 21: {
                     System.out.println("Please enter defected item's name");
                     String name = keyboard.nextLine();
                     String amount = blService.getItemAmountsByName(name);
@@ -198,7 +195,7 @@ public class Main {
                     }
                     break;
                 }
-                case 23: {
+                case 22: {
                     System.out.println("Enter report's beginning date in the following format(dd/MM/yyyy)");
                     String begDate = keyboard.nextLine();
                     System.out.println("Enter report's end date in the following format(dd/MM/yyyy)");
@@ -207,7 +204,7 @@ public class Main {
 
                     break;
                 }
-                case 24: {
+                case 23: {
                     System.out.println("1. Item discount \n" + "2. Category discount\n");
                     String discountType = keyboard.nextLine();
                     if (discountType.equals("1")) {                   //case item discount
@@ -237,7 +234,7 @@ public class Main {
                     }
                     break;
                 }
-                case 25: {
+                case 24: {
                     System.out.println("Please enter item name:");
                     String name = keyboard.nextLine();
                     System.out.println("Enter new store price:");
@@ -247,13 +244,13 @@ public class Main {
                     System.out.println(blService.setNewPrice(name, price, rPrice));
                 }
                 break;
-                case 26:
+                case 25:
                     UpdateDetailsOrder();
                     break;
-                case 27:
+                case 26:
                     CheckcheepSupplier();
                     break;
-                case 28:
+                case 27:
                     Logout();
                     terminate = true;
                     break;
