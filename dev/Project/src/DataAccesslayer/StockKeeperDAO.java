@@ -104,11 +104,12 @@ public class StockKeeperDAO {
 
     public void save(StockKeeper stockKeeper) {
 
-        String sql = "INSERT INTO StockKeepers(id, name, schedule) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO StockKeepers(id, name, schedule, shifts) VALUES(?, ?, ?, ?)";
 
         int id = stockKeeper.getId();
         String name = stockKeeper.getName();
         String schedule = encodeSchedule(stockKeeper.getSchedule());
+        String shifts = encodeShifts(stockKeeper.getWorker_shifts());
 
         // add the contract to the contracts table with the id of the driver
         new WorkerDealDAO().save(stockKeeper.getContract());
@@ -118,6 +119,7 @@ public class StockKeeperDAO {
             pstmt.setInt(1, id);
             pstmt.setString(2, name);
             pstmt.setString(3, schedule);
+            pstmt.setString(4, shifts);
 
             pstmt.executeUpdate();
 
@@ -128,6 +130,17 @@ public class StockKeeperDAO {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    private static String encodeShifts(List<Integer> worker_shifts) {
+        // when encoding a list of shifts, the string value returned is the id's of the shifts
+        // separated by '\n'
+        StringBuilder shiftsIds = new StringBuilder();
+
+        for (Integer shift : worker_shifts)
+            shiftsIds.append(shift).append("\n");
+
+        return shiftsIds.toString();
     }
 
     public void update(StockKeeper stockKeeper) {

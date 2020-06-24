@@ -82,6 +82,8 @@ public class Store {
             ItemRecord ir = new ItemRecord(name,itemId++,minAmount,0,0,0,shelfNumber,manufacture);
             itemRecords.put(name,ir);
             mapperItemRecord.InsertItemRecord(name,ir.getId(),minAmount,0,0,0,shelfNumber,manufacture, address);
+            // add the new product to Products table
+            (new ProductDAO()).save(new Product(name,"" + itemId, 1));
             return name+" added successfully";
        }
     }
@@ -470,6 +472,8 @@ public class Store {
             MapIRS.WriteItemRecord_Supplier(address, id, category, subcategory, sub_subcategory, product_name,manufacturer);
             ir = new ItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer);
             mapperItemRecord.InsertItemRecord(product_name, id, minAmount, 0, 0, 0, shelfNumber, manufacturer, address);
+            // add the new product to Products table
+            (new ProductDAO()).save(new Product(product_name, ""+ id, 1));
         }
         Category main = categories.get(category);
         if(main == null) {
