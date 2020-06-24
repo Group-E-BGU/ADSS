@@ -177,7 +177,7 @@ public class Main {
 
                 }
                 case 20: {
-                    System.out.println("Please enter categories or 'all'");
+                    System.out.println("Please enter categories separated with ',' or 'all'");
                     String names = keyboard.nextLine();
                     System.out.println(blService.getInventoryReport(names));
                     break;

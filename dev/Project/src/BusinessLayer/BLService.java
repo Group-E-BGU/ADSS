@@ -747,7 +747,7 @@ public class BLService {
     }
 
     public String getInventoryReport(String names) {
-        String[] categories = names.split("\\s+");
+        String[] categories = names.split(",");
         String report = "";
         if (categories[0].equals("all")) {
             report = current_Store.getAllInventoryReport();
