@@ -25,7 +25,7 @@ public class InterfaceSupplier {
         Branch=branch;
         BankNumber = bankNumber;
         Payments = payments;
-        Address = Address;
+        this.Address = Address;
         Contract = null;
         Worte = null;
         ContactsID_Name=Contacts_ID;

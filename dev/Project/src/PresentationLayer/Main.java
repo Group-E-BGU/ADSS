@@ -20,9 +20,9 @@ public class Main {
 
     public static void main(String[] argv) {
 
-        blService.initializeDB();
-        init_data.createWorkers();
-        init_data.createShifts();
+    //    blService.initializeDB();
+    //    init_data.createWorkers();
+    //    init_data.createShifts();
         init_data.createMenus();
         blService.loadFromDataBase();
         //init_data.testArrange();
@@ -35,8 +35,7 @@ public class Main {
                     "please enter the correct number\n" +
                     "1. Register\n" +
                     "2. Login\n" +
-                    "3. Initialize data\n" +
-                    "4. Exit");
+                    "3. Exit");
             int choice = getChoice(1, 4);
             switch (choice) {
                 case 1:
@@ -48,9 +47,6 @@ public class Main {
                         actionList();
                     break;
                 case 3:
-                    AddArguments();
-                    break;
-                case 4:
                     System.out.println("GoodBye!");
                     terminate = true;
                     break;
@@ -617,7 +613,7 @@ public class Main {
             }
         }
     }
-
+/*
     private static void AddArguments() {
         blService.Register("A@gmail.com","123","","");
         blService.Register("Store2@gmail.com","S2_superLi","","");
@@ -805,6 +801,8 @@ public class Main {
 
         blService.Logout();
     }
+
+ */
 
 
     private static void Add_Edit_Supplier(int status) {

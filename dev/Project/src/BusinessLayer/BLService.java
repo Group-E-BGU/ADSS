@@ -4,6 +4,7 @@ import DataAccesslayer.*;
 import PresentationLayer.Main;
 import javafx.util.Pair;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -1100,40 +1101,44 @@ public class BLService {
                 String CN = e.getKey().toString();
                 Products.put(CN, e.getValue());
             }
-            LocalDate date = LocalDate.now();
-            Date d = java.util.Date.from(date.atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant());  //todo check if works
-            int DeliveryId = arrangeDelivery(o.getID_Invitation(),d, s.getPayments(), current_Store.getAddress(), Products);
-            if (DeliveryId != -1) {
-                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String now_string = sdf.format(new Date());
+            try
+            {
+                Date d = sdf.parse(now_string);
+                int DeliveryId = arrangeDelivery(o.getID_Invitation(),d, s.getPayments(), current_Store.getAddress(), Products);
+                if (DeliveryId != -1) {
+                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
+                }
             }
+            catch (ParseException pe)
+            {
+                pe.printStackTrace();
+            }
+
         }
     }
 
-    public String RestartDeliveryId() {
-        for (int i = 1; i < 8; i++) {
-            LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(i, current_Store.getAddress());
-            for (int order : ooo
-            ) {
-                Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
-                int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation());
-                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
-            }
-        }
-        return "Done";
-    }
 
     public String RestartDeliveryIdAttheendoftheDay() {  //todo check!!
-        List<Delivery> Deliverys = null;//getAll();
+        List<Delivery> Deliverys = new LinkedList<>(getAllDeliveries().values());//getAll();
         for (Delivery d : Deliverys
         ) {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
-            if (d.getDate().equals(dtf.format(now))) {
-                int OrderId = current_Store.getMapOrder().GetOrderId(current_Store.getAddress(), d.getDeliveryID());
-                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), OrderId, -1);
+            SimpleDateFormat dtf = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                String d_string = dtf.format(d.getDate());
+                Date d_date = dtf.parse(d_string);
+                String today_string = dtf.format(new Date());
+                Date now = dtf.parse(today_string);
+
+                if (d_date.equals(now)) {
+                    int OrderId = current_Store.getMapOrder().GetOrderId(current_Store.getAddress(), d.getDeliveryID());
+                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), OrderId, -1);
+                }
+            } catch (ParseException pe) {
+                pe.printStackTrace();
             }
+
         }
         return "Done";
     }

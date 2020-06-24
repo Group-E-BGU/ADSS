@@ -16,50 +16,6 @@ public class SystemAccess
     public static void register()
     {
 
-
-        // #1 register
-        // first of all enter location
-
-        // telephone number     --. PrimaryKey
-
-        // user name
-
-        // ---------------------------------------------  //
-
-        // which type
-
-        /*
-        List<String> available_locations = blService.getAvailableAddressesRegister();
-        if(available_locations.isEmpty())
-        {
-            System.out.println("no addresses available!");
-            return;
-        }
-        boolean address_chosen = false;
-
-        while (!address_chosen)
-        {
-            System.out.println("please choose one of the available addresses : ");
-            Printer.printAddresses(available_locations);
-            String location = keyboard.nextLine();
-            if(blService.getPayments(location)==null || !available_locations.contains(location))
-            {
-                System.out.println("Error : please type the location of the desired address!");
-                System.out.println("do you want to try again ? y/n");
-                if(!getConfirmation())
-                {
-                    System.out.println("Your registration has been canceled");
-                    return;
-                }
-            }
-            else
-            {
-                address_chosen = true;
-            }
-        }
-
-         */
-
         String address;
         String password;
         String phoneNumber;
