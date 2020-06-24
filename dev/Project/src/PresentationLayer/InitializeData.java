@@ -165,7 +165,7 @@ public class InitializeData {
         String destination= "beerSheva";
         Map<String,Integer> delivery_products = new HashMap<>();
         delivery_products.put("3",1);
-        int id = blService.arrangeDelivery(date,source,destination,delivery_products);
+        int id = blService.arrangeDelivery(0,date,source,destination,delivery_products);
 
         deliveries_size = blService.getAllDeliveries().size();
 
@@ -187,7 +187,7 @@ public class InitializeData {
         Map<String,Integer> delivery_products2 = new HashMap<>();
         delivery_products.put("1",20);
         delivery_products2.put("2",11);
-        id = blService.arrangeDelivery(date2,source2,destination2,delivery_products2);
+        id = blService.arrangeDelivery(1,date2,source2,destination2,delivery_products2);
 
         deliveries_size = blService.getAllDeliveries().size();
 
@@ -195,8 +195,6 @@ public class InitializeData {
             System.out.println(blService.getDelivery(id).toString());
 
         System.out.println(blService.getDelivery(id).getTruckWeight());
-
-        blService.cancelDeliveryDestination(id,destination);
 
     }
 

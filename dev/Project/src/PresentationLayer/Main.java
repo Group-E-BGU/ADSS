@@ -461,7 +461,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    CreateActions.arrangeDelivery();
+                //    CreateActions.arrangeDelivery();
                     break;
                 case 2:
                     if (Data.getInstance().getDeliveries().isEmpty()) {

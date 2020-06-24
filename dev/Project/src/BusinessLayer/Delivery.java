@@ -11,7 +11,7 @@ public class Delivery{
     private String source;
     private String truckSerialNumber;
     private int driverID;
-    private Map<String, Document> documents;
+    private Map<Integer, Document> documents;
     private List<String> logs;
     private int truckWeight;
 
@@ -75,11 +75,11 @@ public class Delivery{
 //    }
 
 
-    public void setDocuments(Map<String, Document> documents) {
+    public void setDocuments(Map<Integer, Document> documents) {
         this.documents = documents;
     }
 
-    public Map<String, Document> getDocuments() {
+    public Map<Integer, Document> getDocuments() {
         return documents;
     }
 
@@ -118,9 +118,9 @@ public class Delivery{
         delivery_string = delivery_string +"Source Address : "+source +'\n';
         delivery_string = delivery_string + "Driver id : " + driverID + '\n';
         delivery_string = delivery_string + "Destinations : ";
-        for(String destination : documents.keySet())
+        for(Document document : documents.values())
         {
-            delivery_string = delivery_string + destination + "     ";
+            delivery_string = delivery_string + document.getDestination() + "     ";
         }
 
 
@@ -131,16 +131,19 @@ public class Delivery{
 
     }
 
-    /*public List<String> getDestinations()
+    public List<String> getDestinations()
     {
 
+        List<String> destinations = new LinkedList<>();
         for(Document document : documents.values())
         {
             String doc_destination = document.getDestination();
-            if()
+            if(!destinations.contains(doc_destination))
+                destinations.add(doc_destination);
         }
 
+        return destinations;
     }
 
-     */
+
 }

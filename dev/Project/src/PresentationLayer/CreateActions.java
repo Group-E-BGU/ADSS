@@ -407,7 +407,7 @@ public class CreateActions {
         }
 
     }
-
+/*
     public static void arrangeDelivery() {
 
         boolean date_chosen = false;
@@ -628,6 +628,8 @@ public class CreateActions {
 
 
     }
+
+ */
 
     private static boolean rearrangeDelivery(Delivery delivery, Shift shift) {
         System.out.println("1) Change truck and driver");

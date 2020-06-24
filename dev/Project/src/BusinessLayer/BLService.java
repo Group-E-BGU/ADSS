@@ -806,7 +806,7 @@ public class BLService {
 
 //----------------------------------------------- new arrange delivery ----------------------------------------//
 
-    public int arrangeDelivery(Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
+    public int arrangeDelivery(int order_id, Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
 
         // check if there are shifts in the destination with the given date and time for 7 days
 
@@ -849,7 +849,7 @@ public class BLService {
                         int free_storage = truck.getMaxAllowedWeight() - delivery.getTruckWeight() - products_weight;
                         if (free_storage >= 0) {
                             // we found a delivery , check if the driver's license still relevant or replace the driver ------> Done
-                            done = updateDelivery(delivery, destination_address, delivery_products);
+                            done = updateDelivery(delivery, order_id, destination_address, delivery_products);
                             if (done) {
                                 arranged_delivery_id = delivery.getDeliveryID();
                                 break;
@@ -872,7 +872,8 @@ public class BLService {
                                 Delivery delivery = new Delivery(potential_date, shiftTime, source_location, truck_cn, driver_id, truck_total_weight);
                                 Document document = new Document();
                                 document.setDeliveryGoods(delivery_products);
-                                delivery.getDocuments().put(destination_location, document);
+                                document.setDestination(destination_location);
+                                delivery.getDocuments().put(order_id, document);
 
                                 work(driver_id, des_shift.getShiftId());
                                 addDelivery(delivery);
@@ -938,7 +939,7 @@ public class BLService {
         return products_weight;
     }
 
-    public boolean updateDelivery(Delivery delivery, Address destination, Map<String, Integer> delivery_goods) {
+    public boolean updateDelivery(Delivery delivery, int order_id, Address destination, Map<String, Integer> delivery_goods) {
         // IMPORTANT : CHECK IF THE DESTINATION EXISTS IN THIS DELIVERY ( USE REPLACE THEN )
 
         int updated_weight = delivery.getTruckWeight() + getDocProductsWeight(delivery_goods);
@@ -978,18 +979,14 @@ public class BLService {
 
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String log = "";
-        if (delivery.getDocuments().containsKey(destination.getLocation())) {
-            updateDocument(delivery.getDeliveryID(), destination.getLocation(), delivery_goods);
-            log = "updated " + destination.getLocation() + " order at " + date_format.format(new Date());
 
-        } else {
-            Document document = new Document();
-            document.setDeliveryGoods(delivery_goods);
-            getDelivery(delivery.getDeliveryID()).getDocuments().put(destination.getLocation(), document);
-            log = "added " + destination.getLocation() + " as a new destination at " + date_format.format(new Date());
-        }
+        Document document = new Document();
+        document.setDeliveryGoods(delivery_goods);
+        document.setDestination(destination.getLocation());
+        delivery.getDocuments().put(order_id, document);
+        log = "added " + destination.getLocation() + " as a new destination at " + date_format.format(new Date());
 
-        getDelivery(delivery.getDeliveryID()).setTruckWeight(updated_weight);
+        delivery.setTruckWeight(updated_weight);
         delivery.getLogs().add(log);
 
         return true;
@@ -1062,7 +1059,7 @@ public class BLService {
         return true;
     }
 
-
+/*
     public void updateDocument(int delivery_id, String destination, Map<String, Integer> products) {
 
         for (Map.Entry<String, Integer> product : products.entrySet()) {
@@ -1077,6 +1074,8 @@ public class BLService {
 
         }
     }
+
+ */
 
     public String DoDelivery() {
         int d = LocalDate.now().getDayOfWeek().getValue() + 1;//todo check!
@@ -1105,7 +1104,7 @@ public class BLService {
             Date d = java.util.Date.from(date.atStartOfDay()
                     .atZone(ZoneId.systemDefault())
                     .toInstant());  //todo check if works
-            int DeliveryId = arrangeDelivery(d, s.getPayments(), current_Store.getAddress(), Products);
+            int DeliveryId = arrangeDelivery(o.getID_Invitation(),d, s.getPayments(), current_Store.getAddress(), Products);
             if (DeliveryId != -1) {
                 current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
             }
@@ -1146,14 +1145,14 @@ public class BLService {
         return "Done";
     }
 
-    public void cancelDeliveryDestination(int delivery_id, String destination_location) {
+    public void cancelOrderFromDelivery(int order_id , int delivery_id) {
 
         // IMPORTANT : what if we want to cancel one order and not all of them , we should not cancel all the destination orders
 
         Delivery delivery = getDelivery(delivery_id);
-        Address destination_address = getAddress(destination_location);
 
-        if (delivery == null || destination_address == null || !delivery.getDocuments().containsKey(destination_location)) {
+
+        if (delivery == null || !delivery.getDocuments().containsKey(order_id) || getAddress(delivery.getDocuments().get(order_id).getDestination())==null) {
             System.out.println("Error : invalid input!");
             return;
         }
@@ -1163,12 +1162,13 @@ public class BLService {
             abortDelivery(delivery_id);
         } else {
             // it is not the only one
-            Document document = delivery.getDocuments().get(destination_location);
+            Document document = delivery.getDocuments().get(order_id);
+            Address destination_address = getAddress(document.getDestination());
             int products_weight = getDocProductsWeight(document.getDeliveryGoods());
 
             delivery.setTruckWeight(delivery.getTruckWeight() - products_weight);
-            delivery.getDocuments().remove(destination_location);
-            delivery.getLogs().add("canceled " + destination_location + " order at " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            delivery.getDocuments().remove(order_id);
+            delivery.getLogs().add("canceled " + destination_address.getLocation() + " order with " + order_id + " at " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 
             // dao delete document ?
 
