@@ -4,6 +4,7 @@ import BusinessLayer.*;
 import javafx.util.Pair;
 import BusinessLayer.User.UserType;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
@@ -392,8 +393,8 @@ public class Printer {
         }
 
         System.out.println("Delivery id : " + delivery.getDeliveryID());
-        System.out.println("Date : " + delivery.getDate().toString());
-        System.out.println("Source location name : " + delivery.getSource());
+        System.out.println("Date : " + new SimpleDateFormat("dd/MM/yyyy").format(delivery.getDate()) + " " + delivery.getShiftTime().toString());
+        System.out.println("Source : " + delivery.getSource());
         System.out.println("Destinations : " + delivery.getDocuments().keySet().toString());
         System.out.println("Truck weight : " + delivery.getTruckWeight());
         System.out.println("Delivery logs : " + delivery.getLogs().toString() + "\n");
@@ -602,8 +603,7 @@ public class Printer {
         System.out.println(tableString);
     }
 
-    public static void printAllSuppliers()
-    {
+    public static void printAllSuppliers() {
        /* LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
         for (InterfaceSupplier Sup : suppliers
         ) {
@@ -629,7 +629,7 @@ public class Printer {
 
         */
 
-        LinkedList<InterfaceSupplier> suppliers =blService.GetSupliers();
+        LinkedList<InterfaceSupplier> suppliers = blService.GetSupliers();
         for (InterfaceSupplier Sup : suppliers
         ) {
 
@@ -638,11 +638,11 @@ public class Printer {
             Map<Integer, List<List<String>>> rows_data = new HashMap<>();
 
 
-            String table_name = "Supplier ID # "+Sup.ID;
+            String table_name = "Supplier ID # " + Sup.ID;
 
-            List<String> table_headers = Arrays.asList("NAME", "PAYMENT METHOD", "BANK","BRANCH","BANK NUMBER");
+            List<String> table_headers = Arrays.asList("NAME", "PAYMENT METHOD", "BANK", "BRANCH", "BANK NUMBER");
             List<List<String>> table_rows = Arrays.asList(
-                    Arrays.asList(Sup.Name, Sup.Payments, Sup.Bank,Sup.Branch,String.valueOf(Sup.BankNumber))
+                    Arrays.asList(Sup.Name, Sup.Payments, Sup.Bank, Sup.Branch, String.valueOf(Sup.BankNumber))
             );
 
             tables_info.put(0, table_name);
@@ -651,15 +651,15 @@ public class Printer {
 
 
             String contact_title = "CONTACTS";
-            List<String> contact_headers = Arrays.asList("ID", "NAME","NUMBER");
+            List<String> contact_headers = Arrays.asList("ID", "NAME", "NUMBER");
             List<List<String>> contact_rows = new LinkedList<>();
 
-            for (Map.Entry<Integer,String> i:Sup.ContactsID_Name.entrySet()
+            for (Map.Entry<Integer, String> i : Sup.ContactsID_Name.entrySet()
             ) {
-                for (Map.Entry<Integer,Integer> e:Sup.ContactsID_number.entrySet()
+                for (Map.Entry<Integer, Integer> e : Sup.ContactsID_number.entrySet()
                 ) {
-                    if (i.getKey().intValue()==e.getKey().intValue()) {
-                        contact_rows.add(Arrays.asList(String.valueOf(i.getKey()), i.getValue(),String.valueOf(e.getValue())));
+                    if (i.getKey().intValue() == e.getKey().intValue()) {
+                        contact_rows.add(Arrays.asList(String.valueOf(i.getKey()), i.getValue(), String.valueOf(e.getValue())));
                     }
                 }
             }

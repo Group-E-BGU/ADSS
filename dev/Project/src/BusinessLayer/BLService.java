@@ -122,7 +122,7 @@ public class BLService {
     }
 
     public boolean updateWorker(Worker worker) {
-        if (worker.getType() == WorkPolicy.WorkingType.StockKeeper)
+        if (worker.getType().equals(WorkPolicy.WorkingType.StockKeeper))
             new StockKeeperDAO().update((StockKeeper) worker);
         else
             new DriverDAO().update((Driver) worker);
@@ -139,7 +139,7 @@ public class BLService {
         for (Integer shift_id : worker.getWorker_shifts()) {
             Shift shift = getShift(shift_id);
             if (shift.getBoss().getId() != new_id) {
-                shift.getWorkingTeam().get(worker.getType()).remove(old_id);
+                shift.getWorkingTeam().get(worker.getType()).remove((Integer) old_id);
                 shift.getWorkingTeam().get(worker.getType()).add(new_id);
             }
         }
@@ -181,7 +181,8 @@ public class BLService {
     }
 
     public boolean work(Integer worker_id, Integer shift_id) {
-        if (isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime())) {
+        if (getWorker(worker_id) != null && getShift(shift_id) != null && isAvailable(worker_id, getShift(shift_id).getShiftDate(), getShift(shift_id).getShiftTime())) {
+            addToWorkingTeam(shift_id, worker_id, getWorker(worker_id).getType());
             getWorker(worker_id).getWorker_shifts().add(shift_id);
             updateWorker(getWorker(worker_id));
             return true;
@@ -238,15 +239,14 @@ public class BLService {
                 return false;
         }
 
-        work(worker_id, shift_id);
         if (!getShift(shift_id).getWorkingTeam().containsKey(workingType))
             getShift(shift_id).getWorkingTeam().put(workingType, new LinkedList<>());
 
         getShift(shift_id).getWorkingTeam().get(workingType).add(worker_id);
 
-        if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.Driver) {
+        if (getWorker(worker_id).getType().equals(WorkPolicy.WorkingType.Driver)) {
             new DriverDAO().update((Driver) getWorker(worker_id));
-        } else if (getWorker(worker_id).getType() == WorkPolicy.WorkingType.StockKeeper) {
+        } else if (getWorker(worker_id).getType().equals(WorkPolicy.WorkingType.StockKeeper)) {
             new StockKeeperDAO().update((StockKeeper) getWorker(worker_id));
         }
 
@@ -256,7 +256,7 @@ public class BLService {
     }
 
     public boolean stockKeeperAvailable(Shift shift) {
-        return (shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper) != null && (!shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper).isEmpty()) || shift.getBoss().getType() == WorkPolicy.WorkingType.StockKeeper);
+        return ((shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper) != null && !shift.getWorkingTeam().get(WorkPolicy.WorkingType.StockKeeper).isEmpty()) || shift.getBoss().getType().equals(WorkPolicy.WorkingType.StockKeeper));
     }
 
     //------------------------------ WorkerDeal --------------------------//
@@ -405,6 +405,7 @@ public class BLService {
 
         data.setDeliveries(deliveryMap);
 
+        /*
         for (Shift shift : getAllShifts().values()) {
             for (List<Integer> working_type : shift.getWorkingTeam().values()) {
                 for (Integer worker_id : working_type) {
@@ -412,6 +413,8 @@ public class BLService {
                 }
             }
         }
+
+         */
 
         return true;
     }
@@ -491,8 +494,8 @@ public class BLService {
         String Done = "you must be logged in before doing any actions";
         if (current_Store != null)
             Done = current_Store.AddSuplier(name, ID, Address, bank, branch, bankNumber, payments, Contacts_ID, Contacts_number);
-        if(Done.equals("Done")){
-            Address a=new Address(Address,name,"555555");
+        if (Done.equals("Done")) {
+            Address a = new Address(Address, name, "555555");
             addAddress(a);
         }
         return Done;
@@ -558,10 +561,10 @@ public class BLService {
         return Done;
     }
 
-    public String Register(String Address,String name, String phoneNumber, String password) {
-        String Done = systemcontroler.Register(Address,name,phoneNumber, password);
-        if(Done.equals("Done")){
-            Address a=new Address(Address,name,phoneNumber);
+    public String Register(String Address, String name, String phoneNumber, String password) {
+        String Done = systemcontroler.Register(Address, name, phoneNumber, password);
+        if (Done.equals("Done")) {
+            Address a = new Address(Address, name, phoneNumber);
             addAddress(a);
         }
         return Done;
@@ -807,7 +810,7 @@ public class BLService {
 
         // check if there are shifts in the destination with the given date and time for 7 days
 
-        Shift.ShiftTime shiftTime= Shift.ShiftTime.Morning;
+        Shift.ShiftTime shiftTime = Shift.ShiftTime.Morning;
         int arranged_delivery_id = -1;
 
 
@@ -826,8 +829,8 @@ public class BLService {
         boolean done = false;
         while (!done && additional_days < 8) {
 
-
-            des_shift = getShift(null, potential_date, shiftTime);
+            // check if there is a shift so we can send a driver to this destination
+            des_shift = getShift(destination_address, potential_date, shiftTime);
 
             if (des_shift != null && stockKeeperAvailable(des_shift)) {
                 // check if there is an available driver and truck
@@ -847,9 +850,8 @@ public class BLService {
                         if (free_storage >= 0) {
                             // we found a delivery , check if the driver's license still relevant or replace the driver ------> Done
                             done = updateDelivery(delivery, destination_address, delivery_products);
-                            if(done)
-                            {
-                                arranged_delivery_id = delivery.getDelivery_id();
+                            if (done) {
+                                arranged_delivery_id = delivery.getDeliveryID();
                                 break;
                             }
                         }
@@ -877,7 +879,7 @@ public class BLService {
 
                                 done = true;
 
-                                arranged_delivery_id = delivery.getDelivery_id();
+                                arranged_delivery_id = delivery.getDeliveryID();
                                 break;
 
                             }
@@ -887,12 +889,9 @@ public class BLService {
                 }
 
             }
-            if(!done && shiftTime.equals(Shift.ShiftTime.Morning))
-            {
+            if (!done && shiftTime.equals(Shift.ShiftTime.Morning)) {
                 shiftTime = Shift.ShiftTime.Evening;
-            }
-            else if(!done)
-            {
+            } else if (!done) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(potential_date);
                 cal.add(Calendar.DAY_OF_WEEK, 1);
@@ -906,14 +905,16 @@ public class BLService {
         if (!done)
             System.out.println("couldn't arrange a delivery");
         else
-            System.out.println("delivery arranged/update , deliveryID = "+arranged_delivery_id);
+            System.out.println("delivery arranged/update , deliveryID = " + arranged_delivery_id);
+
+        return arranged_delivery_id;
 
         // check if there are shifts in the destination with stockKeepers working in the same time of source shift
         // calculate total weight
         // check if there is an available truck in that time ALSO check if there is a suitable driver
         // then we can finish
 
-  return -1;
+
     }
 
     public List<Integer> getDeliveries(String source, Date date, Shift.ShiftTime shiftTime) {
@@ -978,7 +979,7 @@ public class BLService {
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String log = "";
         if (delivery.getDocuments().containsKey(destination.getLocation())) {
-            updateDocument(delivery.getDelivery_id(), destination.getLocation(), delivery_goods);
+            updateDocument(delivery.getDeliveryID(), destination.getLocation(), delivery_goods);
             log = "updated " + destination.getLocation() + " order at " + date_format.format(new Date());
 
         } else {
@@ -1049,11 +1050,18 @@ public class BLService {
         if (!shift.getWorkingTeam().get(worker.getType()).contains(worker_id))
             return false;
 
-        getShift(shift_id).getWorkingTeam().get(worker.getType()).remove(worker_id);
-        getWorker(worker_id).getWorker_shifts().remove(shift_id);
+        Integer w_id = worker_id;
+        Integer s_id = shift_id;
+        getShift(shift_id).getWorkingTeam().get(worker.getType()).remove(w_id);
+        getWorker(worker_id).getWorker_shifts().remove(s_id);
+
+        updateShift(shift);
+        updateWorker(worker);
+
 
         return true;
     }
+
 
     public void updateDocument(int delivery_id, String destination, Map<String, Integer> products) {
 
@@ -1070,42 +1078,42 @@ public class BLService {
         }
     }
 
-    public String DoDelivery(){
-               int d = LocalDate.now().getDayOfWeek().getValue()+1;//todo check!
-               LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(d, current_Store.getAddress());
-               for (int order : ooo
-               ) {
-                   Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
-                   int DeliveryId=current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(),o.getID_Invitation());
-                   if (!o.isAuto()&&DeliveryId!=-1) {
-                       DoDelivery(o);
-                   }
-               }
-           return "done";
-    }
-
-    public void DoDelivery(Order o){
-            Supplier s = current_Store.getMapSupplier().GetSupplier(o.getID_Vendor(), current_Store.getAddress());
-            Contract c = current_Store.getMapContract().getContract(s.getID(), current_Store.getAddress());
-            if (!c.isLeading()) {
-                Map<String, Integer> Products = new HashMap<String, Integer>();
-                for (Map.Entry<Integer, Integer> e : o.getItemsID_NumberOfItems().entrySet()) {
-                    String CN = e.getKey().toString();
-                    Products.put(CN, e.getValue());
-                }
-                    LocalDate date=LocalDate.now();
-                    Date d= java.util.Date.from(date.atStartOfDay()
-                            .atZone(ZoneId.systemDefault())
-                            .toInstant());  //todo check if works
-                   int DeliveryId = arrangeDelivery(d,s.getPayments(),current_Store.getAddress(),Products);
-                   if(DeliveryId!=-1){
-                       current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(),o.getID_Invitation(),DeliveryId);
-                   }
+    public String DoDelivery() {
+        int d = LocalDate.now().getDayOfWeek().getValue() + 1;//todo check!
+        LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(d, current_Store.getAddress());
+        for (int order : ooo
+        ) {
+            Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
+            int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation());
+            if (!o.isAuto() && DeliveryId != -1) {
+                DoDelivery(o);
             }
+        }
+        return "done";
     }
 
-    public String RestartDeliveryId(){
-        for (int i=1;i<8;i++) {
+    public void DoDelivery(Order o) {
+        Supplier s = current_Store.getMapSupplier().GetSupplier(o.getID_Vendor(), current_Store.getAddress());
+        Contract c = current_Store.getMapContract().getContract(s.getID(), current_Store.getAddress());
+        if (!c.isLeading()) {
+            Map<String, Integer> Products = new HashMap<String, Integer>();
+            for (Map.Entry<Integer, Integer> e : o.getItemsID_NumberOfItems().entrySet()) {
+                String CN = e.getKey().toString();
+                Products.put(CN, e.getValue());
+            }
+            LocalDate date = LocalDate.now();
+            Date d = java.util.Date.from(date.atStartOfDay()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant());  //todo check if works
+            int DeliveryId = arrangeDelivery(d, s.getPayments(), current_Store.getAddress(), Products);
+            if (DeliveryId != -1) {
+                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
+            }
+        }
+    }
+
+    public String RestartDeliveryId() {
+        for (int i = 1; i < 8; i++) {
             LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(i, current_Store.getAddress());
             for (int order : ooo
             ) {
@@ -1117,24 +1125,67 @@ public class BLService {
         return "Done";
     }
 
-    public String RestartDeliveryIdAttheendoftheDay(){  //todo check!!
-        List<Delivery>  Deliverys=null;//getAll();
-        for (Delivery d:Deliverys
-             ) {
+    public String RestartDeliveryIdAttheendoftheDay() {  //todo check!!
+        List<Delivery> Deliverys = null;//getAll();
+        for (Delivery d : Deliverys
+        ) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
-            if (d.getDate().equals(dtf.format(now))){
-                int OrderId=current_Store.getMapOrder().GetOrderId(current_Store.getAddress(),d.getDeliveryID());
-                 current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(),OrderId,-1);
+            if (d.getDate().equals(dtf.format(now))) {
+                int OrderId = current_Store.getMapOrder().GetOrderId(current_Store.getAddress(), d.getDeliveryID());
+                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), OrderId, -1);
             }
         }
         return "Done";
     }
 
-    public String CancelOrder(int OrderId){
+    public String CancelOrder(int OrderId) {
         int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId);
-        current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(),OrderId);
+        current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(), OrderId);
         //add delete delivery
         return "Done";
+    }
+
+    public void cancelDeliveryDestination(int delivery_id, String destination_location) {
+
+        // IMPORTANT : what if we want to cancel one order and not all of them , we should not cancel all the destination orders
+
+        Delivery delivery = getDelivery(delivery_id);
+        Address destination_address = getAddress(destination_location);
+
+        if (delivery == null || destination_address == null || !delivery.getDocuments().containsKey(destination_location)) {
+            System.out.println("Error : invalid input!");
+            return;
+        }
+
+        if (delivery.getDocuments().size() == 1) {
+            // it is the only destination
+            abortDelivery(delivery_id);
+        } else {
+            // it is not the only one
+            Document document = delivery.getDocuments().get(destination_location);
+            int products_weight = getDocProductsWeight(document.getDeliveryGoods());
+
+            delivery.setTruckWeight(delivery.getTruckWeight() - products_weight);
+            delivery.getDocuments().remove(destination_location);
+            delivery.getLogs().add("canceled " + destination_location + " order at " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+
+            // dao delete document ?
+
+            new DeliveryDAO().update(delivery);
+        }
+
+    }
+
+    public void abortDelivery(int delivery_id) {
+        // IMPORTANT : WHAT IF THE DRIVER IS THE BOSS ?
+
+        Delivery delivery = getDelivery(delivery_id);
+        int delivery_shift = getDeliveryShift(delivery);
+        removeFromShift(delivery_shift, delivery.getDriverID());
+        getAllDeliveries().remove(delivery_id);
+
+        new DeliveryDAO().delete(delivery_id);
+
     }
 }

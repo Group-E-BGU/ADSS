@@ -25,6 +25,7 @@ public class Main {
         init_data.createShifts();
         init_data.createMenus();
         blService.loadFromDataBase();
+        //init_data.testArrange();
 
 
         boolean terminate = false;
@@ -430,7 +431,7 @@ public class Main {
                         Worker w = blService.getWorker(worker_id);
                         if (w == null) {
                             System.out.println("Error : no worker with such id");
-                        } else if (!blService.addToWorkingTeam(shift_id, worker_id, w.getType())) {
+                        } else if (!blService.work(worker_id,shift_id)) {
                             System.out.println("Error : " + w.getName() + " is not available to work in this shift!");
                         } else {
                             System.out.println("worker added successfully to shift");

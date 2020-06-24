@@ -145,4 +145,60 @@ public class InitializeData {
         menu_options.put(++i, new MenuOption("Logout", User.UserType.values()));
     }
 
+    public void testArrange()
+    {
+        BLService blService = BLService.getInstance();
+
+        int deliveries_size = blService.getAllDeliveries().size();
+        Date date = new Date();
+        String date_string = "25/12/2020";
+        SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            date = date_format.parse(date_string);
+        }
+        catch (ParseException pe)
+        {
+            pe.printStackTrace();
+        }
+        String source ="haifa";
+        String destination= "beerSheva";
+        Map<String,Integer> delivery_products = new HashMap<>();
+        delivery_products.put("3",1);
+        int id = blService.arrangeDelivery(date,source,destination,delivery_products);
+
+        deliveries_size = blService.getAllDeliveries().size();
+
+        if(id!=-1)
+            System.out.println(blService.getDelivery(id).toString());
+
+        Date date2 = new Date();
+        String date_string2 = "26/12/2020";
+
+        try {
+            date2 = date_format.parse(date_string2);
+        }
+        catch (ParseException pe)
+        {
+            pe.printStackTrace();
+        }
+        String source2 ="haifa";
+        String destination2= "beerSheva";
+        Map<String,Integer> delivery_products2 = new HashMap<>();
+        delivery_products.put("1",20);
+        delivery_products2.put("2",11);
+        id = blService.arrangeDelivery(date2,source2,destination2,delivery_products2);
+
+        deliveries_size = blService.getAllDeliveries().size();
+
+        if(id!=-1)
+            System.out.println(blService.getDelivery(id).toString());
+
+        System.out.println(blService.getDelivery(id).getTruckWeight());
+
+        blService.cancelDeliveryDestination(id,destination);
+
+    }
+
+
 }

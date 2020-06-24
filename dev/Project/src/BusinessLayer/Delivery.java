@@ -83,9 +83,6 @@ public class Delivery{
         return documents;
     }
 
-    public void log(String s) {
-        this.logs.add(s);
-    }
 
     public void setTruckWeight(int truckWeight) {
         this.truckWeight = truckWeight;
@@ -107,10 +104,6 @@ public class Delivery{
         this.delivery_id = id;
     }
 
-    public int getDelivery_id() {
-        return delivery_id;
-    }
-
     public Shift.ShiftTime getShiftTime() {return shiftTime;}
 
     @Override
@@ -120,13 +113,14 @@ public class Delivery{
         String delivery_string = "Delivery id : " + delivery_id + '\n';
         delivery_string = delivery_string + "Delivery date : " + dateFormat.format(date) + '\n';
         dateFormat = new SimpleDateFormat("EEEE");
+        delivery_string = delivery_string + "Shift time : "+shiftTime.toString() + '\n';
         delivery_string = delivery_string + "Truck id : " + truckSerialNumber+ '\n';
         delivery_string = delivery_string +"Source Address : "+source +'\n';
         delivery_string = delivery_string + "Driver id : " + driverID + '\n';
         delivery_string = delivery_string + "Destinations : ";
-        for(String location : documents.keySet())
+        for(String destination : documents.keySet())
         {
-            delivery_string = delivery_string + location + "     ";
+            delivery_string = delivery_string + destination + "     ";
         }
 
 
@@ -136,4 +130,17 @@ public class Delivery{
         return delivery_string;
 
     }
+
+    /*public List<String> getDestinations()
+    {
+
+        for(Document document : documents.values())
+        {
+            String doc_destination = document.getDestination();
+            if()
+        }
+
+    }
+
+     */
 }
