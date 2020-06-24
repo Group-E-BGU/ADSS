@@ -180,6 +180,13 @@ public class Mapper {
                     "FOREIGN KEY(OID) REFERENCES Orders(id));";
             stmt.execute(sqlStmt);
 
+            sqlStmt = "CREATE TABLE IF NOT EXISTS \"Addresses\" (\n" +
+                    "\t\"location\"\tTEXT,\n" +
+                    "\t\"contactName\"\tTEXT,\n" +
+                    "\t\"phoneNumber\"\tTEXT,\n" +
+                    "\tPRIMARY KEY(\"location\")\n" +
+                    ")";
+            stmt.execute(sqlStmt);
 
             sqlStmt = "CREATE TABLE IF NOT EXISTS Contract(" +
                     "SupplierId int NOT NULL," +
@@ -232,6 +239,84 @@ public class Mapper {
                     "PRIMARY KEY(sid,day,StoreId)," +
                     "FOREIGN KEY(sid) REFERENCES Contract(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Drivers (" +
+                    "id INTEGER NOT NULL UNIQUE," +
+                    "name TEXT," +
+                    "schedule TEXT," +
+                    "license TEXT NOT NULL," +
+                    "shifts INTEGER," +
+                    "PRIMARY KEY(id)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Documents (" +
+                    "deliveryGoods TEXT," +
+                    "ID INTEGER NOT NULL," +
+                    "destination TEXT," +
+                    "PRIMARY KEY(ID)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Deliveries (" +
+                    "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+                    "date TEXT," +
+                    "source TEXT," +
+                    "truckSerialNumber TEXT," +
+                    "driverId TEXT," +
+                    "documents TEXT," +
+                    "logs TEXT," +
+                    "truckWeight INTEGER," +
+                    "ShiftTime INTEGER" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Products (" +
+                    "CN TEXT NOT NULL UNIQUE," +
+                    "weight INTEGER," +
+                    "name TEXT," +
+                    "PRIMARY KEY(CN)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Shifts (" +
+                    "id INTEGER NOT NULL UNIQUE," +
+                    "date INTEGER," +
+                    "boss INTEGER," +
+                    "time TEXT," +
+                    "workTeam TEXT," +
+                    "address TEXT," +
+                    "PRIMARY KEY(id)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS StockKeepers (" +
+                    "id INTEGER NOT NULL UNIQUE," +
+                    "name TEXT," +
+                    "schedule TEXT," +
+                    "ontract INTEGER," +
+                    "PRIMARY KEY(id)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Trucks (" +
+                    "serialNumber TEXT," +
+                    "weight INTEGER," +
+                    "maxAllowedWeight INTEGER," +
+                    "model TEXT," +
+                    "PRIMARY KEY(serialNumber)" +
+                    ")";
+            stmt.execute(sqlStmt);
+
+            sqlStmt = "CREATE TABLE IF NOT EXISTS Work_Deals (" +
+                    "workerId INTEGER," +
+                    "startDate TEXT," +
+                    "bankAddress TEXT," +
+                    "salary REAL," +
+                    "workConditions TEXT," +
+                    "PRIMARY KEY(workerId)" +
+                    ")";
             stmt.execute(sqlStmt);
 
         } catch (Exception e) {

@@ -25,7 +25,7 @@ public class DeliveryDAO {
         int driverID;
         List<String> logs;
         int truckWeight;
-        Map<String, Document> documents;
+        Map<Integer, Document> documents;
         Shift.ShiftTime shiftTime;
 
         String sql = "SELECT * FROM Deliveries WHERE id = ?";
@@ -64,30 +64,24 @@ public class DeliveryDAO {
         return null;
     }
 
-    private Map<String, Document> decodeDocuments(String documents) {
-        Map<String, Document> decodedDocuments = new HashMap<>();
-        String[] separatedDocuments = documents.split("\n");
-        String[] separatedProducts;
-        String destination;
-        Document document;
-        Map<String, Integer> products;
+    private Map<Integer, Document> decodeDocuments(String documents) {
+        int[] ids = decodeDocumentsIds(documents);
+        Map<Integer, Document> decodedDocuments = new HashMap<>();
 
-        for(String doc : separatedDocuments){
-            separatedProducts = doc.split(",");
-            // separatedProducts[0] is the destination and the rest are the products and their amounts
-            destination = separatedProducts[0];
-            products = new HashMap<>();
-            // loop through the products and their amounts and decode them
-            for(int i = 1; i < separatedProducts.length; i+=2)
-                products.put(separatedProducts[i], Integer.parseInt(separatedProducts[i+1]));
-
-            document = new Document();
-            document.setDeliveryGoods(products);
-
-            decodedDocuments.put(destination, document);
-        }
+        for(int id : ids)
+            decodedDocuments.put(id, DocumentDAO.getDocument(id));
 
         return decodedDocuments;
+    }
+
+    private int[] decodeDocumentsIds(String documents) {
+        String[] docsIds = documents.split(",");
+        int[] output = new int[docsIds.length];
+
+        for(int i = 0; i < docsIds.length; i++)
+            output[i] = Integer.parseInt(docsIds[i]);
+
+        return output;
     }
 
     public List<Delivery> getAll() {
@@ -102,7 +96,7 @@ public class DeliveryDAO {
         String source;
         String truckSerialNumber;
         int driverID;
-        Map<String, Document> documents;
+        Map<Integer, Document> documents;
         int deliveryId;
         Shift.ShiftTime shiftTime;
 
@@ -143,7 +137,7 @@ public class DeliveryDAO {
 
     public int save(Delivery delivery) {
 
-        String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight, shiftTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Deliveries(date, source, truckSerialNumber, driverId, documents, logs, truckWeight, ShiftTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
@@ -158,7 +152,7 @@ public class DeliveryDAO {
         int driverId = delivery.getDriverID();
         List<String> logs = delivery.getLogs();
         int truckWeight = delivery.getTruckWeight();
-        Map<String, Document> documents = delivery.getDocuments();
+        Map<Integer, Document> documents = delivery.getDocuments();
         int deliveryID = -1;
         int shiftTime = delivery.getShiftTime() == Shift.ShiftTime.Morning ? 0 : 1;
 
@@ -168,11 +162,14 @@ public class DeliveryDAO {
             pstmt.setString(2, source);
             pstmt.setString(3, truckSerialnumber);
             pstmt.setInt(4, driverId);
-            pstmt.setString(5, encodeDocuments(documents));
+            pstmt.setString(5, encodeDocsIds(documents.keySet()));
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(7, truckWeight);
             pstmt.setInt(8, shiftTime);
             pstmt.executeUpdate();
+
+            // the Documents field in the DB holds the IDs of the documents, so we have to save the docs
+            saveDocuments(documents);
 
             System.out.println("Delivery has been added successfully");
 
@@ -196,10 +193,29 @@ public class DeliveryDAO {
         return deliveryID;
     }
 
-    private String encodeDocuments(Map<String, Document> documents) {
+    private void saveDocuments(Map<Integer, Document> documents) {
+        DocumentDAO docSaver = new DocumentDAO();
+
+        for(Map.Entry<Integer, Document> entry: documents.entrySet())
+            docSaver.saveDocument(entry.getValue());
+    }
+
+    private String encodeDocsIds(Set<Integer> keySet) {
+        StringBuilder encodedIds = new StringBuilder();
+
+        for(Integer id : keySet)
+            encodedIds.append(",").append(id.toString());
+
+        if(!encodedIds.toString().equals(""))
+            encodedIds = new StringBuilder(encodedIds.substring(1));
+
+        return encodedIds.toString();
+    }
+
+    private String encodeDocuments(Map<Integer, Document> documents) {
         String encodedDocuments = "";
 
-        for(Map.Entry<String, Document> entry : documents.entrySet()){
+        for(Map.Entry<Integer, Document> entry : documents.entrySet()){
             encodedDocuments += entry.getKey() + ",";
             encodedDocuments += encodeDocument(entry.getValue());
             encodedDocuments = encodedDocuments.substring(0, encodedDocuments.length() - 1);
@@ -228,6 +244,7 @@ public class DeliveryDAO {
                 "documents = ? , " +
                 "logs = ? , " +
                 "truckWeight = ? " +
+                "ShiftTime = ? " +
                 "WHERE id = ?";
 
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
@@ -243,7 +260,7 @@ public class DeliveryDAO {
         int driverId = delivery.getDriverID();
         List<String> logs = delivery.getLogs();
         int truckWeight = delivery.getTruckWeight();
-        Map<String, Document> documents = delivery.getDocuments();
+        Map<Integer, Document> documents = delivery.getDocuments();
         int deliveryID = delivery.getDeliveryID();
 
         try (Connection conn = DAL.connect();
@@ -256,6 +273,7 @@ public class DeliveryDAO {
             pstmt.setString(6, encodeLogs(logs));
             pstmt.setInt(7, truckWeight);
             pstmt.setInt(8, deliveryID);
+            pstmt.setInt(9, delivery.getShiftTime() == Shift.ShiftTime.Morning ? 0 : 1);
             pstmt.executeUpdate();
 
         } catch (SQLException ignored) {

@@ -74,7 +74,7 @@ public class AddressDAO {
             pstmt.setString(3, address.getPhoneNumber());
             pstmt.executeUpdate();
 
-            System.out.println("The address has been added successfully");
+            //System.out.println("The address has been added successfully");
 
         } catch (SQLException e) {
 

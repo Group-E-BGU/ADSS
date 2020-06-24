@@ -1,30 +1,38 @@
 package DataAccesslayer;
+import BusinessLayer.Document;
+
+import javax.xml.transform.Result;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DocumentDAO
 {
-/*
-    public void addDocument(Document document) {
-        String sql = "INSERT INTO Documents(TruckWeight, logs, deliveryGoods) VALUES(?,?,?)";
-        // encode the non-primitive fields
-        String logs = encodeLogs(document.getLogs());
+    public void saveDocument(Document document) {
+        String sql = "INSERT INTO Documents(deliveryGoods, ID, destination) VALUES(?,?,?)";
+
         String deliveryGoods = encodeDeliveryGoods(document.getDeliveryGoods());
+        int id = document.getDocumentID();
+        String destination = document.getDestination();
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, document.getTruckWeight());
-            pstmt.setString(2, logs);
-            pstmt.setString(3, deliveryGoods);
+            pstmt.setString(1, deliveryGoods);
+            pstmt.setInt(2, id);
+            pstmt.setString(3, destination);
             pstmt.executeUpdate();
         } catch (SQLException ignored) {
         }
     }
 
-    public Result<List<Document>> getAllDocuments() {
+    public List<Document> getAllDocuments() {
         List<Document> documents = new LinkedList<>();
-        List<String> logs;
-        List<Product> products;
-        Map<String, List<Product>> deliveryGoods;
-        Result<List<Document>> result = new Result<>();
+        // tmp doc fields
+        Map<String, Integer> deliveryGoods = new HashMap<>();
+        int id;
+        String destination;
+        // tmp doc
         Document tmpDocument = new Document();
 
         // get the String that represents the encoded documents
@@ -38,31 +46,28 @@ public class DocumentDAO
             while (rs.next()) {
                 // get the delivery goods and the logs from the database and decode them
                 deliveryGoods = decodeDeliveryGoods(rs.getString("deliverGoods"));
-                logs = decodeLogs(rs.getString("logs"));
-
-                // set the document fields
-                tmpDocument.setLogs(logs);
-                tmpDocument.setTruckWeight(rs.getInt("TruckWeight"));
+                id = rs.getInt("ID");
+                destination = rs.getString("destination");
+                // set the fields
                 tmpDocument.setDeliveryGoods(deliveryGoods);
-                tmpDocument.setDocumentID(rs.getInt("ID"));
+                tmpDocument.setDocumentID(id);
+                tmpDocument.setDestination(destination);
 
                 // add the document to the documents list
                 documents.add(tmpDocument);
             }
+        } catch (SQLException ignored) {
 
-            result.complete(documents);
-        } catch (SQLException e) {
-            result.error("Could not connect to database.");
         }
 
-        return result;
+        return documents;
     }
 
-    public static Result<Document> getDocument(int documentId) {
-        Result<Document> result = new Result<>();
+    public static Document getDocument(int documentId) {
         Document document = new Document();
-        List<String> logs;
-        Map<String, List<Product>> deliveryGoods;
+
+        Map<String, Integer> deliveryGoods;
+        String destination;
 
         String sql = "SELECT * FROM Documents WHERE ID = ?";
 
@@ -76,35 +81,31 @@ public class DocumentDAO
 
             // loop through the result set
             if (rs.next()) {
-                // get the delivery goods and the logs from the database and decode them
+                // get the delivery goods and the destination from the database and decode them
                 deliveryGoods = decodeDeliveryGoods(rs.getString("deliveryGoods"));
-                logs = decodeLogs(rs.getString("logs"));
+                destination = rs.getString("destination");
 
                 // set the document fields
-                document.setLogs(logs);
-                document.setTruckWeight(rs.getInt("TruckWeight"));
                 document.setDeliveryGoods(deliveryGoods);
                 document.setDocumentID(rs.getInt("ID"));
+                document.setDestination(destination);
 
-            } else
-                result.error("No document with ID :" + documentId + " is found.");
-
-        } catch (SQLException e) {
-            result.error("Could not connect to database");
+            }
+        } catch (SQLException ignored) {
         }
 
-        return result;
+        return document;
     }
 
     private static String encodeLogs(List<String> logs) {
         // combine (encode) the logs into one string
         // \n is the char that separates between two different logs
-        String output = "";
+        StringBuilder output = new StringBuilder();
 
         for (String log : logs)
-            output += log + '\n';
+            output.append(log).append('\n');
 
-        return output;
+        return output.toString();
     }
 
     private static List<String> decodeLogs(String logs) {
@@ -116,64 +117,35 @@ public class DocumentDAO
         return decodedLogs;
     }
 
-    private static String encodeDeliveryGoods(Map<String, List<Product>> deliveryGoods) {
-        String encodedGoods = "";
+    private static String encodeDeliveryGoods(Map<String, Integer> deliveryGoods) {
+        StringBuilder encodedGoods = new StringBuilder();
 
         // combine (encode) the goods into one string in the following format :
         // each pair of key and value will be converted to : (<key>\n<value>)
         // each key is a string, so it won't change
-        // each value is a list, so it will be converted to a string, following this format :
-        // each product will be encoded to a pair, the left value is the CN of the product in Products table in the database
-        // the right value is the amount of the product, these two values will be separated by ','
+        // each value is an Integer so it will be represented as a string, in its decimal format
 
         // iterate the map of the destinations and goods (delivery goods field)
-        for (Map.Entry<String, List<Product>> entry : deliveryGoods.entrySet()) {
-            encodedGoods += "(" + entry.getKey() + "\n";
-
-            // iterate the list of the goods
-            for (Product product : entry.getValue()) {
-                // add the left value of the pair, the CN of the product
-                encodedGoods += product.getCN();
-                // add the separator
-                encodedGoods += ",";
-                // add the right value of the pair, the amount
-                encodedGoods += product.getAmount();
-                // add the separator of each two products
-                encodedGoods += "\n";
-            }
-            encodedGoods += ")";
+        for (Map.Entry<String, Integer> entry : deliveryGoods.entrySet()) {
+            encodedGoods.append("(").append(entry.getKey()).append("\n").append(entry.getValue().toString()).append(")");
         }
-        return encodedGoods;
+
+        return encodedGoods.toString();
     }
 
-    private static Map<String, List<Product>> decodeDeliveryGoods(String deliveryGoods) {
-        Product product;
-        List<Product> products;
-        HashMap<String, List<Product>> decodedGoods = new HashMap<>();
+    private static Map<String, Integer> decodeDeliveryGoods(String deliveryGoods) {
+        HashMap<String, Integer> decodedGoods = new HashMap<>();
         // separate the encoded string by parentheses
         Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(deliveryGoods);
         String[] destinationGoods;
-        String[] productInfo;
 
         while (m.find()) {
             destinationGoods = m.group(1).split("\n");
-            products = new LinkedList<>();
 
-            for (int i = 1; i < destinationGoods.length; i++) {
-                productInfo = destinationGoods[i].split(",");
-
-                product = getProduct(productInfo[0]).getResult();
-                product.setAmount(Integer.parseInt(productInfo[1]));
-
-                products.add(product);
-            }
-
-            decodedGoods.put(destinationGoods[0], products);
+            decodedGoods.put(destinationGoods[0], new Integer(destinationGoods[1]));
         }
 
         return decodedGoods;
     }
 
-
- */
 }
