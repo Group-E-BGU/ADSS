@@ -21,11 +21,11 @@ public class Main {
     public static void main(String[] argv) {
 
     //    blService.initializeDB();
-        init_data.createWorkers();
+    //    init_data.createWorkers();
     //    init_data.createShifts();
         init_data.createMenus();
         blService.loadFromDataBase();
-        //init_data.testArrange();
+        init_data.testArrange();
 
 
         boolean terminate = false;

@@ -147,56 +147,42 @@ public class InitializeData {
 
     public void testArrange()
     {
+
+        // weights -> 1(2)   -> 2(5)   -> 3(6)
+
+        // test1
+        int i=0;
         BLService blService = BLService.getInstance();
 
-        int deliveries_size = blService.getAllDeliveries().size();
+        Map<String,Integer> delivery_products = new HashMap<>();
+        delivery_products.put("3",3);
+        int id = blService.arrangeDelivery(i,stringToDate("26/12/2020"),"haifa","beerSheva",delivery_products);
+
+        System.out.println(blService.getDelivery(id).toString());
+
+
+
+
+
+
+    }
+
+    public Date stringToDate(String d)
+    {
         Date date = new Date();
-        String date_string = "25/12/2020";
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
 
         try {
-            date = date_format.parse(date_string);
+            date = date_format.parse(d);
         }
         catch (ParseException pe)
         {
             pe.printStackTrace();
         }
-        String source ="haifa";
-        String destination= "beerSheva";
-        Map<String,Integer> delivery_products = new HashMap<>();
-        delivery_products.put("3",1);
-        int id = blService.arrangeDelivery(0,date,source,destination,delivery_products);
 
-        deliveries_size = blService.getAllDeliveries().size();
-
-        if(id!=-1)
-            System.out.println(blService.getDelivery(id).toString());
-
-        Date date2 = new Date();
-        String date_string2 = "26/12/2020";
-
-        try {
-            date2 = date_format.parse(date_string2);
-        }
-        catch (ParseException pe)
-        {
-            pe.printStackTrace();
-        }
-        String source2 ="haifa";
-        String destination2= "beerSheva";
-        Map<String,Integer> delivery_products2 = new HashMap<>();
-        delivery_products.put("1",20);
-        delivery_products2.put("2",11);
-        id = blService.arrangeDelivery(1,date2,source2,destination2,delivery_products2);
-
-        deliveries_size = blService.getAllDeliveries().size();
-
-        if(id!=-1)
-            System.out.println(blService.getDelivery(id).toString());
-
-        System.out.println(blService.getDelivery(id).getTruckWeight());
-
+        return date;
     }
+
 
 
 }

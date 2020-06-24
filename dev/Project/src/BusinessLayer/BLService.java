@@ -871,6 +871,7 @@ public class BLService {
                             if (driver_id != -1) {
                                 // found a driver
                                 Delivery delivery = new Delivery(potential_date, shiftTime, source_location, truck_cn, driver_id, truck_total_weight);
+
                                 Document document = new Document();
                                 document.setDeliveryGoods(delivery_products);
                                 document.setDestination(destination_location);
@@ -1085,7 +1086,7 @@ public class BLService {
         ) {
             Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
             int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation());
-            if (!o.isAuto() && DeliveryId != -1) {
+            if (!o.isAuto() && DeliveryId == -1) {
                 DoDelivery(o);
             }
         }
@@ -1146,7 +1147,7 @@ public class BLService {
     public String CancelOrder(int OrderId) {
         int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId);
         current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(), OrderId);
-        //add delete delivery
+        cancelOrderFromDelivery(OrderId,DeliveryId);
         return "Done";
     }
 
