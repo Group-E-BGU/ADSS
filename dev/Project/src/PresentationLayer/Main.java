@@ -25,7 +25,7 @@ public class Main {
     //    init_data.createShifts();
         init_data.createMenus();
         blService.loadFromDataBase();
-        init_data.testArrange();
+        //init_data.testArrange();
 
 
         boolean terminate = false;

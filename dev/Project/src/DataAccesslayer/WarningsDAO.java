@@ -11,14 +11,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WarningsDAO {
-    public void save(String warning, String workerType)
+    public void save(String warning, String userType)
     {
         String sql = "INSERT INTO Warnings(warning, workerType) VALUES(?,?)";
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, warning);
-            pstmt.setString(2, workerType);
+            pstmt.setString(2, userType);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -28,7 +28,7 @@ public class WarningsDAO {
 
     }
 
-    public List<String> get(String workerType) {
+    public List<String> get(String userType) {
 
         List<String> warnings = new LinkedList<>();
         String sql = "SELECT * FROM Warnings WHERE workerType = ?";
@@ -37,7 +37,7 @@ public class WarningsDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // set the value
-            pstmt.setString(1, workerType);
+            pstmt.setString(1, userType);
             //
             ResultSet rs = pstmt.executeQuery();
 

@@ -94,6 +94,7 @@ public class DriverDAO
                 contract = new WorkerDealDAO().get(id);
 
                 tmpDriver = new Driver(id, name, schedule, contract, license);
+                tmpDriver.setWorkerShifts(shifts);
 
                 drivers.add(tmpDriver);
             }

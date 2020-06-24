@@ -40,6 +40,7 @@ public class StockKeeperDAO {
                 contract = new WorkerDealDAO().get(id);
 
                 stockKeeper = new StockKeeper(id, name, schedule, contract);
+                stockKeeper.setWorkerShifts(getShiftsIds(rs.getString("shifts")));
 
             } else
                 return null;
@@ -49,6 +50,21 @@ public class StockKeeperDAO {
         }
 
         return stockKeeper;
+    }
+
+    private List<Integer> getShiftsIds(String shifts) {
+        //return Arrays.stream(shifts.split("\n")).map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+
+        List<Integer> shiftsId = new LinkedList<>();
+
+        if(shifts.compareTo("") == 0)
+            return shiftsId;
+
+        String[] separatedIds = shifts.split("\n");
+
+        for (String separatedId : separatedIds) shiftsId.add(Integer.parseInt(separatedId));
+
+        return shiftsId;
     }
 
     public List<StockKeeper> getAll() {
@@ -73,6 +89,7 @@ public class StockKeeperDAO {
                 contract = new WorkerDealDAO().get(id);
 
                 tmpStockKeeper = new StockKeeper(id, name, schedule, contract);
+                tmpStockKeeper.setWorkerShifts(getShiftsIds(rs.getString("shifts")));
 
                 stockKeepers.add(tmpStockKeeper);
             }
