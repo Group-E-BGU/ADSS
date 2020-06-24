@@ -640,9 +640,9 @@ public class Printer {
 
             String table_name = "Supplier ID # " + Sup.ID;
 
-            List<String> table_headers = Arrays.asList("NAME", "PAYMENT METHOD", "BANK", "BRANCH", "BANK NUMBER");
+            List<String> table_headers = Arrays.asList("NAME", "Address", "BANK", "BRANCH", "BANK NUMBER");
             List<List<String>> table_rows = Arrays.asList(
-                    Arrays.asList(Sup.Name, Sup.Payments, Sup.Bank, Sup.Branch, String.valueOf(Sup.BankNumber))
+                    Arrays.asList(Sup.Name, Sup.Address, Sup.Bank, Sup.Branch, String.valueOf(Sup.BankNumber))
             );
 
             tables_info.put(0, table_name);

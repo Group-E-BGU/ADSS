@@ -96,7 +96,7 @@ public class Store {
         }
         Supplier sup=new Supplier(name, id, address, bank,branch,bankNumber,payments,contacts_id,contacts_number);
         list_of_Suplier.add(sup);
-        MapSupplier.WriteSupplier(name, id,address, bank,branch,bankNumber,payments,address,contacts_id,contacts_number);
+        MapSupplier.WriteSupplier(name, id,address, bank,branch,bankNumber,payments,this.address,contacts_id,contacts_number);
         return "Done";
     }
 
@@ -157,7 +157,7 @@ public class Store {
                 s.setPayments(payments);
                 s.setContactsID_Name(contacts_id_name);
                 s.setContactsID_number(contacts_number);
-                MapSupplier.UpdateSupplier(name, id, address, bank,branch,bankNumber,payments, address,contacts_id_name,contacts_number);
+                MapSupplier.UpdateSupplier(name, id, address, bank,branch,bankNumber,payments, this.address,contacts_id_name,contacts_number);
               return "Done";
             }
         }

@@ -24,8 +24,8 @@ public class Supplier {
         Bank=bank;
         Branch=branch;
         BankNumber = bankNumber;
-        address = payments;
-        payments=payments;
+        this.address = address;
+        this.payments=payments;
         Contract = null;
         Worte = null;
         ContactsID_Name=Contacts_ID;
