@@ -39,7 +39,7 @@ public class MapperContract {
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
             stmt.setInt(1,suplaier_ID);
-            stmt.setBoolean(2,fixeDays); //todo check if its work
+            stmt.setBoolean(2,fixeDays);
             stmt.setBoolean(3,leading);
             stmt.setString(4,storeId);
 

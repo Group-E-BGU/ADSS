@@ -97,12 +97,10 @@ public class Store {
         Supplier sup=new Supplier(name, id, address, bank,branch,bankNumber,payments,contacts_id,contacts_number);
         list_of_Suplier.add(sup);
         MapSupplier.WriteSupplier(name, id,address, bank,branch,bankNumber,payments,address,contacts_id,contacts_number);
-        ///todo add the address to the addresses table
         return "Done";
     }
 
     public String Delete(int id) {
-       //todo change
         for (Supplier s:list_of_Suplier
         ) {
             if(s.getID()==id){
@@ -272,7 +270,7 @@ public class Store {
                 Double tot=order.getTotalPrice();
                 AtomicReference<Double> TotalPrice = new AtomicReference<>(tot);
                 for (Map.Entry<Integer, Integer> e : order.getItemsID_NumberOfItems().entrySet()) {
-                    double Price = sup.getPric(e.getKey(), e.getValue()); //todo check if works
+                    double Price = sup.getPric(e.getKey(), e.getValue());
                     TotalPrice.set(TotalPrice.get() + Price);
                 }
 
@@ -313,7 +311,7 @@ public class Store {
         }
         if(sup!=null) {
             LinkedList<Integer> day = new LinkedList<Integer>();
-            day.add(LocalDate.now().getDayOfWeek().getValue()+2);
+            day.add(LocalDate.now().getDayOfWeek().getValue()+2);//todo! check!
 
             Map<Integer, Integer> ProductStoreID_IDSupplier = new ConcurrentHashMap<Integer, Integer>();
             Map<Integer, Integer> ProductIDSupplier_numberOfItems = new ConcurrentHashMap<Integer, Integer>();
@@ -1023,7 +1021,6 @@ public class Store {
         }
 
     public LinkedList<InterfaceOrder> GetOrderDetails() {
-     //todo changed
      LinkedList<InterfaceOrder> orders=new LinkedList<InterfaceOrder>();
      int today = LocalDate.now().getDayOfWeek().getValue()+1;
      LinkedList<Integer> ooo=MapOrder.GetOrdersId(today, address);

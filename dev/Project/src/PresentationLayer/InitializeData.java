@@ -139,7 +139,9 @@ public class InitializeData {
         menu_options.put(++i, new MenuOption("Enter new discount",new User.UserType[]{User.UserType.Stock}));
         menu_options.put(++i, new MenuOption("Enter new price",new User.UserType[]{User.UserType.Stock}));
         menu_options.put(++i, new MenuOption("Update DetailsOrder",new User.UserType[]{User.UserType.Stock}));
-        menu_options.put(++i, new MenuOption("Check the Cheaper Supplier for specific product",new User.UserType[]{User.UserType.StoreManager}));
+        menu_options.put(++i, new MenuOption("Check the Cheaper Supplier for specific product",new User.UserType[]{User.UserType.Stock}));
+        menu_options.put(++i, new MenuOption("Restart the DeliveryId At the end of the day",new User.UserType[]{User.UserType.Stock,User.UserType.WorkersManager,User.UserType.Logistic}));
+        menu_options.put(++i, new MenuOption("Cancel Order",new User.UserType[]{User.UserType.StoreManager}));
         menu_options.put(++i, new MenuOption("Logout", User.UserType.values()));
     }
 

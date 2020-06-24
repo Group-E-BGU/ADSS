@@ -21,7 +21,7 @@ public class system {
 
     public String Register(String address, String name, String phoneNumber, String password) {
     String s=CheckEmailExist(address);
-    if(s.equals("Not Exist")){ //todo- add to the database information
+    if(s.equals("Not Exist")){
         MapUser.WriteUser(address,password);
         MapStore.WriteStore(address, 0, 0, 0 );
         return "Done";

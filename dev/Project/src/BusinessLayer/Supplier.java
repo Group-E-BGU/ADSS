@@ -140,7 +140,6 @@ public class Supplier {
     }
 
     public int GetIdProductPerStore(int id) {
-        //todo change!
         int ID_product=-1;
         if(Contract!=null){
             ID_product=Contract.GetIdPerStore(id);

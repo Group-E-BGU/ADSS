@@ -7,7 +7,9 @@ import javafx.util.Pair;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class BLService {
@@ -489,7 +491,10 @@ public class BLService {
         String Done = "you must be logged in before doing any actions";
         if (current_Store != null)
             Done = current_Store.AddSuplier(name, ID, Address, bank, branch, bankNumber, payments, Contacts_ID, Contacts_number);
-
+        if(Done.equals("Done")){
+            Address a=new Address(Address,name,"555555");
+            addAddress(a);
+        }
         return Done;
     }
 
@@ -555,6 +560,10 @@ public class BLService {
 
     public String Register(String Address,String name, String phoneNumber, String password) {
         String Done = systemcontroler.Register(Address,name,phoneNumber, password);
+        if(Done.equals("Done")){
+            Address a=new Address(Address,name,phoneNumber);
+            addAddress(a);
+        }
         return Done;
     }
 
@@ -615,7 +624,6 @@ public class BLService {
     }
 
     public String Logout() {
-        //todo changed
         if (logged_user == null | current_Store == null) {
             return "you need to Login before you logout";
         }
@@ -795,7 +803,7 @@ public class BLService {
 
 //----------------------------------------------- new arrange delivery ----------------------------------------//
 
-    public void arrangeDelivery(Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
+    public int arrangeDelivery(Date delivery_date, String source_location, String destination_location, Map<String, Integer> delivery_products) {
 
         // check if there are shifts in the destination with the given date and time for 7 days
 
@@ -811,7 +819,7 @@ public class BLService {
         Address destination_address = getAddress(destination_location);
         if (destination_address == null) {
             System.out.println("Error : invalid location");
-            return;
+            return -1;
         }
 
         int additional_days = 0;
@@ -905,7 +913,7 @@ public class BLService {
         // check if there is an available truck in that time ALSO check if there is a suitable driver
         // then we can finish
 
-
+  return -1;
     }
 
     public List<Integer> getDeliveries(String source, Date date, Shift.ShiftTime shiftTime) {
@@ -1062,29 +1070,21 @@ public class BLService {
         }
     }
 
-    public String DoDelivery(){  //todo auto or pressing?
-       if(LocalDate.now().getDayOfWeek().getValue()+1==1)
-       {
-           LinkedList<Order> Orders = new LinkedList<Order>();
-           for (int i = 1; i < 8; i++) {
-               LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(i, current_Store.getAddress());
+    public String DoDelivery(){
+               int d = LocalDate.now().getDayOfWeek().getValue()+1;//todo check!
+               LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(d, current_Store.getAddress());
                for (int order : ooo
                ) {
                    Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
-                   Orders.add(o);
+                   int DeliveryId=current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(),o.getID_Invitation());
+                   if (!o.isAuto()&&DeliveryId!=-1) {
+                       DoDelivery(o);
+                   }
                }
-           }
-           for (Order o : Orders
-           ) {
-               DoDelivery(o);
-           }
            return "done";
-       }
-       return "we do delivery just on sunday";
     }
 
     public void DoDelivery(Order o){
-        if (!o.isAuto()) {
             Supplier s = current_Store.getMapSupplier().GetSupplier(o.getID_Vendor(), current_Store.getAddress());
             Contract c = current_Store.getMapContract().getContract(s.getID(), current_Store.getAddress());
             if (!c.isLeading()) {
@@ -1093,18 +1093,48 @@ public class BLService {
                     String CN = e.getKey().toString();
                     Products.put(CN, e.getValue());
                 }
-                for (int day : o.getDay()
-                ) {
                     LocalDate date=LocalDate.now();
-                    date=date.plusDays(day-1);
                     Date d= java.util.Date.from(date.atStartOfDay()
                             .atZone(ZoneId.systemDefault())
                             .toInstant());  //todo check if works
-
-                    arrangeDelivery(d,s.getPayments(),current_Store.getAddress(),Products);
-                }
+                   int DeliveryId = arrangeDelivery(d,s.getPayments(),current_Store.getAddress(),Products);
+                   if(DeliveryId!=-1){
+                       current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(),o.getID_Invitation(),DeliveryId);
+                   }
             }
-        }
     }
 
+    public String RestartDeliveryId(){
+        for (int i=1;i<8;i++) {
+            LinkedList<Integer> ooo = current_Store.getMapOrder().GetOrdersId(i, current_Store.getAddress());
+            for (int order : ooo
+            ) {
+                Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
+                int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation());
+                current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
+            }
+        }
+        return "Done";
+    }
+
+    public String RestartDeliveryIdAttheendoftheDay(){  //todo check!!
+        List<Delivery>  Deliverys=null;//getAll();
+        for (Delivery d:Deliverys
+             ) {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            if (d.getDate().equals(dtf.format(now))){
+                int OrderId=current_Store.getMapOrder().GetOrderId(current_Store.getAddress(),d.getDeliveryID());
+                 current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(),OrderId,-1);
+            }
+        }
+        return "Done";
+    }
+
+    public String CancelOrder(int OrderId){
+        int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId);
+        current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(),OrderId);
+        //add delete delivery
+        return "Done";
+    }
 }

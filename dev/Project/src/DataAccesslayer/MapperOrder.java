@@ -22,7 +22,7 @@ public class MapperOrder {
                 Class.forName("org.sqlite.JDBC");
                 conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
-                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?)";
+                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?,?)";
 
                 PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
@@ -34,6 +34,7 @@ public class MapperOrder {
                 stmt.setDouble(6, TotalPrice);
                 stmt.setString(7, status);
                 stmt.setString(8, storeId);
+                stmt.setInt(9, -1);
 
                 stmt.executeUpdate();
 
@@ -428,6 +429,86 @@ public class MapperOrder {
             }
         }
         return oId;
+    }
+
+    public int GetOrderId(String StoreId,int DeliveryId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Orders " +
+                    "WHERE DeliveryNumber = '"+DeliveryId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return rs.getInt(1);
+        } catch (Exception e) {
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    public int GetDeliveryId(String StoreId,int OId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "SELECT * " +
+                    "FROM Orders " +
+                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlstmt);
+            if(rs.next())
+                return rs.getInt(9);
+        } catch (Exception e) {
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    public void UpdateDeliveryID(String StoreId,int OId, int DeliveryId){
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
+
+            String sqlstmt = "UPDATE Orders SET " +
+                    " DeliveryNumber = '"+DeliveryId+"'," +
+                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+
+            Statement stmt = conn.createStatement();
+            stmt.execute(sqlstmt);
+
+        } catch (Exception e) {
+             System.out.println(e.getMessage());
+        }
+        finally{
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                //   System.out.println(ex.getMessage());
+            }
+        }
     }
 }
 

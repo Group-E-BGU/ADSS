@@ -43,6 +43,7 @@ public class Main {
                     break;
                 case 2:
                     if (SystemAccess.login())
+                        blService.DoDelivery(); //todo check if here
                         actionList();
                     break;
                 case 3:
@@ -250,7 +251,19 @@ public class Main {
                 case 26:
                     CheckcheepSupplier();
                     break;
-                case 27:
+                case 27:{
+                    System.out.println("Do you sure you want to restart the DeliveryId? y/n ");
+                    String ans = keyboard.nextLine();
+                    if (ans.equals("y")) {
+                        blService.RestartDeliveryIdAttheendoftheDay();
+                        System.out.println("Successfully initialized");
+                    }
+                    }
+                    break;
+                case 28:
+                    DeleteOrder();
+                    break;
+                case 29:
                     Logout();
                     terminate = true;
                     break;
@@ -259,10 +272,30 @@ public class Main {
                     break;
 
             }
-
             Printer.border();
         }
 
+    }
+
+    private static void DeleteOrder() {
+        boolean conect = blService.CheckConected();
+        if (!conect) {
+            System.out.println("You need to connect before you take any action");
+        }
+        if (conect) {
+            Scanner myScanner = new Scanner(System.in);
+            LinkedList<Integer> Days = new LinkedList<Integer>();
+            System.out.println("Please enter the Order ID you want to Delete");
+            int ID_Order = getChoice(0, Integer.MAX_VALUE);
+            String Able = blService.CheckAbleToChangeOrder(ID_Order);
+            if (Able.equals("Able")) {
+                blService.CancelOrder(ID_Order);
+                System.out.println("Order canceled");
+            }
+            else{
+                System.out.println("Too late to cancel the order");
+            }
+        }
     }
 
     private static void workersView() {
@@ -558,7 +591,6 @@ public class Main {
 //----------------------------------- Other --------------------------------
 
     private static void CheckcheepSupplier() {
-        //todo change!
         Scanner myScanner = new Scanner(System.in);
         System.out.println("Please enter the product ID");
         int ProdudtId = getChoice(0,Integer.MAX_VALUE);
@@ -591,21 +623,21 @@ public class Main {
 
         blService.Login("A@gmail.com","123");
         Map<Integer,Integer> contactAli1=new ConcurrentHashMap<Integer, Integer>();
-        contactAli1.put(2087564,0524536272);
-        contactAli1.put(2453214,0523756223);
+        contactAli1.put(2087564,524536272);
+        contactAli1.put(2453214,523756223);
         Map<Integer,String> contactAli2=new ConcurrentHashMap<Integer, String>();
         contactAli2.put(2087564,"yoni");
         contactAli2.put(2453214,"roi");
         blService.AddSupplier("Ron",51345,"haprahim, 5, Tel Aviv","Mizrahi","007",873645,"EFT",contactAli2,contactAli1);
         Map<Integer,Integer> contactIKEA1=new ConcurrentHashMap<Integer, Integer>();
-        contactIKEA1.put(208231,0522136272);
-        contactIKEA1.put(4283214,0523546253);
+        contactIKEA1.put(208231,522136272);
+        contactIKEA1.put(4283214,523546253);
         Map<Integer,String> contactIKEA2=new ConcurrentHashMap<Integer, String>();
         contactIKEA2.put(208231,"Dov");
         contactIKEA2.put(4283214,"Leni");
         blService.AddSupplier("Tom",51321,"shalom, 17, Hulon","Ben-Leumi","027",432679,"EFT",contactIKEA2,contactIKEA1);
         Map<Integer,Integer> contacttXiaomi1=new ConcurrentHashMap<Integer, Integer>();
-        contacttXiaomi1.put(45337561,05221336272);
+        contacttXiaomi1.put(45337561,522133272);
         Map<Integer,String> contactXiaomi2=new ConcurrentHashMap<Integer, String>();
         contactXiaomi2.put(45337561,"Or");
         blService.AddSupplier("Eli",51328,"shibolet, 11, yafo","Leumi","3456",435678,"EFT",contactXiaomi2,contacttXiaomi1);
@@ -837,7 +869,7 @@ public class Main {
                     ContactId = getChoice(id_lower_bound,id_upper_bound);
                     Contacts_ID.put(ContactId, ContactName);
                     int PhoneNumber;
-                    System.out.println("Please enter the Contact's Phone number");
+                    System.out.println("Please enter the Contact's Phone number (Without the first digit!)");
                     PhoneNumber = getChoice(0,Integer.MAX_VALUE);;
                     Contacts_number.put(ContactId, PhoneNumber);
                     String ans;
@@ -1285,13 +1317,12 @@ public class Main {
         for (Map.Entry<Integer,Integer> I:o.ItemsID_ItemsIDVendor.entrySet()
         ) {
             System.out.print(I.getValue()+" ");
-            System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
+            System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));
         }
         System.out.println("The Total Price of the order is: "+o.TotalPrice);
     }
 
     private static void GetOrderDetails() {
-        //todo changed!
         System.out.println("Orders that are scheduled to arrive today:");
         LinkedList<InterfaceOrder> Orders=blService.GetOrderDetails();
         for (InterfaceOrder o:Orders
@@ -1302,7 +1333,7 @@ public class Main {
             for (Map.Entry<Integer, Integer> I : o.ItemsID_ItemsIDVendor.entrySet()
             ) {
                 System.out.print(I.getValue());
-                System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));  //todo check if work
+                System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));
             }
         }
         System.out.println("\nIf an order arrives at the store,\n" +

@@ -25,7 +25,7 @@ public class Mapper {
                     "email varchar NOT NULL," +
                     "itemId int," +
                     "NumOfOrder int," +
-                    "totalAmount int," + //todo?
+                    "totalAmount int," +
                     "PRIMARY KEY(email));";
             stmt.execute(sqlStmt);
 
@@ -156,6 +156,7 @@ public class Mapper {
                     "totalPrice double,"+
                     "status varchar,"+
                     "StoreId varchar," +
+                    "DeliveryNumber int," +
                     "PRIMARY KEY(id,StoreId)," +
                     "FOREIGN KEY(SID) REFERENCES Supplier(id),"+
                     "FOREIGN KEY(StoreId) REFERENCES Store(email));";

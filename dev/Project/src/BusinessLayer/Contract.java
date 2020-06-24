@@ -28,7 +28,6 @@ public class Contract {
     }
 
     public double GetPrice(int Id){
-     //todo change it!
        AtomicReference<Double> p= new AtomicReference<>((double) 1);
         productIDVendor_Price.forEach((id,Price)->{
             if(id==Id){
@@ -126,7 +125,6 @@ public class Contract {
         return false;
     }
 
-    //todo change
     public int GetIdPerStore(int id) {
         AtomicInteger Id = new AtomicInteger(-1);
         for (Map.Entry<Integer, Integer> p : ItemsID_ItemsIDSupplier.entrySet()
