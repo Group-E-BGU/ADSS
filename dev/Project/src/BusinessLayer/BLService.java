@@ -557,13 +557,13 @@ public class BLService {
         return Done;
     }
 
-    public String CheckEmailExist(String email) {
-        String Done = systemcontroler.CheckEmailExist(email);
+    public String UserAddressExist(String address) {
+        String Done = systemcontroler.UserAddressExist(address);
         return Done;
     }
 
     public String Register(String Address, String name, String phoneNumber, String password) {
-        String Done = systemcontroler.Register(Address, name, phoneNumber, password);
+        String Done = systemcontroler.Register(Address, password);
         if (Done.equals("Done")) {
             Address a = new Address(Address, name, phoneNumber);
             addAddress(a);
@@ -571,11 +571,11 @@ public class BLService {
         return Done;
     }
 
-    public String Login(String email, String password) {
-        String Done = systemcontroler.Login(email, password);
+    public String Login(String address, String password) {
+        String Done = systemcontroler.Login(address, password);
         if (Done.equals("Done")) {
-            logged_user = new User(email, password, null);
-            current_Store = Store.createInstance(email);
+            logged_user = new User(address, password, null);
+            current_Store = Store.createInstance(address);
         }
         //initialize();
         return Done;

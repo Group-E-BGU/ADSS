@@ -14,13 +14,13 @@ public class system {
         MapStore= new MapperStore();
     }
 
-    public String CheckEmailExist(String email) {
-        String s= MapUser.CheckEmailExist(email);
+    public String UserAddressExist(String address) {
+        String s= MapUser.UserAddressExist(address);
         return s;
     }
 
-    public String Register(String address, String name, String phoneNumber, String password) {
-    String s=CheckEmailExist(address);
+    public String Register(String address,String password) {
+    String s=UserAddressExist(address);
     if(s.equals("Not Exist")){
         MapUser.WriteUser(address,password);
         MapStore.WriteStore(address, 0, 0, 0 );
@@ -29,10 +29,10 @@ public class system {
     return s;
     }
 
-    public String Login(String email, String password) {
-        String s=CheckEmailExist(email);
+    public String Login(String address, String password) {
+        String s=UserAddressExist(address);
         if(s.equals("Exist")){
-            s= MapUser.CheckCorrectPassword(email,password);
+            s= MapUser.CheckCorrectPassword(address,password);
             if(s.equals("correct")){
                 return "Done";
             }

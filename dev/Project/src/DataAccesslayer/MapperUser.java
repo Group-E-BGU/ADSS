@@ -6,7 +6,7 @@ public class MapperUser {
 
     private static Connection conn;
 
-    public void WriteUser(String email, String password){
+    public void WriteUser(String address ,String password){
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
@@ -15,7 +15,7 @@ public class MapperUser {
 
             PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
-            stmt.setString(1,email);
+            stmt.setString(1,address);
             stmt.setString(2,password);
 
             stmt.executeUpdate();
@@ -34,14 +34,14 @@ public class MapperUser {
         }
     }
 
-    public String CheckEmailExist(String email) {
+    public String UserAddressExist(String address) {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
                     "FROM User " +
-                    "WHERE email = '"+email+"';";
+                    "WHERE Address = '"+address+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
@@ -64,14 +64,14 @@ public class MapperUser {
         return "Not Exist";
     }
 
-    public String CheckCorrectPassword(String email, String password) {
+    public String CheckCorrectPassword(String address, String password) {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
                     "FROM User " +
-                    "WHERE email = '"+email+"';";
+                    "WHERE Address = '"+address+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);

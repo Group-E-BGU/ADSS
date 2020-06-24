@@ -22,7 +22,7 @@ public class SystemAccess
         String name;
         System.out.println("Please enter your Address");
         address = keyboard.nextLine();
-        String Ex=blService.CheckEmailExist(address);
+        String Ex=blService.UserAddressExist(address);
         if(!Ex.equals("Not Exist")){
             System.out.println(Ex);
         }
@@ -44,11 +44,11 @@ public class SystemAccess
 
     public static boolean login()
     {
-        String email;
+        String address;
         String password;
-        System.out.println("Please enter your email");
-        email = keyboard.nextLine();
-        String Ex = blService.CheckEmailExist(email);
+        System.out.println("Please enter your branch address");
+        address = keyboard.nextLine();
+        String Ex = blService.UserAddressExist(address);
         boolean done = true;
         if(!Ex.equals("Exist")) {
             System.out.println(Ex);
@@ -57,7 +57,7 @@ public class SystemAccess
         if (done) {
             System.out.println("Please enter password");
             password = keyboard.nextLine();
-            String Done = blService.Login(email, password);
+            String Done = blService.Login(address, password);
             if (!Done.equals("Done")) {
                 System.out.println("wrong password");
                 done=false;
@@ -65,7 +65,7 @@ public class SystemAccess
         }
         if(done) {
             chooseType();
-            System.out.println(email + " welcome to your super!");
+            System.out.println(" welcome to your superLee : "+address + " branch!");
             //       GetOrderDetails();
             //       Action();
             return true;
@@ -111,16 +111,4 @@ public class SystemAccess
         }
     }
 
-    private static boolean getConfirmation() {
-        for (; ; ) {
-            String keyboard_input = keyboard.nextLine();
-            if (keyboard_input.equals("y") || keyboard_input.equals("Y"))
-                return true;
-            else if (keyboard_input.equals("n") || keyboard_input.equals("N"))
-                return false;
-            else
-                System.out.println("Error : Invalid input ! type n to cancel or y to confirm");
-        }
-
-    }
 }

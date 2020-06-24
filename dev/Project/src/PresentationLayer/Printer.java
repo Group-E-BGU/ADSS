@@ -525,7 +525,7 @@ public class Printer {
 
 
         if (rows_data == null || columns_names == null || rows_data.isEmpty() || rows_data.get(0).size() != columns_names.size())
-            throw new IllegalArgumentException();
+            return "Error empty table !!!";
 
 
         Integer[] widths = new Integer[rows_data.get(0).size()];
