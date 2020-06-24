@@ -43,8 +43,10 @@ public class Main {
                     break;
                 case 2:
                     if (SystemAccess.login())
+                    {
                         blService.DoDelivery(); //todo check if here
                         actionList();
+                    }
                     break;
                 case 3:
                     System.out.println("GoodBye!");
