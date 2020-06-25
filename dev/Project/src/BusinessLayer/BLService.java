@@ -1162,7 +1162,7 @@ public class BLService {
             try {
                 String d_string = dtf.format(d.getDate());
                 Date d_date = dtf.parse(d_string);
-                String today_string = dtf.format(new Date());
+                String today_string = "26/12/2020";
                 Date now = dtf.parse(today_string);
 
                 if (d_date.equals(now)) {

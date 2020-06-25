@@ -268,6 +268,7 @@ public class Main {
                     break;
                 case 29:
                     deliveriesArrival();
+                    break;
                 case 30:
                     Logout();
                     terminate = true;
