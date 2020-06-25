@@ -4,6 +4,7 @@ import DataAccesslayer.*;
 import PresentationLayer.Main;
 import javafx.util.Pair;
 
+import javax.jws.soap.SOAPBinding;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -1261,6 +1262,18 @@ public class BLService {
 
     public void clearWarnings(User.UserType userType)
     {
-        warnings.remove(userType);
+        if(userType.equals(User.UserType.Master))
+        {
+            for(User.UserType user : User.UserType.values())
+            {
+                if(warnings.containsKey(user))
+                    warnings.get(user).clear();
+            }
+        }
+        else
+        {
+            warnings.get(userType).clear();
+        }
+        new WarningsDAO().delete(userType.toString());
     }
 }

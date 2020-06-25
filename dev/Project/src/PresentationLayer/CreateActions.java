@@ -407,7 +407,7 @@ public class CreateActions {
         }
 
     }
-/*
+
     public static void arrangeDelivery() {
 
         boolean date_chosen = false;
@@ -604,7 +604,7 @@ public class CreateActions {
                 } else {
                     driver_chosen = true;
                     Delivery delivery = new Delivery(date,source_shift.getShiftTime(), source, truck_serial_number, driver_id, total_weight);
-                    delivery.setDocuments(documents);
+                //    delivery.setDocuments(documents);
                     delivery.setLogs(logs);
                     if (total_weight > delivery_truck.getMaxAllowedWeight()) {
                         System.out.println("Error : the truck's weight exceeds its allowed weight");
@@ -629,7 +629,7 @@ public class CreateActions {
 
     }
 
- */
+
 
     private static boolean rearrangeDelivery(Delivery delivery, Shift shift) {
         System.out.println("1) Change truck and driver");

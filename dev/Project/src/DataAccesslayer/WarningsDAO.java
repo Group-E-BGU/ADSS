@@ -56,14 +56,18 @@ public class WarningsDAO {
     public void delete(String userType) {
         String sql;
 
-        sql = userType.equals("Master") ? "DELETE * FROM Warnings" :
-                "DELETE FROM Warnings WHERE workerType = " + userType;
+         sql = userType.equals("Master") ? "DELETE FROM Warnings" :
+                "DELETE FROM Warnings WHERE workerType = ?";
+
 
         try (Connection conn = DAL.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            if(!userType.equals("Master"))
+                pstmt.setString(1, userType);
             pstmt.executeUpdate();
-        } catch (SQLException ignored) {
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
