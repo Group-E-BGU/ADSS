@@ -1339,7 +1339,7 @@ public class Main {
                 for (Map.Entry<String,Integer> productS:doc.getDeliveryGoods().entrySet()) {
                     ItemRecord ir = Store.getInstance().getItemRecordFromDelivery(productS.getKey());//get Item record
                     if (ir != null) {
-                        System.out.println("Add all " + ir.getName() + "'s to inventory? Y/N");
+                        System.out.println("Add all " + ir.getName() + " to inventory? Y/N");
                         boolean choice = getConfirmation();
                         if (choice) {
                             System.out.println("Enter expiration date in the following format(dd/MM/yyyy)");

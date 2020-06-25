@@ -60,6 +60,7 @@ public class ItemRecord {
             items.addFirst(new Item(Iid,expDate));
             mapperItemRecord.InsertItem(id,Iid,expDate);
             totalAmount++;
+            storageAmount++;
         }
         if(totalAmount < minAmount){
             Store store = Store.getInstance();
