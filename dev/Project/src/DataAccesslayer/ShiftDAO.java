@@ -23,6 +23,7 @@ public class ShiftDAO {
         Worker boss;
         Shift.ShiftTime shift_time;
         Map<WorkPolicy.WorkingType, List<Integer>> work_team;
+        int shiftId;
 
         String sql = "SELECT * FROM Shifts WHERE id = ?";
 
@@ -112,6 +113,7 @@ public class ShiftDAO {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+        int shiftId;
 
         int bossId = shift.getBoss().getId();
         String shift_time = shift.getShiftTime() == Shift.ShiftTime.Morning ? "Morning" : "Evening";
@@ -130,6 +132,22 @@ public class ShiftDAO {
         } catch (SQLException ignored)
         {
         }
+
+        sql = "SELECT MAX(id) AS LAST FROM Shifts";
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                shiftId =  rs.getInt("LAST");
+                shift.setShiftID(shiftId);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.toString());
+        }
+
     }
 
 

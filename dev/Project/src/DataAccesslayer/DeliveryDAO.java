@@ -190,6 +190,7 @@ public class DeliveryDAO {
             System.out.println(e.toString());
         }
 
+        delivery.setDeliveryId(deliveryID);
         return deliveryID;
     }
 
