@@ -303,21 +303,7 @@ public class Printer {
 
         String tableString = objectToTableString(headersList, rowsList, 10);
         System.out.println(tableString);
-    /*
-        Map<String, Truck> trucks_map = blService.getAllTrucks();
 
-        String trucks = "";
-
-        for (Truck t : trucks_map.values()) {
-            trucks += "Truck serial number : " + t.getSerialNumber() + "\n" +
-                    "Model : " + t.getModel() + "\n" +
-                    "Weight : " + t.getWeight() + "\n" +
-                    "Max allowed weight : " + t.getMaxAllowedWeight() + "\n\n";
-        }
-
-        System.out.println(trucks);
-
-     */
     }
 
 
@@ -366,44 +352,82 @@ public class Printer {
 
     public static void printDeliveriesView() {
 
-        String deliveries_string = "";
-        for (Delivery delivery : blService.getAllDeliveries().values()) {
-            deliveries_string = deliveries_string + delivery.toString() + '\n';
-        }
-        if (deliveries_string.equals("")) {
-            System.out.println(deliveries_string);
 
+        if (blService.getAllDeliveries().isEmpty()) {
+            System.out.println("no deliveries in the dataBase!!!!!");
         } else {
-            deliveries_string = deliveries_string.substring(0, deliveries_string.length() - 1);
-            System.out.println(deliveries_string + '\n');
+
+            for (Delivery delivery : blService.getAllDeliveries().values()) {
+                printDelivery(delivery.getDeliveryID());
+            }
+
+            System.out.println("1) Arrange a delivery");
+            System.out.println("2) select a delivery");
+            System.out.println("3) Return\n");
+
         }
-
-
-        System.out.println("1) Arrange a delivery");
-        System.out.println("2) select a delivery");
-        System.out.println("3) Return\n");
-
     }
 
     public static void PrintDeliveryView(int delivery_id) {
+
+
         Delivery delivery = blService.getDelivery(delivery_id);
         if (delivery == null) {
             System.out.println("Error : no delivery with such id");
             return;
         }
 
-        System.out.println("Delivery id : " + delivery.getDeliveryID());
-        System.out.println("Date : " + new SimpleDateFormat("dd/MM/yyyy").format(delivery.getDate()) + " " + delivery.getShiftTime().toString());
-        System.out.println("Source : " + delivery.getSource());
-        System.out.println("Destinations : " + delivery.getDocuments().keySet().toString());
-        System.out.println("Truck weight : " + delivery.getTruckWeight());
-        System.out.println("Delivery logs : " + delivery.getLogs().toString() + "\n");
+        printDelivery(delivery_id);
 
 
         System.out.println("1) Print Documents");
         System.out.println("2) Return");
 
     }
+
+    private static void printDelivery(int delivery_id) {
+
+        Delivery delivery = blService.getDelivery(delivery_id);
+
+        Map<Integer, String> tables_info = new HashMap<>();
+        Map<Integer, List<String>> columns_names = new HashMap<>();
+        Map<Integer, List<List<String>>> rows_data = new HashMap<>();
+
+        int available_space = blService.getTruck(delivery.getTruckSerialNumber()).getMaxAllowedWeight() - delivery.getTruckWeight();
+
+        String table_name = "Delivery #" + delivery.getDeliveryID();
+        List<String> table_headers = Arrays.asList("DATE", "SOURCE", "AVAILABLE SPACE");
+        List<List<String>> table_rows = Arrays.asList(
+                Arrays.asList(new SimpleDateFormat("dd/MM/yyyy").format(delivery.getDate()) + "  " + delivery.getShiftTime(), delivery.getSource(), String.valueOf(available_space))
+        );
+
+        tables_info.put(0, table_name);
+        columns_names.put(0, table_headers);
+        rows_data.put(0, table_rows);
+
+
+        String destinations_table_name = "DESTINATIONS";
+        List<String> delivery_headers = Arrays.asList("ADDRESS", "CONTACT NAME", "PHONE NUMBER");
+        List<List<String>> delivery_rows = new LinkedList<>();
+
+
+        for (String destination : delivery.getDestinations()) {
+
+            Address des = blService.getAddress(destination);
+            delivery_rows.add(Arrays.asList(destination, des.getContactName(), des.getPhoneNumber()));
+        }
+
+
+        tables_info.put(1, destinations_table_name);
+        columns_names.put(1, delivery_headers);
+        rows_data.put(1, delivery_rows);
+
+
+        System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
+
+
+    }
+
 
     public static void border() {
         System.out.println("--------------------------------");
@@ -412,17 +436,42 @@ public class Printer {
     public static void printDocuments(int delivery_id) {
 
         for (Document document : blService.getDelivery(delivery_id).getDocuments().values()) {
+            Map<Integer, String> tables_info = new HashMap<>();
+            Map<Integer, List<String>> columns_names = new HashMap<>();
+            Map<Integer, List<List<String>>> rows_data = new HashMap<>();
 
-            System.out.println("document id : " + document.getDocumentID());
-            System.out.println("Trade goods : \n");
-            for (Map.Entry<String, Integer> entry : document.getDeliveryGoods().entrySet()) {
-                System.out.println("Product name : " + blService.getProduct(entry.getKey()).getName() + "     , amount : " + entry.getValue() + '\n');
+            Delivery delivery = blService.getDelivery(delivery_id);
+            int weight = blService.getDocProductsWeight(document.getDeliveryGoods());
+            String table_name = "Document #" + document.getDocumentID();
+            List<String> table_headers = Arrays.asList("SOURCE", "DESTINATION", "PRODUCTS WEIGHT");
+            List<List<String>> table_rows = Arrays.asList(
+                    Arrays.asList(delivery.getSource(), document.getDestination(), String.valueOf(weight))
+            );
+
+            tables_info.put(0, table_name);
+            columns_names.put(0, table_headers);
+            rows_data.put(0, table_rows);
+
+
+            String products_title = "PRODUCTS";
+            List<String> products_headers = Arrays.asList("NAME", "AMOUNT", "TOTAL WEIGHT");
+            List<List<String>> products_rows = new LinkedList<>();
+
+            for (Map.Entry<String, Integer> product_entry : document.getDeliveryGoods().entrySet()) {
+                Product product = blService.getProduct(product_entry.getKey());
+                String product_total_weight = String.valueOf(product_entry.getValue() * product.getWeight());
+                products_rows.add(Arrays.asList(product.getName(), String.valueOf(product_entry.getValue()), product_total_weight));
             }
 
-            System.out.println("\n");
+            if (products_rows.isEmpty()) {
+                products_rows.add(Arrays.asList("", ""));
+            }
+            tables_info.put(1, products_title);
+            columns_names.put(1, products_headers);
+            rows_data.put(1, products_rows);
 
+            System.out.println(objectToComplexTableString(tables_info, columns_names, rows_data));
         }
-
 
     }
 
@@ -445,19 +494,6 @@ public class Printer {
             System.out.println(tableString);
         }
 
-    /*    String addresses = "";
-        for (String location : available_addresses) {
-            Address a = blService.getPayments(location);
-
-            addresses += "Location : " + a.getLocation() + "\n" +
-                    "Contact Name : " + a.getContactName() + "\n" +
-                    "Phone Number : " + a.getPhoneNumber() + "\n\n";
-
-        }
-
-        System.out.println(addresses);
-
-     */
     }
 
 
@@ -521,7 +557,8 @@ public class Printer {
 
     // Table printing functions
 
-    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data, int additional_space) {
+    private static String objectToTableString(List<String> columns_names, List<List<String>> rows_data,
+                                              int additional_space) {
 
 
         if (rows_data == null || columns_names == null || rows_data.isEmpty() || rows_data.get(0).size() != columns_names.size())
@@ -678,7 +715,8 @@ public class Printer {
 
     }
 
-    private static String objectToComplexTableString(Map<Integer, String> tables_info, Map<Integer, List<String>> columns_names, Map<Integer, List<List<String>>> rows_data) {
+    private static String objectToComplexTableString
+            (Map<Integer, String> tables_info, Map<Integer, List<String>> columns_names, Map<Integer, List<List<String>>> rows_data) {
 
 // tables_info <tableNumber,tableName>
 // columns_names <tableNumber , tableColumnsNames>
@@ -835,4 +873,15 @@ public class Printer {
 
     }
 
+    public static void printWarnings(UserType userType) {
+
+        List<String> user_warnings = blService.getWarnings(userType);
+
+        if (!user_warnings.isEmpty()) {
+            for (String warning_string : user_warnings) {
+                System.out.println(warning_string);
+            }
+        }
+
+    }
 }

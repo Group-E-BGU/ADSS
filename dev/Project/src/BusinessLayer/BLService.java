@@ -20,6 +20,7 @@ public class BLService {
     static int MAX_B_WEIGHT = 1000;
     private final History history;
     private final Workers workers;
+    private Map<User.UserType,List<String>> warnings;
     private final Data data;
     private final DAL dal;
     private final system systemcontroler;
@@ -30,6 +31,7 @@ public class BLService {
         history = History.getInstance();
         workers = Workers.getInstance();
         data = Data.getInstance();
+        warnings = new HashMap<>();
         dal = new DAL();
         logged_user = null;
         current_Store = null;
@@ -405,6 +407,13 @@ public class BLService {
         }
 
         data.setDeliveries(deliveryMap);
+
+
+        for(User.UserType userType : User.UserType.values())
+        {
+            List<String> type_warnings = new WarningsDAO().get(userType.toString());
+            warnings.put(userType,type_warnings);
+        }
 
         /*
         for (Shift shift : getAllShifts().values()) {
@@ -1193,5 +1202,17 @@ public class BLService {
 
         new DeliveryDAO().delete(delivery_id);
 
+    }
+
+    public List<String> getWarnings(User.UserType userType)
+    {
+        if(userType.equals(User.UserType.Master))
+        {
+            List<String> master_warnings = new LinkedList<>();
+            for(Map.Entry<User.UserType,List<String>> entry : warnings.entrySet())
+                master_warnings.addAll(entry.getValue());
+            return master_warnings;
+        }
+        return warnings.get(userType);
     }
 }

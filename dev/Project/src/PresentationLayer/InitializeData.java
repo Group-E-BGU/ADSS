@@ -148,21 +148,30 @@ public class InitializeData {
     public void testArrange()
     {
 
+
         // weights -> 1(2)   -> 2(5)   -> 3(6)
 
         // test1
         int i=0;
         BLService blService = BLService.getInstance();
-
+/*
         Map<String,Integer> delivery_products = new HashMap<>();
         delivery_products.put("3",3);
         int id = blService.arrangeDelivery(i,stringToDate("26/12/2020"),"haifa","beerSheva",delivery_products);
 
-        System.out.println(blService.getDelivery(id).toString());
+
+ */
+        i++;
+        Map<String,Integer> delivery_products2 = new HashMap<>();
+        delivery_products2.put("1",10);
+        delivery_products2.put("2",10);
+        int id2 = blService.arrangeDelivery(i,stringToDate("26/12/2020"),"haifa","beerSheva",delivery_products2);
 
 
-
-
+        if(blService.getAllDeliveries().size()>0)
+        {
+            blService.cancelOrderFromDelivery(0,1);
+        }
 
 
     }
