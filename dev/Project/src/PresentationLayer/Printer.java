@@ -361,11 +361,11 @@ public class Printer {
                 printDelivery(delivery.getDeliveryID());
             }
 
-            System.out.println("1) Arrange a delivery");
-            System.out.println("2) select a delivery");
-            System.out.println("3) Return\n");
-
         }
+
+        System.out.println("1) Arrange a delivery");
+        System.out.println("2) select a delivery");
+        System.out.println("3) Return\n");
     }
 
     public static void PrintDeliveryView(int delivery_id) {
