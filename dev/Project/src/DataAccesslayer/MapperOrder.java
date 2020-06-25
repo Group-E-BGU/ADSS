@@ -459,14 +459,14 @@ public class MapperOrder {
         return -1;
     }
 
-    public int GetDeliveryId(String StoreId,int OId){
+    public int GetDeliveryId(String StoreId,int OId,int day){
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
                     "FROM DayForOrders " +
-                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+                    " WHERE OID = '"+OId+ "' AND day = '"+day+"' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
@@ -486,20 +486,21 @@ public class MapperOrder {
         return -1;
     }
 
-    public void UpdateDeliveryID(String StoreId,int OId, int DeliveryId){
+    public void UpdateDeliveryID(String StoreId,int OId, int DeliveryId,int day){
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
+
             String sqlstmt = "UPDATE DayForOrders SET " +
-                    " DeliveryNumber = '"+DeliveryId+"'," +
-                    "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
+                    " DeliveryNumber = '"+DeliveryId+"'" +
+                    " WHERE OID = '"+OId+ "' AND day = '"+day+"' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
             stmt.execute(sqlstmt);
 
         } catch (Exception e) {
-             System.out.println(e.getMessage());
+             System.out.println("where syntax");
         }
         finally{
             try {

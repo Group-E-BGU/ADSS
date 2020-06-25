@@ -638,7 +638,6 @@ public class CreateActions {
 
         int choice = getChoice(1, 2);
         if (choice == 2) {
-            Delivery.counter--;
             return false;
         }
 

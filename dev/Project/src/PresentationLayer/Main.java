@@ -28,6 +28,8 @@ public class Main {
     //    init_data.createShifts();
         init_data.createMenus();
         blService.loadFromDataBase();
+        if(blService.getAllShifts().size()==0)
+            init_data.createShifts();
      //   init_data.testArrange();
 
 
@@ -1353,6 +1355,7 @@ public class Main {
 
                 }
                 blService.abortDelivery(d.getDeliveryID());
+                blService.getAllDeliveries().remove(d.getDeliveryID());
             }
         }
 

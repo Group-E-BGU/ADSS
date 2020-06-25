@@ -1097,15 +1097,15 @@ public class BLService {
         for (int order : ooo
         ) {
             Order o = current_Store.getMapOrder().GetOrder(order, current_Store.getAddress());
-            int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation());
+            int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), o.getID_Invitation(),d);
             if (!o.isAuto() && DeliveryId == -1) {
-                DoDelivery(o);
+                DoDelivery(o,d);
             }
         }
         return "done";
     }
 
-    public void DoDelivery(Order o) {
+    public void DoDelivery(Order o, int day) {
         Supplier s = current_Store.getMapSupplier().GetSupplier(o.getID_Vendor(), current_Store.getAddress());
         Contract c = current_Store.getMapContract().getContract(s.getID(), current_Store.getAddress());
         if (!c.isLeading()) {
@@ -1121,7 +1121,7 @@ public class BLService {
                 Date d = sdf.parse(now_string);
                 int DeliveryId = arrangeDelivery(o.getID_Invitation(),d, s.getPayments(), current_Store.getAddress(), Products);
                 if (DeliveryId != -1) {
-                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
+                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId, day);
                 }
                 else
                 {
@@ -1140,6 +1140,7 @@ public class BLService {
 
 
     public String RestartDeliveryIdAttheendoftheDay() {  //todo check!!
+        int day = LocalDate.now().getDayOfWeek().getValue() + 1;//todo check!
         List<Delivery> Deliverys = new LinkedList<>(getAllDeliveries().values());//getAll();
         for (Delivery d : Deliverys
         ) {
@@ -1152,7 +1153,7 @@ public class BLService {
 
                 if (d_date.equals(now)) {
                     int OrderId = current_Store.getMapOrder().GetOrderId(current_Store.getAddress(), d.getDeliveryID());
-                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), OrderId, -1);
+                    current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), OrderId, -1,day);
                 }
             } catch (ParseException pe) {
                 pe.printStackTrace();
@@ -1187,9 +1188,13 @@ public class BLService {
     }
 
     public String CancelOrder(int OrderId) {
-        int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId);
-        current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(), OrderId);
-        cancelOrderFromDelivery(OrderId,DeliveryId);
+        for (int d: current_Store.getMapOrder().GetOrder(OrderId,current_Store.getAddress()).getDay())
+         {
+            int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId,d);
+            cancelOrderFromDelivery(OrderId,DeliveryId);
+        }
+          current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(), OrderId);
+
         return "Done";
     }
 

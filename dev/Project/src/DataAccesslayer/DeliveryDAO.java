@@ -49,7 +49,7 @@ public class DeliveryDAO {
                 shiftTime = rs.getInt("shiftTime") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
 
                 delivery = new Delivery(date, shiftTime, source, truckSerialNumber,driverID,truckWeight);
-                delivery.setDeliveryId(id);
+            //    delivery.setDeliveryId(id);
 
                 delivery.setDocuments(documents);
                 delivery.setLogs(logs);
@@ -120,7 +120,7 @@ public class DeliveryDAO {
                 shiftTime = rs.getInt("shiftTime") == 0 ? Shift.ShiftTime.Morning : Shift.ShiftTime.Evening;
 
                 delivery = new Delivery(date, shiftTime, source, truckSerialNumber,driverID,truckWeight);
-                delivery.setDeliveryId(deliveryId);
+            //    delivery.setDeliveryId(deliveryId);
                 delivery.setDocuments(documents);
                 delivery.setLogs(logs);
 
@@ -190,7 +190,7 @@ public class DeliveryDAO {
             System.out.println(e.toString());
         }
 
-        delivery.setDeliveryId(deliveryID);
+    //    delivery.setDeliveryId(deliveryID);
         return deliveryID;
     }
 
