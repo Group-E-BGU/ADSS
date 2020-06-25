@@ -58,19 +58,26 @@ public class InitializeData {
     }
 
     public void createShifts() {
-        History history = History.getInstance();
+        BLService blService = BLService.getInstance();
+        Date date = new Date();
         SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            Address a = new Address("Haifa","Shadi","0507483947");
-            Address b = new Address("Tel Aviv","Eran","0547322165");
-            Data.getInstance().getAddresses().put(a.getLocation(),a);
-            Data.getInstance().getAddresses().put(b.getLocation(),b);
-            Shift sundayMorning_shift = new Shift(a,date_format.parse("13/04/2020"), Shift.ShiftTime.Morning, BLService.getInstance().getWorker(111111111), new HashMap<>());
-            Shift mondayEvening_shift = new Shift(b,date_format.parse("14/04/2020"), Shift.ShiftTime.Evening, BLService.getInstance().getWorker(222222222), new HashMap<>());
-            history.getShifts().put(sundayMorning_shift.getShiftId(),sundayMorning_shift);
-            history.getShifts().put(mondayEvening_shift.getShiftId(),mondayEvening_shift);
-            Workers.getInstance().getAllWorkers().get(111111111).getWorker_shifts().add(sundayMorning_shift.getShiftId());
-            Workers.getInstance().getAllWorkers().get(222222222).getWorker_shifts().add(mondayEvening_shift.getShiftId());
+            Address haifa = blService.getAddress("haifa");
+            Address akko = blService.getAddress("akko");
+            Address beerSheva = blService.getAddress("beerSheva");
+            Address karmiel = blService.getAddress("karmiel");
+            Address hulon = blService.getAddress("Hulon");
+            Address yafo = blService.getAddress("Yafo");
+
+            String now_string = date_format.format(date);
+
+            date = date_format.parse(now_string);
+
+            Date one_week = addWeek(date);
+
+
+
+
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
@@ -199,6 +206,15 @@ public class InitializeData {
         return date;
     }
 
+    public Date addWeek(Date curr_date)
+    {
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(curr_date);
+        cal.add(Calendar.DAY_OF_WEEK, 7);
+        return  cal.getTime();
+
+    }
 
 
 }
