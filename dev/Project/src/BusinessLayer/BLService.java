@@ -18,7 +18,7 @@ public class BLService {
 
     private static BLService blService_instance = null;
 
-    static int MAX_B_WEIGHT = 1000;
+    static int MAX_B_WEIGHT = 4500;
     private final History history;
     private final Workers workers;
     private Map<User.UserType,List<String>> warnings;
