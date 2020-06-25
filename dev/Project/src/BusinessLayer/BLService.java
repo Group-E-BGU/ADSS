@@ -1153,6 +1153,29 @@ public class BLService {
         return "Done";
     }
 
+    public List<Delivery> getDeliveriesOfToday() {
+        List<Delivery> Deliverys = new LinkedList<>(getAllDeliveries().values());//getAll();
+        List<Delivery> todaysDeliveries = new LinkedList<>();
+        for (Delivery d : Deliverys
+        ) {
+            SimpleDateFormat dtf = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                String d_string = dtf.format(d.getDate());
+                Date d_date = dtf.parse(d_string);
+                String today_string = dtf.format(new Date());
+                Date now = dtf.parse(today_string);
+
+                if (d_date.equals(now)) {
+                    todaysDeliveries.add(d);
+                }
+            } catch (ParseException pe) {
+                pe.printStackTrace();
+            }
+
+        }
+        return todaysDeliveries;
+    }
+
     public String CancelOrder(int OrderId) {
         int DeliveryId = current_Store.getMapOrder().GetDeliveryId(current_Store.getAddress(), OrderId);
         current_Store.getMapOrder().DeleteOrder(current_Store.getAddress(), OrderId);

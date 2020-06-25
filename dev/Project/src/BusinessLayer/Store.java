@@ -1,5 +1,6 @@
 package BusinessLayer;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -632,6 +633,15 @@ public class Store {
                 return "No such item in inventory";
         }
         return  ir.getAmounts();
+    }
+
+    public ItemRecord getItemRecordFromDelivery(String id) {
+        try {
+            int IRid = Integer.parseInt(id);
+            return mapperItemRecord.getItemRecordById(IRid);
+        } catch (Exception e) {
+            return null;
+        }
     }
     @SuppressWarnings("deprecation")
 

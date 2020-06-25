@@ -7,6 +7,9 @@ import BusinessLayer.*;
 import BusinessLayer.InterfaceContract;
 import BusinessLayer.InterfaceOrder;
 import BusinessLayer.InterfaceSupplier;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -264,6 +267,8 @@ public class Main {
                     DeleteOrder();
                     break;
                 case 29:
+                    deliveriesArrival();
+                case 30:
                     Logout();
                     terminate = true;
                     break;
@@ -1325,22 +1330,29 @@ public class Main {
         System.out.println("The Total Price of the order is: "+o.TotalPrice);
     }
 
-    private static void GetOrderDetails() {
-        System.out.println("Orders that are scheduled to arrive today:");
-        LinkedList<InterfaceOrder> Orders=blService.GetOrderDetails();
-        for (InterfaceOrder o:Orders
-        ) {
-            System.out.println("Order ID is: " + o.ID_Inventation);
-            System.out.println("Supplier ID is: " + o.ID_Vendor);
-            System.out.println("The product that include in the Order is: ");
-            for (Map.Entry<Integer, Integer> I : o.ItemsID_ItemsIDVendor.entrySet()
-            ) {
-                System.out.print(I.getValue());
-                System.out.println(o.ItemsID_NumberOfItems.get(I.getKey()));
+    private static void deliveriesArrival() {
+        System.out.println("Products that are scheduled to arrive today:");
+        List<Delivery> deliveries=blService.getDeliveriesOfToday();
+        for (Delivery d:deliveries) {
+            for (Document doc:d.getDocuments().values()) {
+                for (Map.Entry<String,Integer> productS:doc.getDeliveryGoods().entrySet()) {
+                    ItemRecord ir = Store.getInstance().getItemRecordFromDelivery(productS.getKey());//get Item record
+                    if (ir != null) {
+                        System.out.println("Add all " + ir.getName() + "'s to inventory? Y/N");
+                        boolean choice = getConfirmation();
+                        if (choice) {
+                            System.out.println("Enter expiration date in the following format(dd/MM/yyyy)");
+                            String edate = keyboard.nextLine();
+                            java.sql.Date expdate = new java.sql.Date(Integer.parseInt(edate.substring(6))-1900,Integer.parseInt(edate.substring(3,5))-1,Integer.parseInt(edate.substring(0,2)));
+                            ir.setTotalAmount(productS.getValue(), expdate);
+
+                        }
+                    }
+
+                }
+                blService.abortDelivery(d.getDeliveryID());
             }
         }
-        System.out.println("\nIf an order arrives at the store,\n" +
-                " select the \"Change item amount\" in the menu and fill the Product that arraived to the store\n");
 
     }
 
