@@ -1,6 +1,7 @@
 package DataAccesslayer;
 
 import BusinessLayer.Address;
+import BusinessLayer.StockKeeper;
 import sun.awt.image.ImageWatched;
 
 import java.sql.Connection;
@@ -50,5 +51,19 @@ public class WarningsDAO {
         }
 
         return warnings;
+    }
+
+    public void delete(String userType) {
+        String sql;
+
+        sql = userType.equals("Master") ? "DELETE * FROM Warnings" :
+                "DELETE FROM Warnings WHERE workerType = " + userType;
+
+        try (Connection conn = DAL.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.executeUpdate();
+        } catch (SQLException ignored) {
+        }
     }
 }
