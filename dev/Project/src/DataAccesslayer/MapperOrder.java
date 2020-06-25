@@ -22,7 +22,7 @@ public class MapperOrder {
                 Class.forName("org.sqlite.JDBC");
                 conn = DriverManager.getConnection("jdbc:sqlite:SuperLee.db");
 
-                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?,?)";
+                String sqlstmt = "INSERT INTO Orders  VALUES (?,?,?,?,?,?,?,?)";
 
                 PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
@@ -34,7 +34,7 @@ public class MapperOrder {
                 stmt.setDouble(6, TotalPrice);
                 stmt.setString(7, status);
                 stmt.setString(8, storeId);
-                stmt.setInt(9, -1);
+
 
                 stmt.executeUpdate();
 
@@ -58,13 +58,14 @@ public class MapperOrder {
                 Class.forName("org.sqlite.JDBC");
                 conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-                String sqlstmt = "INSERT INTO DayForOrders  VALUES (?,?,?)";
+                String sqlstmt = "INSERT INTO DayForOrders  VALUES (?,?,?,?)";
 
                 PreparedStatement stmt = conn.prepareStatement(sqlstmt);
 
                 stmt.setInt(1,IdOrder);
                 stmt.setInt(2, day);
                 stmt.setString(3, storeId);
+                stmt.setInt(4, -1);
                 stmt.executeUpdate();
 
             } catch (Exception e) {
@@ -437,7 +438,7 @@ public class MapperOrder {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
-                    "FROM Orders " +
+                    "FROM DayForOrders " +
                     "WHERE DeliveryNumber = '"+DeliveryId+ "' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
@@ -464,13 +465,13 @@ public class MapperOrder {
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
             String sqlstmt = "SELECT * " +
-                    "FROM Orders " +
+                    "FROM DayForOrders " +
                     "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlstmt);
             if(rs.next())
-                return rs.getInt(9);
+                return rs.getInt(4);
         } catch (Exception e) {
         }
         finally{
@@ -490,7 +491,7 @@ public class MapperOrder {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:superLee.db");
 
-            String sqlstmt = "UPDATE Orders SET " +
+            String sqlstmt = "UPDATE DayForOrders SET " +
                     " DeliveryNumber = '"+DeliveryId+"'," +
                     "WHERE OID = '"+OId+ "' AND StoreId = '"+StoreId+"';";
 

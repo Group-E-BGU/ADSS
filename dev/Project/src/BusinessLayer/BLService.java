@@ -913,11 +913,13 @@ public class BLService {
             }
 
         }
-
+/*
         if (!done)
             System.out.println("couldn't arrange a delivery");
         else
             System.out.println("delivery arranged/update , deliveryID = " + arranged_delivery_id);
+
+ */
 
         return arranged_delivery_id;
 
@@ -1120,6 +1122,12 @@ public class BLService {
                 if (DeliveryId != -1) {
                     current_Store.getMapOrder().UpdateDeliveryID(current_Store.getAddress(), o.getID_Invitation(), DeliveryId);
                 }
+                else
+                {
+                    String warning = "WARNING : order  with id : "+o.getID_Invitation()+" couldn't be completed!";
+                    new WarningsDAO().save(warning, User.UserType.WorkersManager.toString());
+                    addWarning(warning, User.UserType.WorkersManager);
+                }
             }
             catch (ParseException pe)
             {
@@ -1162,7 +1170,8 @@ public class BLService {
             try {
                 String d_string = dtf.format(d.getDate());
                 Date d_date = dtf.parse(d_string);
-                String today_string = "26/12/2020";
+        //        String today_string = "26/12/2020";
+                String today_string = dtf.format(new Date());
                 Date now = dtf.parse(today_string);
 
                 if (d_date.equals(now)) {
@@ -1237,5 +1246,21 @@ public class BLService {
             return master_warnings;
         }
         return warnings.get(userType);
+    }
+
+    public void addWarning(String warning, User.UserType userType)
+    {
+        if(!warnings.containsKey(userType))
+            warnings.put(userType,new LinkedList<>());
+        warnings.get(userType).add(warning);
+    }
+
+     public Order getOrderDey(int i, String haifa) {
+      return current_Store.getMapOrder().GetOrder(i,haifa);
+    }
+
+    public void clearWarnings(User.UserType userType)
+    {
+        warnings.remove(userType);
     }
 }

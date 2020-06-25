@@ -177,6 +177,12 @@ public class InitializeData {
 
     }
 
+    public void warningsTest()
+    {
+        BLService blService = BLService.getInstance();
+        blService.DoDelivery(blService.getOrderDey(2,"haifa"));
+    }
+
     public Date stringToDate(String d)
     {
         Date date = new Date();

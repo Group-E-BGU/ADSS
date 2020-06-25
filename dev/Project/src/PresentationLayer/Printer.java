@@ -878,9 +878,14 @@ public class Printer {
         List<String> user_warnings = blService.getWarnings(userType);
 
         if (!user_warnings.isEmpty()) {
+            System.out.println("-------------------------------------------- Warnings --------------------------------");
+            int i=1;
             for (String warning_string : user_warnings) {
-                System.out.println(warning_string);
+                System.out.println(i+") "+warning_string);
+                i++;
             }
+            blService.clearWarnings(userType);
+            System.out.println("--------------------------------------------------------------------------------------");
         }
 
     }
